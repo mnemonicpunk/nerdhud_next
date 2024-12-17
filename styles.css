@@ -1,0 +1,359 @@
+@import url('font/NunitoSans-Italic-VariableFont_YTLC\,opsz\,wdth\,wght.ttf');
+@import url('font/NunitoSans-VariableFont_YTLC\,opsz\,wdth\,wght.ttf');
+
+
+#nerd-hud-canvas {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+#nerd-hud-ui {
+  font-family: "Nunito Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 100;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100,
+    "YTLC" 500;
+  font-size: 150%;
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+@keyframes slideFadeIn {
+  0% {
+    transform: translateY(20px); /* Slide in from 20 pixels left */
+    opacity: 0;                   /* Start with the element invisible */
+  }
+  100% {
+    transform: translateY(0);     /* Slide to its original position */
+    opacity: 1;                   /* Fully visible */
+  }
+}
+
+@keyframes slideFadeOut {
+  0% {
+    transform: translateY(0);   /* Start from original position */
+    opacity: 1;                 /* Fully visible */
+  }
+  100% {
+    transform: translateY(20px); /* Slide out downwards by 20 pixels */
+    opacity: 0;                  /* Fade to invisible */
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+/* Add classes for showing and hiding */
+.slide-fade-in {
+  animation: slideFadeIn 0.15s ease-out forwards;
+}
+
+.slide-fade-out {
+  animation: slideFadeOut 0.15s ease-in forwards;
+}
+
+.nerd_hud_window {
+  padding: 10px;
+  border-radius: 10px;
+  background-color: rgba(64, 64, 160, 0.75);
+  color: #fff;
+  position: absolute;
+  font-size: 50%;
+
+  max-height: 60vh;
+}
+
+.nerd_hud_window_inner {
+  width: 100%;
+  max-height: calc(60vh - 20px);
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.nerd_hud_window_inner::-webkit-scrollbar-track
+{
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  background-color: rgba(41, 40, 119, 0.3)
+}
+
+.nerd_hud_window_inner::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+}
+
+.nerd_hud_window_inner::-webkit-scrollbar
+{
+  width: 12px;
+  background-color: rgba(41, 40, 119, 0.3)
+}
+
+.nerd_hud_window_inner::-webkit-scrollbar-thumb
+{
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  background-color: #30b2da;
+}
+
+.nerd_hud_window_inner ::-webkit-scrollbar-track
+{
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  background-color: rgba(41, 40, 119, 0.3)
+}
+
+.nerd_hud_window_inner ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+}
+
+.nerd_hud_window_inner ::-webkit-scrollbar
+{
+  width: 12px;
+  background-color: rgba(41, 40, 119, 0.3)
+}
+
+.nerd_hud_window_inner ::-webkit-scrollbar-thumb
+{
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  background-color: #30b2da;
+}
+
+.nerd_hud_window_inner progress[value] {
+  background-color: rgba(41, 40, 119, 0.3);
+  width: 100%;
+  height: 6px;
+}
+
+.nerd_hud_window_inner progress[value]::-webkit-progress-bar {
+  background-color: rgba(41, 40, 119, 0.3);
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+}
+
+.nerd_hud_window_inner progress[value]::-webkit-progress-value {
+  background-color: #2aaa75;
+  border-radius: 6px;
+}
+
+.nerd_hud_window_inner progress[value="100"]::-webkit-progress-value {
+  background-color: #30b2da;
+ }
+
+ .nerd_hud_window_inner:empty:before {
+  content: attr(data-placeholder);
+}
+
+.nerd_hud_docked_left {
+  bottom: 6px;
+  left: 0;
+  pointer-events: all;
+  box-shadow: 10px 5px 5px rgba(0, 0, 0, 0.3);
+}
+
+.nerd_hud_docked_right {
+  bottom: 6px;
+  right: 0;
+  pointer-events: all;
+  box-shadow: -10px 5px 5px rgba(0, 0, 0, 0.3);
+}
+
+.nerd_hud_panel_right {
+  background-color: rgba(64, 64, 160, 0.75); 
+  position: fixed; 
+  bottom: calc(100% + 11px);
+  padding: 11px;
+  border-radius: 11px; 
+  right: 0;
+  box-shadow: -10px 5px 5px rgba(0, 0, 0, 0.3);
+}
+
+.nerd_window_table td {
+  padding: 5px;
+}
+
+.hud_icon_small {
+  width: 16px;
+  height: 16px;
+}
+
+.hud_icon_medium {
+  width: 24px;
+  height: 24px;
+}
+
+.hud_icon_large {
+  width: 32px;
+  height: 32px;
+}
+
+.hud_list_heading {
+  padding: 10px;
+  text-align: center;
+  font-size: 150%;
+}
+
+#nerd_dock_left {
+  position: absolute;
+  height: 32px;
+  left: 20px;
+  bottom: 20px;
+}
+
+#nerd_dock_right {
+  position: absolute;
+  height: 32px;
+  right: 20px;
+  bottom: 20px;
+}
+
+#nerd_windows_left {
+  position: absolute;
+  left: 20px;
+  bottom: 68px;
+  white-space: nowrap;
+}
+
+#nerd_windows_right {
+  position: absolute;
+  right: 20px;
+  bottom: 68px;
+  white-space: nowrap;
+}
+
+.nerd_dock_icon {
+  width: 48px;
+  height: 48px;
+  pointer-events: all;
+}
+
+.hud_window_group {
+  padding: 6px;
+  background-color: rgba(28, 57, 80, 0.278);
+  border-radius: 11px;
+  margin-top: 11px;
+  margin-bottom: 11px;
+}
+
+.hud_window_group:hover {
+  background-color: rgba(47, 88, 177, 0.478)
+}
+
+.hud_window_group_header {
+  font-weight: bold;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  text-align: center;
+  padding: 6px;
+  border-bottom: 3px solid rgba(47, 173, 177, 0.778);
+}
+
+.hud_window_group_entry {
+  margin-left: 5px;
+}
+
+.hud_data_table {
+  padding: 6px;
+  background-color: rgba(28, 57, 80, 0.278);
+  border-radius: 11px;
+}
+
+.hud_data_table td {
+  padding: 6px;
+}
+
+.hud_data_table tr:nth-child(odd) {
+  background-color: rgba(47, 102, 148, 0.278);
+}
+
+.hud_stat_pane {
+  background-color: rgba(28, 57, 80, 0.278);
+  border-radius: 11px;
+  margin-bottom: 11px;
+}
+
+.hud_stat_header {
+  font-weight: bold;
+  padding: 6px;
+  text-align: center;
+}
+
+.hud_stat_display {
+  text-align: center;
+}
+
+.hud_stat_entry {
+  display: inline-block;
+  padding: 6px;
+}
+
+.hud_search_option {
+  padding: 6px;
+  background-color: rgba(28, 57, 80, 0.278);
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.nerd_hud_window input {
+  padding: 11px;
+  background-color: rgba(47, 88, 177, 0.478);
+  border-radius: 11px;
+  outline: none;
+  color: #fff;
+  font-size: 150%;
+  border: 1px solid rgba(47, 173, 177, 0.778);
+  width: 100%;
+}
+
+.hud_interactive_list {
+  margin-right: 11px;
+}
+
+.hud_interactive_list_item {
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+}
+
+.hud_interactive_list_item:hover {
+  background-color: rgba(47, 88, 177, 0.678);
+}
+
+.hud_details_card {
+  background-color: rgba(240,230,140, 0.423);
+  border-radius: 11px;
+  padding: 11px;
+  text-align: center;
+  font-style: italic;
+}
+
+.hud_button {
+  padding: 11px;
+  border-radius: 11px;
+  text-align: center;
+
+  background-color: rgba(82, 125, 218, 0.623);
+
+  margin-bottom: 6px;
+  margin-top: 6px;
+}
+
+.hud_button:hover {
+  background-color: rgba(82, 125, 218, 0.815);
+}

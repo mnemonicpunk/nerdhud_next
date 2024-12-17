@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "NERD HUD Next",
+  "version": "0.0.1",
+  "description": "Next generation Nerd HUD for Pixels",
+  "permissions": [
+    "storage", 
+    "tabs",
+    "notifications",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "*://play.pixels.xyz/*",
+    "*://nerdguild.xyz/*",
+    "*://pixelnerds.xyz/*",
+    "*://github.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://play.pixels.xyz/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_start"
+    }
+  ],
+  "icons": {
+    "32": "favicon-32x32.webp"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["install.json", "loader.js", "nerdhudnext_logo.png", "apps/*", "lib/libPixels.js", "img/*", "font/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

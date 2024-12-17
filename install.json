@@ -1,0 +1,19 @@
+{
+    "libPixels": {
+        "url": "builtin:/lib/libPixels.js",
+        "version": "0.1.10"
+    },
+    "apps": [
+        "builtin:apps/inventory.js",
+        "builtin:apps/market.js",
+        "builtin:apps/debug.js",
+        "builtin:apps/taskboard.js",
+        "builtin:apps/stats.js",
+        "builtin:apps/iteminfo.js",
+        "builtin:apps/shoppinglist.js",
+        "builtin:apps/storage.js",
+        "builtin:apps/timer.js",
+        "builtin:apps/report.js",
+        "builtin:apps/nerdmenu.js"
+    ]
+}
