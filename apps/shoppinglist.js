@@ -202,6 +202,21 @@ export default class ShoppingListApp extends NerdHudApp {
                 if (!el) {
                     el = document.createElement('tr');
                     el.dataset.item = itemId;
+
+                    el.addEventListener('click', () => {
+                        let market_entry = document.getElementsByClassName('Marketplace_filter__3ynr2');
+                        if (market_entry[0]) {
+                            const element = market_entry[0];
+                            const text = this.sys.getItemName(itemId);
+
+                            // Set the value programmatically
+                            Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(element, text);
+
+                            // Create and dispatch an input event to simulate React's onChange handling
+                            const inputEvent = new Event('input', { bubbles: true });
+                            element.dispatchEvent(inputEvent);
+                        }
+                    })
                     
                     let desc = document.createElement('td');
                     let cost = document.createElement('td');

@@ -71,7 +71,29 @@ export default class TimerApp extends NerdHudApp {
             ctx.fillStyle = "#88d";
             ctx.globalAlpha = 0.5;
             ctx.fillRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
+        }
 
+        if (this.timers[entity.mid]) {
+            let t = this.timers[entity.mid];
+            let time = this.sys.formatRelativeTime(t.finish_time);
+            
+            ctx.globalAlpha = 1;
+
+            let dim = ctx.measureText(time);
+
+            let x = bounds.x;
+            let y = bounds.y+bounds.height/2;
+            if (entity.entity.includes("crops")) {
+                y = bounds.y;
+            }
+
+            ctx.fillStyle = "#000";
+            ctx.fillText(time, x - dim.width/2 - 1, y);
+            ctx.fillText(time, x - dim.width/2 + 1, y);
+            ctx.fillText(time, x - dim.width/2, y - 1);
+            ctx.fillText(time, x - dim.width/2, y + 1);
+            ctx.fillStyle = "#fff";
+            ctx.fillText(time, x - dim.width/2, y);
         }
     }
     updateTimers() {
