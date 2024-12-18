@@ -1,5 +1,4 @@
 window.addEventListener('message', (msg) => {
-    console.log("MESSAGE RECEIVED: ", msg);
     if (msg.data && msg.data.type === "load_libPixels") {
         const scriptElement = document.createElement('script');
         scriptElement.textContent = msg.data.libPixels;

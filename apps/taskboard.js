@@ -65,7 +65,7 @@ export default class TaskboardApp extends NerdHudApp {
     onCreate() {
         this.window = this.sys.createWindow({ 
             docked: "left",
-            icon: chrome.runtime.getURL("img/nhud_icon_task.png"),
+            icon: "builtin:img/nhud_icon_task.png",
             name: "taskboard",
             title: "Taskboard"
         });

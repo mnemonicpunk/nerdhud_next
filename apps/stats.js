@@ -40,7 +40,7 @@ export default class StatsApp extends NerdHudApp {
     onCreate() {
         this.window = this.sys.createWindow({ 
             docked: "left",
-            icon: chrome.runtime.getURL("img/nhud_icon_coin.png"),
+            icon: "builtin:img/nhud_icon_coin.png",
             name: "stats",
             title: "Stats"
         });
@@ -55,6 +55,7 @@ export default class StatsApp extends NerdHudApp {
         }
     }
     onLoad(data) {
+        console.log("STATS ONLOAD");
         this.balance = data.balance;
         this.reset_time = data.reset_time;
 

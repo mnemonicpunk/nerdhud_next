@@ -1,5 +1,9 @@
 // background.js
 
+function resolveBuiltinPath(path) {
+    return chrome.runtime.getURL(path.replace("builtin:", ""));
+}
+
 // Listen for messages from other parts of the extension
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "report") {

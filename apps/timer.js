@@ -42,7 +42,7 @@ export default class TimerApp extends NerdHudApp {
     onCreate() {
         this.window = this.sys.createWindow({ 
             docked: "right",
-            icon: chrome.runtime.getURL("img/nhud_icon_timer.png"),
+            icon: "builtin:img/nhud_icon_timer.png",
             name: "timers",
             title: "Timers"
         });
