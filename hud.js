@@ -213,7 +213,7 @@ class NerdHUD {
 
         //this.loadEnvironment(resolveBuiltinPath("builtin:install.json"));
         console.log("LIBPIXELS: ", window.nhud);
-        this.loadEnvironment("builtin:install.json");
+        this.loadEnvironment("https://raw.githubusercontent.com/mnemonicpunk/nerdhud_next/refs/heads/main/install.json");
     }
     async loadEnvironment(unresolved_url) {
         try {
