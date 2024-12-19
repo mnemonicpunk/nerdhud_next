@@ -31,7 +31,6 @@ export default class InventoryApp extends NerdHudApp {
     event(type, data) {
         if (type == "inventory") {
             this.inventory = data;
-            console.log("INVENTORY: ", this.inventory);
         }
     }
     draw(ctx, width, height, camera) {
@@ -72,7 +71,6 @@ export default class InventoryApp extends NerdHudApp {
         return count;
     }
     getItemSlot(num) {
-        console.log("FINDING SLOT: ", num, this.inventory.slots[num], this.inventory.slots);
         return this.inventory.slots[num];
     }
 }

@@ -112,6 +112,7 @@ export default class TaskboardApp extends NerdHudApp {
             }
 
             elements.main.addEventListener('click', () => {
+                let order = this.orders[slot];
                 let market_entry = document.getElementsByClassName('Marketplace_filter__3ynr2');
                 if (market_entry[0]) {
                     const element = market_entry[0];

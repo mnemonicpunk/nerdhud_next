@@ -31,7 +31,6 @@ export default class StatsApp extends NerdHudApp {
             this.save();
         }
         if (type == "currency") {
-            console.log("CURRENCY: ", data);
             this.updateCurrency(data);
             this.save();
         }
@@ -55,7 +54,6 @@ export default class StatsApp extends NerdHudApp {
         }
     }
     onLoad(data) {
-        console.log("STATS ONLOAD");
         this.balance = data.balance;
         this.reset_time = data.reset_time;
 

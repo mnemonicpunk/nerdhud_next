@@ -74,7 +74,6 @@ export default class ItemInfoApp extends NerdHudApp {
 
         search_entry_text.addEventListener('input', (e) => {
             let matches = this.sys.findItemsByName(search_entry_text.value);
-            console.log("MATCHES: ", matches);
 
             this.setSearchSuggestions(matches);
 
@@ -94,7 +93,6 @@ export default class ItemInfoApp extends NerdHudApp {
         
     }
     setMode(mode) {
-        console.log("ITEM INFO MODE: ", mode)
         if (mode == "item_display") {
             this.elements.search.style.display = "none";
             this.elements.info.style.display = "block";
@@ -113,8 +111,6 @@ export default class ItemInfoApp extends NerdHudApp {
         this.elements.info.innerHTML = ""; //JSON.stringify(this.hud.getItemData(item));
         let data = this.sys.getItemData(item);
         if (data) {
-            console.log("ITEM DATA: ", data);
-            console.log("CRAFTING COST: ", this.getCraftingEnergyCostFor(item));
             this.elements.info.innerHTML = "";
 
             // BEGIN DETAILS

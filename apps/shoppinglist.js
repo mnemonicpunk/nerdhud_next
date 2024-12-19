@@ -7,7 +7,6 @@ export default class ShoppingListApp extends NerdHudApp {
     event(type, data) {
         super.event(type, data);
         if (type == "inventory_slot") {
-            console.log("SLOT CHANGE: ", data);
             
             // we're only interested in slots with contents anyway, so if there is none ignore
             if (data.value) {
@@ -17,8 +16,6 @@ export default class ShoppingListApp extends NerdHudApp {
                 let new_slot = data.value;
 
                 let item = slot?.item || new_slot?.item;
-
-                console.log("SLOT VALUES: ", slot, new_slot);
 
                 if (item in this.list) {
                     let old_num = slot?.quantity || 0;

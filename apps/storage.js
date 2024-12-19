@@ -8,9 +8,7 @@ export default class StorageApp extends NerdHudApp {
     event(type, data) {
         super.event(type, data);
         if (type == "set_storage") {
-            console.log("Storage Module: Got the following storage ", data);
             this.storages[data.mapEntity_id] = data;
-            console.log(this.storages);
             this.updateStorages(data);
             this.save();
         }
@@ -48,7 +46,6 @@ export default class StorageApp extends NerdHudApp {
             mids.push(storages[i].mapEntity_id);
         }
         this.highlighted_storages = mids;
-        console.log("HIGHLIGHTING STORAGES WITH: ", item, mids, storages);
     }
     onDrawEntity(ctx, entity, bounds, camera) {
         if ((this.highlighted_storages) && (this.highlighted_storages.includes(entity.mid))) {

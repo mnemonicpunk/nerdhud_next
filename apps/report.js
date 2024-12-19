@@ -5,18 +5,6 @@ export default class ReportApp extends NerdHudApp {
     }
     event(type, data) {
         super.event(type, data);
-        /*if (type == "state_change") {
-            console.log("DEBUG: ", data);
-        }*/
-        /*if (type == "mine_started") {
-            console.log("MINE STARTED: ", data);
-        }
-        if (type == "industry_started") {
-            console.log("INDUSTRY STARTED: ", data);
-        }
-        if (type == "crop_planted") {
-            console.log("CROP PLANTED: ", data);
-        }*/
         if (type == "taskboard") {
             this.fileReport('https://pixelnerds.xyz/api/hud/save/taskboard/' + this.sys.mid, data);
         }

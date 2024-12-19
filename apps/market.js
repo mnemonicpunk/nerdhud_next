@@ -25,7 +25,6 @@ export default class MarketApp extends NerdHudApp {
             this.last_update = Date.now();
             fetch("https://pixels-server.pixels.xyz/cache/marketplace/listings/count").then(async (response) => {
                 this.price_data = await response.json();
-                console.log(this.price_data);
             });
         }
        

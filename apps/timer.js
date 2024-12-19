@@ -74,7 +74,6 @@ export default class TimerApp extends NerdHudApp {
         this.updateTimerUI();
     }
     highlightMids(mids) {
-        console.log("HIGHLIGHTING: ", mids);
         this.highlights = mids;
     }
     onDrawEntity(ctx, entity, bounds, camera) {
