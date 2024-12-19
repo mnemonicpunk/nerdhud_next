@@ -1,7 +1,7 @@
 {
     "libPixels": {
         "url": "builtin:/lib/libPixels.js",
-        "version": "0.1.24"
+        "version": "0.1.25"
     },
     "apps": [
         "builtin:apps/inventory.js",
