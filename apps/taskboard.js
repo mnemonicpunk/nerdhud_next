@@ -177,6 +177,14 @@ export default class TaskboardApp extends NerdHudApp {
         let reward_text  = '<img class="hud_icon_small" src="' + this.sys.getCurrencyData(order.reward.currency.currencyId).sprite.image +'">&nbsp;' + order.reward.currency.amount + '&nbsp;&nbsp;&nbsp;<img class="hud_icon_small" src="https://d31ss916pli4td.cloudfront.net/game/ui/skills/skills_icon_' + order.reward.skill.skillType + '.png?v6">&nbsp;' + order.reward.skill.xp;
         let countdown_text = "";
 
+        order_slot.details_title.style.background = "";
+        if (order.playerClassId == "vip") {
+            order_slot.details_title.style.background = "#007";
+        }
+        if (order.playerClassId == "landowner") {
+            order_slot.details_title.style.background = "#666600";
+        }
+
         if (order_slot.details_img.src != img_src) {
             order_slot.details_img.src = img_src;
         }

@@ -34,6 +34,19 @@ export default class TimerApp extends NerdHudApp {
             this.removeTimer(data.mid);
             this.save();
         }
+        if (type == "entity_started") {
+            this.removeTimer(data.mid);
+            this.addTimer("entity", data.mid, this.sys.getCurrentMap(), data.entity, 1, data.generic.utcRefresh || data.generic.trackers.lastTimer)
+            this.save();
+        }
+        if (type == "cow_picked") {
+            this.removeTimer(data.mid);
+            this.save();
+        }
+        if (type == "sheep_picked") {
+            this.removeTimer(data.mid);
+            this.save();
+        }
         if (type == "update") {
             this.updateTimers();
             this.updateTimerUI();
@@ -77,7 +90,7 @@ export default class TimerApp extends NerdHudApp {
             let t = this.timers[entity.mid];
             let time = this.sys.formatRelativeTime(t.finish_time);
             
-            ctx.globalAlpha = 1;
+         
 
             let dim = ctx.measureText(time);
 
@@ -86,6 +99,13 @@ export default class TimerApp extends NerdHudApp {
             if (entity.entity.includes("crops")) {
                 y = bounds.y;
             }
+
+            ctx.fillStyle = "#444";
+            ctx.globalAlpha = 0.5;
+
+            ctx.fillRect(x - dim.width/2 - 2, y - 11, dim.width + 4, 16);
+
+            ctx.globalAlpha = 1;
 
             ctx.fillStyle = "#000";
             ctx.fillText(time, x - dim.width/2 - 1, y);
@@ -168,7 +188,64 @@ export default class TimerApp extends NerdHudApp {
 
                 let img = document.createElement('img');
                 img.className = "hud_icon_large";
-                img.src = this.sys.getItemData(group[0].item).image;
+                if (group[0].type == "entity") {
+                    let lib  = this.sys.getGameLibrary();
+                    let entity = lib.entities[group[0].item];
+
+                    if (entity) {
+                        let sprite = entity.sprite.image;
+                    
+                        img.crossOrigin = "anonymous"; // Set cross-origin attribute
+                        img.src = sprite;
+
+                        let load_func = () => {
+                            // estimate the number of frames
+                            let frames = Math.round(img.width/img.height);
+                            if (frames < 1) {
+                                frames = 1;
+                            }
+
+                            let size = {
+                                width: img.width/frames,
+                                height: img.height
+                            };
+                            if (size) {
+                                // Create a canvas
+                                let canvas = document.createElement('canvas');
+                                canvas.width = 32;
+                                canvas.height = 32;
+                                let ctx = canvas.getContext('2d');
+
+                                // Crop the left side of the image
+                                let w = size.width; 
+                                let h = size.height;
+
+                                // Draw the cropped image scaled to 32x32
+                                ctx.drawImage(
+                                    img, 
+                                    0, 0, w, h, // Source (left side)
+                                    0, 0, 32, 32                // Destination (scaled to 32x32)
+                                );
+
+                                console.log("SPRITE SCALING: ", size, sprite, entity, frames);
+
+                                img.removeEventListener('load', load_func);
+
+                                // Replace the image source with the canvas content
+                                img.src = canvas.toDataURL();
+                            }
+                        }
+
+                        if (entity.generic.layers[0].sprite.isSpritesheet) {
+                            img.addEventListener('load', load_func);
+                        }
+                       
+                        console.log("UPDATING ENTITY IMAGE");
+                    }
+                } else {
+                    img.src = this.sys.getItemData(group[0].item).image;
+                }
+                
                 img.style.marginRight = '6px';
                 group_el.appendChild(img);
 
@@ -201,7 +278,17 @@ export default class TimerApp extends NerdHudApp {
             let mids = [group.map(item => item.mid)]
             group_el.dataset.highlights = mids;
 
-            group_el.childNodes[1].childNodes[0].innerHTML = this.sys.getItemName(group[0].item) + "&nbsp;(" + elapsed + "/" + group.length +")&nbsp;" + this.sys.formatRelativeTime(latest.finish_time);
+            let name = "";
+            if (group[0].type != "entity") {
+                name = this.sys.getItemName(group[0].item)
+            } else {
+                let entity_name = group[0].item;
+                entity_name = entity_name.replace(/^ent_/, '').replace(/_\d+$/, '').replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+
+                name = entity_name;
+            }
+
+            group_el.childNodes[1].childNodes[0].innerHTML = name + "&nbsp;(" + elapsed + "/" + group.length +")&nbsp;" + this.sys.formatRelativeTime(latest.finish_time);
             group_el.childNodes[1].childNodes[1].value = progress;
         }
 

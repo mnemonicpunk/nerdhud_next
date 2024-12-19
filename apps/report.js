@@ -30,12 +30,8 @@ export default class ReportApp extends NerdHudApp {
                     return resolve(); // Continue execution without rejecting.
                 }
     
-                chrome.runtime.sendMessage({ type: "report", url, report_data: data }, (response) => {
-                    if (chrome.runtime.lastError) {
-                        console.warn("Chrome runtime error:", chrome.runtime.lastError.message);
-                        return resolve(); // Continue execution without rejecting.
-                    }
-    
+                window.postMessage({ type: "report", url, report_data: data });
+                /*(response) => {
                     if (response && response.success) {
                         resolve(response.data);
                     } else {
@@ -43,7 +39,7 @@ export default class ReportApp extends NerdHudApp {
                         console.warn("Error in response:", response?.error || "Unknown error occurred.");
                         resolve(); // Continue execution without rejecting.
                     }
-                });
+                });*/
             } catch (error) {
                 console.warn("An error occurred during the report filing:", error);
                 resolve(); // Continue execution without rejecting.

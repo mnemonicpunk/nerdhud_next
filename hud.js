@@ -548,7 +548,12 @@ class NerdHUD {
             };
 
             // Draw the image onto the canvas
-            ctx.drawImage(img, rect.x, rect.y-20, rect.width, rect.height);
+            try {
+                ctx.drawImage(img, rect.x, rect.y-20, rect.width, rect.height);
+            } catch(e) {
+                console.log("Error when drawing splash screen: ", e);
+            }
+           
             //ctx.drawImage(img, this.canvas.width/2 - img.width/2, this.canvas.height/2 - img.height/2);
 
             ctx.fontSize = "150%";

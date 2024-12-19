@@ -73,4 +73,9 @@ window.addEventListener('message', (event) => {
             });
         });
      }
+
+     if (message.type === "report") {
+        chrome.runtime.sendMessage(message);
+     }
+
 });
