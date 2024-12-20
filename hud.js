@@ -433,14 +433,21 @@ class NerdHUD {
     }
     draw() {
         const ctx = this.canvas.getContext('2d');
+
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
         // draw entities if necessary
         if (this.is_in_game) {
+            let entities = this.scene_state?.entities;
+            let players = this.scene_state?.players;
+            if ((!entities)||(!players)) {
+                return;
+            } 
+
             // let apps draw entity specific content
             for (let i in this.entity_bounds) {
                 let bounds = this.boundsToScreenCoords(this.entity_bounds[i]);
-                let entities = this.scene_state.entities;
+                
                 
                 // if the entity is on screen, allow apps to draw an overlay for them
                 if ((bounds.x > 0) && (bounds.x < this.canvas.width) && (bounds.y > 0) && (bounds.y < this.canvas.height)) {
@@ -467,7 +474,7 @@ class NerdHUD {
             // let apps draw player specific content
             for (let i in this.player_bounds) {
                 let bounds = this.boundsToScreenCoords(this.player_bounds[i]);
-                let players = this.scene_state.players;
+
                 
                 // if the entity is on screen, allow apps to draw an overlay for them
                 if ((bounds.x > 0) && (bounds.x < this.canvas.width) && (bounds.y > 0) && (bounds.y < this.canvas.height)) {
