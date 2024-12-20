@@ -86,6 +86,35 @@ async function putStorage(data) {
     });
 }
 
+function flattenColyseus(arr) {
+    if (!arr) { return {}; }
+    const ret = {};
+    for (let i=0; i<arr.length; i++) {
+        if (arr[i].numeric) {
+            ret[arr[i].name] = parseFloat(arr[i].value);
+        } else {
+            ret[arr[i].name] = arr[i].value;
+        }
+    }
+    if (ret == {}) {
+        console.log("Array resulted in empty obj: ", arr);
+    }
+    return ret;
+}
+
+function flattenEntity(entity) {
+    if (!entity) { return null; }
+
+    const new_entity = JSON.parse(JSON.stringify(entity)); // True deep copy
+
+    if (entity.generic) { 
+        new_entity.generic.statics = flattenColyseus(entity.generic.statics);
+        new_entity.generic.trackers = flattenColyseus(entity.generic.trackers);
+    }
+
+    return new_entity;
+}
+
 class NerdHudApp {
     constructor(sys) {
         this.sys = sys;
@@ -148,6 +177,12 @@ class NerdHUD {
         }
         this._known_good_app_data = {};
         this._initial_app_data_load_finished = false;
+
+        // handle saving
+        this.save_interval = 5000;
+        this._debounceTimeout = null;
+        this._latestArgs = null;
+        this._lastSaveTime = 0;
 
         // app function exports
         this.app_funcs = {};
@@ -445,7 +480,7 @@ class NerdHUD {
                         if (app.onDrawEntity) {
                             ctx.save();
                             try {
-                                let entity = entities[i];
+                                let entity = flattenEntity(entities[i]);
                                 if (entity) {
                                     app.onDrawEntity(ctx, entity, bounds, this.camera);
                                 }
@@ -593,8 +628,7 @@ class NerdHUD {
                 save_data[app.name] = this._known_good_app_data[app.name] || null; 
             });
             if (save_data) {
-                console.log("SAVING APP DATA: ", save_data);
-                this.saveAppData(this.mid, save_data);
+                this.debounceSaveAppData(this.mid, save_data);
             }
             this._known_good_app_data = save_data;
             this.data_needs_saving = false;
@@ -634,7 +668,6 @@ class NerdHUD {
         if (!this.is_in_game) { return; }
 
         if (msg.type == "state_change") {
-            console.log("GOT STATE CHANGE EVENT: ", msg.data);
             this.scene_state = msg.data;
         }
 
@@ -691,17 +724,46 @@ class NerdHUD {
             const dataToSave = {
                 ["NHN_" + mid]: data
             };
-    
+
             await new Promise((resolve, reject) => {
                 putStorage(dataToSave).then((result) => {
-                    console.log("SAVE RESULT: ", result)
-                });
+                    console.log("SAVE RESULT: ", result);
+                    resolve();
+                }).catch(reject);
             });
+
+            // Update the last save time
+            this._lastSaveTime = Date.now();
             return true;
         } catch (error) {
             console.error("Error saving data for mid:", mid, error);
             return false;
         }
+    }
+
+    debounceSaveAppData(mid, data) {
+        const now = Date.now();
+
+        // If enough time has passed since the last save, save immediately
+        if (now - this._lastSaveTime >= this.save_interval) {
+            this.saveAppData(mid, data);
+            return;
+        }
+
+        // Otherwise, debounce the save
+        this._latestArgs = { mid, data };
+
+        // Clear any existing timeout
+        if (this._debounceTimeout) {
+            clearTimeout(this._debounceTimeout);
+        }
+
+        // Set a new timeout to save after the remaining interval
+        const timeUntilNextSave = this.save_interval - (now - this._lastSaveTime);
+        this._debounceTimeout = setTimeout(async () => {
+            const { mid, data } = this._latestArgs;
+            await this.saveAppData(mid, data);
+        }, timeUntilNextSave);
     }
     clearAppData() {
         this.saveAppData(this.mid, {}).then(() => { window.location.reload(); }); 

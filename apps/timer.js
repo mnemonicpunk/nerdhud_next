@@ -48,17 +48,19 @@ export default class TimerApp extends NerdHudApp {
             this.save();
         }
         if (type == "state_change") {
-            for (let e in data.entities) {
-                let entity = data.entities[e];
+            if (this.sys.getCurrentMap().startsWith('shareInterior')) {
+                for (let e in data.entities) {
+                    let entity = data.entities[e];
 
-                // special case for tracking bed covers
-                if (entity.entity == "ent_bed_covers") {
-                    console.log("CHECKING OUT ent_bed_covers: ", entity);
-                    if ((!this.hasTimer(entity.mid)) && (entity.generic.utcRefresh > Date.now())) {
-                        this.addTimer("entity", entity.mid, this.sys.getCurrentMap(), "ent_bed_speck", 1, entity.generic.utcRefresh || entity.generic.trackers.lastTimer)
-                    }
-                    if ((this.hasTimer(entity.mid)) && (entity.generic.utcRefresh <= Date.now())) {
-                        this.removeTimer(entity.mid)
+                    // special case for tracking bed covers
+                    if (entity.entity == "ent_bed_covers") {
+                        console.log("CHECKING OUT ent_bed_covers: ", entity);
+                        if ((!this.hasTimer(entity.mid)) && (entity.generic.utcRefresh > Date.now())) {
+                            this.addTimer("entity", entity.mid, this.sys.getCurrentMap(), "ent_bed_speck", 1, entity.generic.utcRefresh || entity.generic.trackers.lastTimer)
+                        }
+                        if ((this.hasTimer(entity.mid)) && (entity.generic.utcRefresh <= Date.now())) {
+                            this.removeTimer(entity.mid)
+                        }
                     }
                 }
             }
@@ -102,34 +104,41 @@ export default class TimerApp extends NerdHudApp {
         }
 
         if (this.timers[entity.mid]) {
-            let t = this.timers[entity.mid];
-            let time = this.sys.formatRelativeTime(t.finish_time);
-            
-         
-
-            let dim = ctx.measureText(time);
-
-            let x = bounds.x;
-            let y = bounds.y+bounds.height/2;
-            if (entity.entity.includes("crops")) {
-                y = bounds.y;
+            let t = this.timers[entity.mid].finish_time;
+            this.drawEntityTimer(ctx, bounds, entity, t, "#444");
+        } else {
+            if (entity.generic?.statics.thetimer) {
+                let t = entity.generic?.statics.thetimer;
+                this.drawEntityTimer(ctx, bounds, entity, t, "#f44");
             }
-
-            ctx.fillStyle = "#444";
-            ctx.globalAlpha = 0.5;
-
-            ctx.fillRect(x - dim.width/2 - 2, y - 11, dim.width + 4, 16);
-
-            ctx.globalAlpha = 1;
-
-            ctx.fillStyle = "#000";
-            ctx.fillText(time, x - dim.width/2 - 1, y);
-            ctx.fillText(time, x - dim.width/2 + 1, y);
-            ctx.fillText(time, x - dim.width/2, y - 1);
-            ctx.fillText(time, x - dim.width/2, y + 1);
-            ctx.fillStyle = "#fff";
-            ctx.fillText(time, x - dim.width/2, y);
         }
+    }
+    drawEntityTimer(ctx, bounds, entity, timestamp, color) {
+        let time = this.sys.formatRelativeTime(timestamp);
+        if (time == "") { return; }
+        
+        let dim = ctx.measureText(time);
+
+        let x = bounds.x;
+        let y = bounds.y+bounds.height/2;
+        if (entity.entity.includes("crops")) {
+            y = bounds.y;
+        }
+
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.5;
+
+        ctx.fillRect(x - dim.width/2 - 2, y - 11, dim.width + 4, 16);
+
+        ctx.globalAlpha = 1;
+
+        ctx.fillStyle = "#000";
+        ctx.fillText(time, x - dim.width/2 - 1, y);
+        ctx.fillText(time, x - dim.width/2 + 1, y);
+        ctx.fillText(time, x - dim.width/2, y - 1);
+        ctx.fillText(time, x - dim.width/2, y + 1);
+        ctx.fillStyle = "#fff";
+        ctx.fillText(time, x - dim.width/2, y);
     }
     updateTimers() {
         for (let i in this.timers) {
