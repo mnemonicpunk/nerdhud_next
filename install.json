@@ -3,6 +3,7 @@
         "url": "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/lib/libPixels.js",
         "version": "0.1.27"
     },
+    "hud": "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/hud.js",
     "apps": [
         "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/inventory.js",
         "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/market.js",

@@ -7,20 +7,6 @@ async function resolveURL(path) {
     return path;
 }
 
-// Helper function to compare version strings (e.g., "1.0.0" > "0.9.9")
-function isVersionNewer(newVersion, currentVersion) {
-    const newParts = newVersion.split('.').map(Number);
-    const currentParts = currentVersion.split('.').map(Number);
-
-    for (let i = 0; i < Math.max(newParts.length, currentParts.length); i++) {
-        const newPart = newParts[i] || 0;
-        const currentPart = currentParts[i] || 0;
-        if (newPart > currentPart) return true;
-        if (newPart < currentPart) return false;
-    }
-    return false;
-}
-
 async function getChromeURL(url) {
     return new Promise((resolve, reject) => {
         // Handler for messages
@@ -40,6 +26,20 @@ async function getChromeURL(url) {
             url
         });
     });
+}
+
+// Helper function to compare version strings (e.g., "1.0.0" > "0.9.9")
+function isVersionNewer(newVersion, currentVersion) {
+    const newParts = newVersion.split('.').map(Number);
+    const currentParts = currentVersion.split('.').map(Number);
+
+    for (let i = 0; i < Math.max(newParts.length, currentParts.length); i++) {
+        const newPart = newParts[i] || 0;
+        const currentPart = currentParts[i] || 0;
+        if (newPart > currentPart) return true;
+        if (newPart < currentPart) return false;
+    }
+    return false;
 }
 
 async function getStorage(key) {
@@ -212,23 +212,11 @@ class NerdHUD {
         this.resize();
 
         //this.loadEnvironment(resolveBuiltinPath("builtin:install.json"));
-        console.log("LIBPIXELS: ", window.nhud);
-        this.loadEnvironment("https://raw.githubusercontent.com/mnemonicpunk/nerdhud_next/refs/heads/main/install.json");
+        this.loadEnvironment(window.nhud_install);
         //this.loadEnvironment("builtin:install_builtin.json");
     }
-    async loadEnvironment(unresolved_url) {
+    async loadEnvironment(install) {
         try {
-            console.log("LOADING ENVIRONMENT: ", unresolved_url);
-            const url = await resolveURL(unresolved_url);
-            console.log("LOADING ENVIRONMENT FROM: ", url);
-
-            // Fetch the loadout JSON file from the provided URL
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch loadout file: ${response.statusText}`);
-            }
-            const install = await response.json();
-    
             // Validate the loadout format
             if (!install.libPixels || !install.libPixels.version || !install.libPixels.url) {
                 throw new Error("Invalid loadout file format.");
@@ -646,6 +634,7 @@ class NerdHUD {
         if (!this.is_in_game) { return; }
 
         if (msg.type == "state_change") {
+            console.log("GOT STATE CHANGE EVENT: ", msg.data);
             this.scene_state = msg.data;
         }
 

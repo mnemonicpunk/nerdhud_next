@@ -47,6 +47,22 @@ export default class TimerApp extends NerdHudApp {
             this.removeTimer(data.mid);
             this.save();
         }
+        if (type == "state_change") {
+            for (let e in data.entities) {
+                let entity = data.entities[e];
+
+                // special case for tracking bed covers
+                if (entity.entity == "ent_bed_covers") {
+                    console.log("CHECKING OUT ent_bed_covers: ", entity);
+                    if ((!this.hasTimer(entity.mid)) && (entity.generic.utcRefresh > Date.now())) {
+                        this.addTimer("entity", entity.mid, this.sys.getCurrentMap(), "ent_bed_speck", 1, entity.generic.utcRefresh || entity.generic.trackers.lastTimer)
+                    }
+                    if ((this.hasTimer(entity.mid)) && (entity.generic.utcRefresh <= Date.now())) {
+                        this.removeTimer(entity.mid)
+                    }
+                }
+            }
+        }
         if (type == "update") {
             this.updateTimers();
             this.updateTimerUI();
@@ -330,6 +346,9 @@ export default class TimerApp extends NerdHudApp {
             elapsed: false
         }
         this.timers[mid] = timer;
+    }
+    hasTimer(mid) {
+        return this.timers[mid] != undefined;
     }
     removeTimer(mid) {
         if (this.timers[mid]) {

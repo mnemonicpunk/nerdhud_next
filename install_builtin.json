@@ -3,6 +3,7 @@
         "url": "builtin:/lib/libPixels.js",
         "version": "0.1.27"
     },
+    "hud": "builtin:hud.js",
     "apps": [
         "builtin:apps/inventory.js",
         "builtin:apps/market.js",
