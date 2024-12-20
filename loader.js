@@ -57,7 +57,7 @@ async function loadNerdHud(unresolved_url) {
 
     // Create a script element to load the HUDt
     const hudElement = document.createElement('script');
-    hudElement.src = install.hud;
+    hudElement.src = await resolveURL(install.hud);
 
     // Inject the script into the document head
     (document.head || document.documentElement).appendChild(hudElement);

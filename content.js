@@ -7,14 +7,6 @@ scriptElement.src = chrome.runtime.getURL('loader.js');
 (document.head || document.documentElement).appendChild(scriptElement);
 scriptElement.remove(); // Clean up after execution
 
-// Create a script element to load the HUDt
-const hudElement = document.createElement('script');
-hudElement.src = chrome.runtime.getURL('hud.js');
-
-// Inject the script into the document head
-(document.head || document.documentElement).appendChild(hudElement);
-hudElement.remove(); // Clean up after execution
-
 let LIBPIXELS_VER = "";
 
 const libPixels_key = 'nhud_libPixels'; // chrome storage location of libPixels, .file property contains the file contents, .version property the version number
