@@ -16,6 +16,7 @@
         "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/timer.js",
         "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/report.js",
         "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/nerdmenu.js",
+        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/notification.js",
         "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/gw.js"
     ]
 }

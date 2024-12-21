@@ -1,10 +1,3 @@
-const ENTITY_NAME_OVERRIDES = {
-    ent_saunarocks_charger: "VIP Charger",
-    ent_cow_pickup: "Cow",
-    ent_bed_covers: "Bed",
-    ent_goosetrailer: "OG Ticket Redemption"
-}
-
 export default class TimerApp extends NerdHudApp {
     constructor(sys) {
         super(sys);
@@ -16,6 +9,19 @@ export default class TimerApp extends NerdHudApp {
     }
     event(type, data) {
         super.event(type, data);
+        if (type == "timer_finished") {
+            let group = this.getGroupOfTimer(data.mid);
+            if (group) {
+                let all_finished = true;
+                for (let i in group) {
+                    let timer = group[i];
+                    all_finished &= timer.elapsed;
+                }
+                if (all_finished) {
+                    this.sys.dispatchEvent('timer_group_finished', group);
+                }
+            }
+        }
         if (type == "crop_planted") {
             this.addTimer("crop", data.mid, this.sys.getCurrentMap(), data.generic.statics.fruitItem, 1, (Date.now() + (60000 * data.generic.statics.minutesNeeded)));
             this.save();
@@ -315,14 +321,7 @@ export default class TimerApp extends NerdHudApp {
             if (group[0].type != "entity") {
                 name = this.sys.getItemName(group[0].item)
             } else {
-                if (ENTITY_NAME_OVERRIDES[group[0].item]) {
-                    name = ENTITY_NAME_OVERRIDES[group[0].item];
-                } else {
-                    let entity_name = group[0].item;
-                    entity_name = entity_name.replace(/^ent_/, '').replace(/_\d+$/, '').replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-    
-                    name = entity_name;     
-                }
+                name = this.sys.getEntityName(group[0].item);
             }
 
             group_el.childNodes[1].childNodes[0].innerHTML = name + "&nbsp;(" + elapsed + "/" + group.length +")&nbsp;" + this.sys.formatRelativeTime(latest.finish_time);
@@ -368,6 +367,19 @@ export default class TimerApp extends NerdHudApp {
             elapsed: false
         }
         this.timers[mid] = timer;
+    }
+    getGroupOfTimer(mid) {
+        if (!this.timers[mid]) { return null; }
+        const compare_timer = this.timers[mid]; 
+
+        let group = [];
+        for (let i in this.timers) {
+            const timer = this.timers[i];
+            if ((compare_timer.type == timer.type) && (compare_timer.map == timer.map) && (compare_timer.item == timer.item)) {
+                group.push(timer);
+            }
+        }
+        return group;
     }
     hasTimer(mid) {
         return this.timers[mid] != undefined;

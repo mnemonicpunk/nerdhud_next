@@ -23,9 +23,6 @@ export default class GWApp extends NerdHudApp {
         if (type == "state_change") {
             //console.log("DEBUG: ", data);
         }
-        if (type == "crop_planted") {
-            console.log("CROP PLANTED: ", data);
-        }
     }
     onDrawEntity(ctx, entity, bounds, camera) {
         if (!this.sys.getCurrentMap().startsWith('guildCropWars')) { return; }

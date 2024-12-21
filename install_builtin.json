@@ -16,6 +16,7 @@
         "builtin:apps/timer.js",
         "builtin:apps/report.js",
         "builtin:apps/nerdmenu.js",
+        "builtin:apps/notification.js",
         "builtin:apps/gw.js"
     ]
 }

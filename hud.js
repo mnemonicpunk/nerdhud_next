@@ -1,3 +1,10 @@
+const ENTITY_NAME_OVERRIDES = {
+    ent_saunarocks_charger: "VIP Charger",
+    ent_cow_pickup: "Cow",
+    ent_bed_covers: "Bed",
+    ent_goosetrailer: "OG Ticket Redemption"
+}
+
 // Helper function to resolve "builtin:" paths to Chrome extension URLs
 async function resolveURL(path) {
     if (path.startsWith("builtin:")) {
@@ -487,67 +494,65 @@ class NerdHUD {
             if (this._game_modal || this._game_halfmodal) {
                 return;
             }
-            if ((!entities)||(!players)) {
-                return;
-            } 
-
-            // let apps draw entity specific content
-            for (let i in this.entity_bounds) {
-                let bounds = this.boundsToScreenCoords(this.entity_bounds[i]);
-                
-                
-                // if the entity is on screen, allow apps to draw an overlay for them
-                if ((bounds.x > 0) && (bounds.x < this.canvas.width) && (bounds.y > 0) && (bounds.y < this.canvas.height)) {
-                    for (let j in this.apps) {
-                        
-                        let app = this.apps[j];
-                        if (app.onDrawEntity) {
-                            ctx.save();
-                            try {
-                                let entity = flattenEntity(entities[i]);
-                                if (entity) {
-                                    app.onDrawEntity(ctx, entity, bounds, this.camera);
+            if (entities&&players) {
+                // let apps draw entity specific content
+                for (let i in this.entity_bounds) {
+                    let bounds = this.boundsToScreenCoords(this.entity_bounds[i]);
+                    
+                    
+                    // if the entity is on screen, allow apps to draw an overlay for them
+                    if ((bounds.x > 0) && (bounds.x < this.canvas.width) && (bounds.y > 0) && (bounds.y < this.canvas.height)) {
+                        for (let j in this.apps) {
+                            
+                            let app = this.apps[j];
+                            if (app.onDrawEntity) {
+                                ctx.save();
+                                try {
+                                    let entity = flattenEntity(entities[i]);
+                                    if (entity) {
+                                        app.onDrawEntity(ctx, entity, bounds, this.camera);
+                                    }
+                                } catch(e) {
+                                    console.log("onDrawEntity error with ", app, this.scene_state.entities[i], e);
                                 }
-                            } catch(e) {
-                                console.log("onDrawEntity error with ", app, this.scene_state.entities[i], e);
+                                ctx.restore();
                             }
-                            ctx.restore();
+                            
                         }
-                        
                     }
                 }
-            }
 
-            // let apps draw player specific content
-            for (let i in this.player_bounds) {
-                let bounds = this.boundsToScreenCoords(this.player_bounds[i]);
+                // let apps draw player specific content
+                for (let i in this.player_bounds) {
+                    let bounds = this.boundsToScreenCoords(this.player_bounds[i]);
 
-                
-                // if the entity is on screen, allow apps to draw an overlay for them
-                if ((bounds.x > 0) && (bounds.x < this.canvas.width) && (bounds.y > 0) && (bounds.y < this.canvas.height)) {
-                    for (let j in this.apps) {
-                        
-                        let app = this.apps[j];
-                        if (app.onDrawPlayer) {
-                            ctx.save();
-                            try {
-                                let player = null;
-                                for (let p in players) {
-                                    if (players[p].mid == i) {
-                                        player = players[p];
+                    
+                    // if the entity is on screen, allow apps to draw an overlay for them
+                    if ((bounds.x > 0) && (bounds.x < this.canvas.width) && (bounds.y > 0) && (bounds.y < this.canvas.height)) {
+                        for (let j in this.apps) {
+                            
+                            let app = this.apps[j];
+                            if (app.onDrawPlayer) {
+                                ctx.save();
+                                try {
+                                    let player = null;
+                                    for (let p in players) {
+                                        if (players[p].mid == i) {
+                                            player = players[p];
+                                        }
                                     }
+                                    if (player) {
+                                        app.onDrawPlayer(ctx, player, bounds, this.camera);
+                                    } else {
+                                        console.log("NO PLAYER FOUND FOR ", i);
+                                    }
+                                } catch(e) {
+                                    console.log("onDrawPlayer error with ", app, this.scene_state.players[i], e);
                                 }
-                                if (player) {
-                                    app.onDrawPlayer(ctx, player, bounds, this.camera);
-                                } else {
-                                    console.log("NO PLAYER FOUND FOR ", i);
-                                }
-                            } catch(e) {
-                                console.log("onDrawPlayer error with ", app, this.scene_state.players[i], e);
+                                ctx.restore();
                             }
-                            ctx.restore();
+                            
                         }
-                        
                     }
                 }
             }
@@ -1035,6 +1040,18 @@ class NerdHUD {
     }
     getItemName(itm) {
         return this.item_name_mapping[itm] || itm;
+    }
+    getEntityName(entity) {
+        let name = "";
+        if (ENTITY_NAME_OVERRIDES[entity]) {
+            name = ENTITY_NAME_OVERRIDES[entity];
+        } else {
+            let entity_name = entity;
+            entity_name = entity_name.replace(/^ent_/, '').replace(/_\d+$/, '').replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+
+            name = entity_name;     
+        }
+        return name;
     }
     findItemsByName(name) {
         if (!this.item_name_mapping) { return {}; }

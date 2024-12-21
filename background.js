@@ -45,4 +45,58 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Indicate that the response will be sent asynchronously
         return true;
     }
+
+    if (message.type === "show_hud_notification") {
+        const { title, message: notificationMessage, icon } = message;
+    
+        // Get the current active tab ID dynamically
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            const originTabId = tabs[0].id;
+    
+            let callback = () => {
+                sendResponse({
+                    type: 'hud_notification_cleared'
+                });
+            };
+    
+            chrome.notifications.create({
+                type: "basic",
+                iconUrl: icon || chrome.runtime.getURL('img/nhud_icon_nerd.png'), // Default icon if not provided
+                title: title,
+                message: notificationMessage
+            }, (notificationId) => {
+                if (chrome.runtime.lastError) {
+                    console.error("Failed to create notification:", chrome.runtime.lastError);
+                } else {
+                    console.log("Notification created with ID:", notificationId);
+    
+                    // Automatically dismiss the notification after 5 seconds
+                    setTimeout(() => {
+                        chrome.notifications.clear(notificationId, () => {
+                            console.log("Notification dismissed after 5 seconds");
+                            callback();
+                        });
+                    }, 5000); // 5000 milliseconds = 5 seconds
+    
+                    // Add click event listener for the notification
+                    chrome.notifications.onClicked.addListener((clickedNotificationId) => {
+                        if (clickedNotificationId === notificationId) {
+                            chrome.tabs.update(originTabId, { active: true }); // Bring the originating tab to focus
+                            chrome.notifications.clear(notificationId); // Clear the notification
+                            callback();
+                        }
+                    });
+    
+                    // Handle notification timeout or dismissal
+                    chrome.notifications.onClosed.addListener((closedNotificationId, byUser) => {
+                        if (closedNotificationId === notificationId) {
+                            if (!byUser) {
+                                callback();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    }    
 });

@@ -70,4 +70,14 @@ window.addEventListener('message', (event) => {
         chrome.runtime.sendMessage(message);
      }
 
+    if (message.type === "show_hud_notification") {
+        chrome.runtime.sendMessage(message);
+    }
+});
+
+// Listen for messages from other parts of the extension
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === "hud_notification_cleared") {
+        window.postMessage(message);
+    }
 });

@@ -76,7 +76,7 @@ async function loadNerdHud(unresolved_url) {
     hudElement.remove(); // Clean up after execution
 }
 
-//loadNerdHud("https://raw.githubusercontent.com/mnemonicpunk/nerdhud_next/refs/heads/main/install.json");
-loadNerdHud("builtin:install_builtin.json");
+loadNerdHud("https://raw.githubusercontent.com/mnemonicpunk/nerdhud_next/refs/heads/main/install.json");
+//loadNerdHud("builtin:install_builtin.json");
 
 
