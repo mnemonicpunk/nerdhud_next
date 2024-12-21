@@ -61,7 +61,6 @@ export default class TimerApp extends NerdHudApp {
 
                     // special case for tracking bed covers
                     if (entity.entity == "ent_bed_covers") {
-                        console.log("CHECKING OUT ent_bed_covers: ", entity);
                         if ((!this.hasTimer(entity.mid)) && (entity.generic.utcRefresh > Date.now())) {
                             this.addTimer("entity", entity.mid, this.sys.getCurrentMap(), entity.entity, 1, entity.generic.utcRefresh || entity.generic.trackers.lastTimer)
                         }
