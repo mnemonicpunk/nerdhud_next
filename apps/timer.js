@@ -1,3 +1,10 @@
+const ENTITY_NAME_OVERRIDES = {
+    ent_saunarocks_charger: "VIP Charger",
+    ent_cow_pickup: "Cow",
+    ent_bed_covers: "Bed",
+    ent_goosetrailer: "OG Ticket Redemption"
+}
+
 export default class TimerApp extends NerdHudApp {
     constructor(sys) {
         super(sys);
@@ -56,7 +63,7 @@ export default class TimerApp extends NerdHudApp {
                     if (entity.entity == "ent_bed_covers") {
                         console.log("CHECKING OUT ent_bed_covers: ", entity);
                         if ((!this.hasTimer(entity.mid)) && (entity.generic.utcRefresh > Date.now())) {
-                            this.addTimer("entity", entity.mid, this.sys.getCurrentMap(), "ent_bed_speck", 1, entity.generic.utcRefresh || entity.generic.trackers.lastTimer)
+                            this.addTimer("entity", entity.mid, this.sys.getCurrentMap(), entity.entity, 1, entity.generic.utcRefresh || entity.generic.trackers.lastTimer)
                         }
                         if ((this.hasTimer(entity.mid)) && (entity.generic.utcRefresh <= Date.now())) {
                             this.removeTimer(entity.mid)
@@ -104,11 +111,11 @@ export default class TimerApp extends NerdHudApp {
         }
 
         if (this.timers[entity.mid]) {
-            let t = this.timers[entity.mid].finish_time;
+            let t = this.timestampToServerTime(this.timers[entity.mid].finish_time);
             this.drawEntityTimer(ctx, bounds, entity, t, "#444");
         } else {
             if (entity.generic?.statics.thetimer) {
-                let t = entity.generic?.statics.thetimer;
+                let t = this.timestampToServerTime(entity.generic?.statics.thetimer);
                 this.drawEntityTimer(ctx, bounds, entity, t, "#f44");
             }
         }
@@ -306,10 +313,14 @@ export default class TimerApp extends NerdHudApp {
             if (group[0].type != "entity") {
                 name = this.sys.getItemName(group[0].item)
             } else {
-                let entity_name = group[0].item;
-                entity_name = entity_name.replace(/^ent_/, '').replace(/_\d+$/, '').replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-
-                name = entity_name;
+                if (ENTITY_NAME_OVERRIDES[group[0].item]) {
+                    name = ENTITY_NAME_OVERRIDES[group[0].item];
+                } else {
+                    let entity_name = group[0].item;
+                    entity_name = entity_name.replace(/^ent_/, '').replace(/_\d+$/, '').replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+    
+                    name = entity_name;     
+                }
             }
 
             group_el.childNodes[1].childNodes[0].innerHTML = name + "&nbsp;(" + elapsed + "/" + group.length +")&nbsp;" + this.sys.formatRelativeTime(latest.finish_time);
@@ -350,8 +361,8 @@ export default class TimerApp extends NerdHudApp {
             map,
             item,
             quantity,
-            start_time: Date.now(),
-            finish_time: time,
+            start_time: this.timestampToServerTime(Date.now()),
+            finish_time: this.timestampToServerTime(time),
             elapsed: false
         }
         this.timers[mid] = timer;
@@ -363,5 +374,8 @@ export default class TimerApp extends NerdHudApp {
         if (this.timers[mid]) {
             delete this.timers[mid];
         }
+    }
+    timestampToServerTime(timestamp) {
+        return (timestamp + (libpixels.getServerTime() - Date.now())); 
     }
 }
