@@ -117,6 +117,9 @@ export default class TimerApp extends NerdHudApp {
             if (entity.generic?.statics.thetimer) {
                 let t = this.timestampToServerTime(entity.generic?.statics.thetimer);
                 this.drawEntityTimer(ctx, bounds, entity, t, "#f44");
+            } else if (entity.generic?.statics.firedUntil) {
+                let t = this.timestampToServerTime(entity.generic?.statics.firedUntil);
+                this.drawEntityTimer(ctx, bounds, entity, t, "#880");
             }
         }
     }

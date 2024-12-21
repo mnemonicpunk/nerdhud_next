@@ -1,7 +1,7 @@
 {
     "libPixels": {
         "url": "builtin:/lib/libPixels.js",
-        "version": "0.1.30"
+        "version": "0.1.33"
     },
     "hud": "builtin:hud.js",
     "apps": [
@@ -15,6 +15,7 @@
         "builtin:apps/storage.js",
         "builtin:apps/timer.js",
         "builtin:apps/report.js",
-        "builtin:apps/nerdmenu.js"
+        "builtin:apps/nerdmenu.js",
+        "builtin:apps/gw.js"
     ]
 }

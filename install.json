@@ -1,7 +1,7 @@
 {
     "libPixels": {
         "url": "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/lib/libPixels.js",
-        "version": "0.1.30"
+        "version": "0.1.33"
     },
     "hud": "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/hud.js",
     "apps": [
@@ -15,6 +15,7 @@
         "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/storage.js",
         "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/timer.js",
         "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/report.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/nerdmenu.js"
+        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/nerdmenu.js",
+        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/gw.js"
     ]
 }

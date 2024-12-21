@@ -158,6 +158,8 @@ class NerdHUD {
         this.is_in_game = false;
         this.data_needs_saving = false;
         this.is_narrow_screen = false;
+        this._game_modal = false;
+        this._game_halfmodal = false;
 
         // create loading screen logo
         this.logo = document.createElement('img');
@@ -371,6 +373,17 @@ class NerdHUD {
 
         this.resize();
 
+        this.watchClass("commons_modalBackdrop__EOPaN", 100, async () => {
+            this._game_modal = true;
+        }, async () => {
+            this._game_modal = false;
+        });
+        this.watchClass("InventoryWindow_inventoryContainer__kDLsJ", 100, () => {
+            this._game_halfmodal = true;
+        }, () => {
+            this._game_halfmodal = false;
+        });
+
         // only set to in-game after loading app data to avoid clashes
         this.is_in_game = true;     
         
@@ -463,6 +476,10 @@ class NerdHUD {
         if (this.is_in_game) {
             let entities = this.scene_state?.entities;
             let players = this.scene_state?.players;
+
+            if (this._game_modal || this._game_halfmodal) {
+                return;
+            }
             if ((!entities)||(!players)) {
                 return;
             } 
@@ -528,7 +545,7 @@ class NerdHUD {
                 }
             }
         
-                    // let apps draw their add-on content onto the screen
+            // let apps draw their add-on content onto the screen
             for (let i in this.apps) {
                 ctx.save();
                 let app = this.apps[i];
