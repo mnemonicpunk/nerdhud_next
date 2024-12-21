@@ -110,7 +110,7 @@ export default class TimerApp extends NerdHudApp {
             ctx.fillRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
         }
 
-        if (this.timers[entity.mid]) {
+        if ((this.timers[entity.mid]) && (!this.timers[entity.mid].elapsed)) {
             let t = this.timestampToServerTime(this.timers[entity.mid].finish_time);
             this.drawEntityTimer(ctx, bounds, entity, t, "#444");
         } else {
