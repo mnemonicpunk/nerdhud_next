@@ -327,7 +327,13 @@ class NerdHUD {
             completed++;
             progress_callback(completed, total);
             
-            const cacheBustedUrl = `${fileUrl}?_=${new Date().getTime()}`;
+            // Calculate a timestamp that changes every 5 minutes
+            const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+            const currentTimestamp = Math.floor(Date.now() / fiveMinutes) * fiveMinutes;
+
+            // Append the timestamp to the file URL
+            const cacheBustedUrl = `${fileUrl}?_=${currentTimestamp}`;
+
             return import(cacheBustedUrl).then(app => {
                 // Make sure the module is correctly imported, and return the default export (class)
                 return app.default || null;

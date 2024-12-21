@@ -47,13 +47,10 @@ async function loadNerdHud(unresolved_url) {
     const url = await resolveURL(unresolved_url);
     console.log("LOADING ENVIRONMENT FROM: ", url);
     
-    // Fetch the loadout JSON file from the provided URL
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Cache-Control': 'no-cache'
-        },
-    });
+    // Add a unique query parameter to the URL to prevent caching
+    const noCacheUrl = `${url}?_=${new Date().getTime()}`;
+
+    const response = await fetch(noCacheUrl);
     if (!response.ok) {
         throw new Error(`Failed to fetch loadout file: ${response.statusText}`);
     }
@@ -62,14 +59,24 @@ async function loadNerdHud(unresolved_url) {
 
     // Create a script element to load the HUDt
     const hudElement = document.createElement('script');
-    hudElement.src = await resolveURL(install.hud);
+
+    const HudUrl = await resolveURL(install.hud);
+
+    // Calculate a timestamp that changes every 5 minutes
+    const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const currentTimestamp = Math.floor(Date.now() / fiveMinutes) * fiveMinutes;
+
+    // Append the timestamp to the HUD URL
+    const noCacheHudUrl = `${HudUrl}?_=${currentTimestamp}`;
+
+    hudElement.src = noCacheHudUrl;
 
     // Inject the script into the document head
     (document.head || document.documentElement).appendChild(hudElement);
     hudElement.remove(); // Clean up after execution
 }
 
-loadNerdHud("https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/install.json");
-//loadNerdHud("builtin:install_builtin.json");
+//loadNerdHud("https://raw.githubusercontent.com/mnemonicpunk/nerdhud_next/refs/heads/main/install.json");
+loadNerdHud("builtin:install_builtin.json");
 
 
