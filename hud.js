@@ -321,19 +321,20 @@ class NerdHUD {
         let total = filenames.length;
         let completed = 0;
         const imports = await filenames.map(async (filename) => {
-          const fileUrl = await resolveURL(filename); // Resolving to chrome-extension:// URL
-          
-          // call the progress callback so we can show progress and hide the interstitial screen when done
-          completed++;
-          progress_callback(completed, total);
-          
-          return import(fileUrl).then(app => {
-            // Make sure the module is correctly imported, and return the default export (class)
-            return app.default || null;
-          }).catch(error => {
-            console.error(`Failed to load script ${filename}:`, error);
-            return null; // Return null if the import fails
-          });
+            const fileUrl = await resolveURL(filename); // Resolving to chrome-extension:// URL
+            
+            // call the progress callback so we can show progress and hide the interstitial screen when done
+            completed++;
+            progress_callback(completed, total);
+            
+            const cacheBustedUrl = `${fileUrl}?_=${new Date().getTime()}`;
+            return import(cacheBustedUrl).then(app => {
+                // Make sure the module is correctly imported, and return the default export (class)
+                return app.default || null;
+            }).catch(error => {
+                console.error(`Failed to load script ${filename}:`, error);
+                return null; // Return null if the import fails
+            });
         });
       
         // Wait for all imports to finish

@@ -48,7 +48,12 @@ async function loadNerdHud(unresolved_url) {
     console.log("LOADING ENVIRONMENT FROM: ", url);
     
     // Fetch the loadout JSON file from the provided URL
-    const response = await fetch(url);
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Cache-Control': 'no-cache'
+        },
+    });
     if (!response.ok) {
         throw new Error(`Failed to fetch loadout file: ${response.statusText}`);
     }
