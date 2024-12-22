@@ -20,11 +20,12 @@ export default class StatsApp extends NerdHudApp {
         this.orders = [];
         this.balance = {}
         this.reset_time = 0;
+        this.past_days = [];
     }
     event(type, data) {
         super.event(type, data);
         if (type == "update") {
-            //this.updateStats();
+            this.update();
         }
         if (type == "order_delivered") {
             this.orderDelivered(data);
@@ -34,6 +35,55 @@ export default class StatsApp extends NerdHudApp {
             this.updateCurrency(data);
             this.save();
         }
+        if (type == "taskboard") {
+            this.reset_time = data.nextReset;
+            this.save();
+        }
+
+    }
+    update() {
+        let timer_element = this.window.querySelector('#hud_reset_timer');
+        
+        if (this.reset_time != 0) {
+            let rt = this.timestampToServerTime(this.reset_time);
+
+            timer_element.innerHTML = this.sys.formatRelativeTime(rt) + " until reset";
+
+            if (rt < Date.now()) {
+                console.log("Reset detected.");
+                this.performReset();
+                this.save();
+            }
+
+            
+        } else {
+            timer_element.innerHTML = "Visit taskboard to set reset time.";
+        }
+    }
+    performReset() {
+        // push current stats to the past days
+        this.past_days.push({
+            time: this.reset_time,
+            order: this.orders,
+            balance: this.balance
+        })
+        while (this.past_days.length > 7) {
+            this.past_days.shift();
+        }
+        
+        // reset current stats
+        this.orders = [];
+        this.balance = {};
+        let new_rt = rt;
+        const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        while (new_rt <= this.timestampToServerTime(Date.now())) {
+            new_rt += oneDayInMs;
+        }
+        this.reset_time = new_rt;
+
+        // update UI
+        this.updateBreakdown();
+        this.updateCurrency();
 
     }
     onCreate() {
@@ -50,12 +100,14 @@ export default class StatsApp extends NerdHudApp {
         return {
             orders: this.orders,
             balance: this.balance,
-            reset_time: this.reset_time
+            reset_time: this.reset_time,
+            past_days: this.past_days
         }
     }
     onLoad(data) {
         this.balance = data.balance;
         this.reset_time = data.reset_time;
+        this.past_days = data.past_days;
 
         this.updateCurrency(this.balance);
         for (let i=0; i < data.orders.length; i++) {
@@ -67,10 +119,20 @@ export default class StatsApp extends NerdHudApp {
         let income_element = document.createElement('div');
         income_element.className = "hud_stat_pane";
 
-        let coin_display = '<img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image +'"> <span data-currency="cur_coins">0</span>';
-        let pixel_display = '<img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_pixel').sprite.image +'"> <span data-currency="cur_pixel">0</span>';
+        //let coin_display = '<img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image +'"> <span data-currency="cur_coins">0</span>';
+        //let pixel_display = '<img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_pixel').sprite.image +'"> <span data-currency="cur_pixel">0</span>';
         
-        income_element.innerHTML = '<div class="hud_stat_header">Income Today</div><div class="hud_stat_display"><div class="hud_stat_entry">' + coin_display + '</div><div class="hud_stat_entry">' + pixel_display + '</div></div><div class="hud_stat_display"><div class="hud_stat_entry">13:17 until reset</div></div></div>';
+        let all_currencies = this.sys.getGameLibrary().currencies;
+        let currency_list = ['cur_coins', 'cur_pixel', 'cur_guildtoken', 'cur_mistletoe_white', 'cur_mistletoe_green', 'cur_mistletoe']
+
+        let income_currencies = "";
+        for (let i=0; i < currency_list.length; i++) {
+            let c = all_currencies[currency_list[i]];
+            let currency_display = '<img class="hud_icon_small" src="' + c.sprite.image +'"> <span data-currency="' + currency_list[i] + '">0</span>';
+            income_currencies += '<div class="hud_stat_entry">' + currency_display + '</div>'
+        }
+
+        income_element.innerHTML = '<div class="hud_stat_header">Currencies and Income</div><div class="hud_stat_display" style="display: flex; flex-wrap: wrap; text-align: center; gap: 6px;">' + income_currencies + '</div><div class="hud_stat_display"><div class="hud_stat_entry" id="hud_reset_timer"></div></div></div>';
 
         this.elements.income = income_element;
 
@@ -107,6 +169,35 @@ export default class StatsApp extends NerdHudApp {
 
         this.window.appendChild(delivery_details);
         
+    }
+    updateBreakdown() {
+        for (let i in SKILLS) {
+            let skill = SKILLS[i];
+            let el = this.elements.breakdown[skill];
+            let data = this.order_cache[skill];
+            let icon = '<img class="hud_icon_medium" src="https://d31ss916pli4td.cloudfront.net/game/ui/skills/skills_icon_' + skill +'.png?v6">';
+            if (skill == "total") {
+                icon = "Total";
+            }
+
+            let cpp = "n/a";
+            if (data.pixels > 0) {
+                cpp = this.sys.formatCurrency(data.value / data.pixels);
+            }
+ 
+            let html = '<td>' + icon +  '</td><td>' + data.delivered + '</td><td>' + this.sys.formatCurrency(data.pixels) + '</td><td>' + this.sys.formatCurrency(data.coins) + '</td><td>' + cpp + '</td><td>' + this.sys.formatCurrency(data.value) + '</td>'
+            if (el.innerHTML != html) {
+                el.innerHTML = html;
+            }
+
+            if (skill != "total") {
+                if (data.delivered > 0) {
+                    el.style.display = "table-row";
+                } else {
+                    el.style.display = "none";
+                }
+            }
+        }
     }
     createOrderCache() {
         let breakdown = {};
@@ -157,33 +248,7 @@ export default class StatsApp extends NerdHudApp {
         breakdown["total"].value += value; 
         breakdown[order_skill].value += value;
 
-        for (let i in SKILLS) {
-            let skill = SKILLS[i];
-            let el = this.elements.breakdown[skill];
-            let data = this.order_cache[skill];
-            let icon = '<img class="hud_icon_medium" src="https://d31ss916pli4td.cloudfront.net/game/ui/skills/skills_icon_' + skill +'.png?v6">';
-            if (skill == "total") {
-                icon = "Total";
-            }
-
-            let cpp = "n/a";
-            if (data.pixels > 0) {
-                cpp = this.sys.formatCurrency(data.value / data.pixels);
-            }
- 
-            let html = '<td>' + icon +  '</td><td>' + data.delivered + '</td><td>' + this.sys.formatCurrency(data.pixels) + '</td><td>' + this.sys.formatCurrency(data.coins) + '</td><td>' + cpp + '</td><td>' + this.sys.formatCurrency(data.value) + '</td>'
-            if (el.innerHTML != html) {
-                el.innerHTML = html;
-            }
-
-            if (skill != "total") {
-                if (data.delivered > 0) {
-                    el.style.display = "table-row";
-                } else {
-                    el.style.display = "none";
-                }
-            }
-        }
+        this.updateBreakdown();
     }
     updateCurrency(currency) {
         for (let i=0; i < currency.length; i++) {
@@ -207,7 +272,9 @@ export default class StatsApp extends NerdHudApp {
             let balance = this.balance[i];
             let el = this.elements.income.querySelector('[data-currency="' + i + '"]');
             if (el) {
-                el.innerHTML = this.sys.formatCurrency(balance.change);
+                let change = '<span style="' + (balance.change>0?'color:#afa;">(+':'color:#faa;">(') + this.sys.formatCurrency(balance.change) + ')</span>'
+                if (balance.change == 0) { change = ""};
+                el.innerHTML = this.sys.formatCurrency(balance.balance) + "&nbsp;" + change;
             }
         }
     }

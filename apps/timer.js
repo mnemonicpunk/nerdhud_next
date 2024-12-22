@@ -389,7 +389,4 @@ export default class TimerApp extends NerdHudApp {
             delete this.timers[mid];
         }
     }
-    timestampToServerTime(timestamp) {
-        return (timestamp + (libpixels.getServerTime() - Date.now())); 
-    }
 }

@@ -154,6 +154,9 @@ class NerdHudApp {
     save() {
         this.sys.dataDirty();
     }
+    timestampToServerTime(timestamp) {
+        return (timestamp + (libpixels.getServerTime() - Date.now())); 
+    }
 }
 
 
