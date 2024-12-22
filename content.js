@@ -22,7 +22,6 @@ let loader_handler = window.addEventListener('message', (msg) => {
                     type: "load_libPixels",
                     libPixels: libPixels.file
                 };
-                console.log("SENDING libPixels..." ,msg);
                 window.postMessage(msg);
         
                 LIBPIXELS_VER = libPixels.version;

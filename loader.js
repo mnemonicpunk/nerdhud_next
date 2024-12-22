@@ -1,7 +1,6 @@
 // Helper function to resolve "builtin:" paths to Chrome extension URLs
 async function resolveURL(path) {
     if (path.startsWith("builtin:")) {
-        console.log("RESOLVING BUILT-IN URL: ", path);
         return await getChromeURL(path.replace('builtin:', ''));
     }
     return path;
@@ -43,9 +42,7 @@ window.addEventListener('message', (msg) => {
 window.postMessage('libPixels_loader_ready');
 
 async function loadNerdHud(unresolved_url) {
-    console.log("LOADING ENVIRONMENT: ", unresolved_url);
     const url = await resolveURL(unresolved_url);
-    console.log("LOADING ENVIRONMENT FROM: ", url);
     
     // Add a unique query parameter to the URL to prevent caching
     const noCacheUrl = `${url}?_=${new Date().getTime()}`;

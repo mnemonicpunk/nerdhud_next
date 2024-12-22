@@ -8,7 +8,6 @@ const ENTITY_NAME_OVERRIDES = {
 // Helper function to resolve "builtin:" paths to Chrome extension URLs
 async function resolveURL(path) {
     if (path.startsWith("builtin:")) {
-        console.log("RESOLVING BUILT-IN URL: ", path);
         return await getChromeURL(path.replace('builtin:', ''));
     }
     return path;
@@ -54,7 +53,6 @@ async function getStorage(key) {
         // Handler for messages
         function handleMessage(event) {
             if (event.data.type === 'get_storage_response' && event.data.result) {
-                console.log("LOADED FROM STORAGE: ", event.data.result);
                 window.removeEventListener('message', handleMessage); // Clean up listener
                 resolve(event.data.result);
             }
@@ -76,7 +74,6 @@ async function putStorage(data) {
         // Handler for messages
         function handleMessage(event) {
             if (event.data.type === 'put_storage_response' && event.data.result) {
-                console.log("SAVED TO STORAGE: ", event.data.result);
                 window.removeEventListener('message', handleMessage); // Clean up listener
                 resolve(event.data.result);
             }
@@ -297,9 +294,7 @@ class NerdHUD {
                             version: install.libPixels.version,
                             file: fileContent
                         }
-                    }).then((result) => {
-                        console.log("STORAGE RESULT: ", result);
-                    });
+                    })
 
                     window.location.reload();
                 } else {
@@ -374,8 +369,6 @@ class NerdHUD {
         console.log("Apps created, loading save data...");
 
         this.loadAppData(this.mid, data => {
-            console.log("LOADING APP DATA: ", data);
-
             if (data) {
                 this.withApps(app => {
                     let app_data = data[app.name];
@@ -546,8 +539,6 @@ class NerdHUD {
                                     }
                                     if (player) {
                                         app.onDrawPlayer(ctx, player, bounds, this.camera);
-                                    } else {
-                                        console.log("NO PLAYER FOUND FOR ", i);
                                     }
                                 } catch(e) {
                                     console.log("onDrawPlayer error with ", app, this.scene_state.players[i], e);
@@ -747,9 +738,8 @@ class NerdHUD {
         });
     }
     async saveAppData(mid, data) {
-        console.log("Saving data for mid:", mid);
         if (!this._initial_app_data_load_finished) {
-            console.log("ERROR: Attempted to save before initial load: ", data);
+            //console.log("ERROR: Attempted to save before initial load: ", data);
             return;
         }
         try {
@@ -759,7 +749,6 @@ class NerdHUD {
 
             await new Promise((resolve, reject) => {
                 putStorage(dataToSave).then((result) => {
-                    console.log("SAVE RESULT: ", result);
                     resolve();
                 }).catch(reject);
             });

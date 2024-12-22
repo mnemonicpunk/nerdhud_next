@@ -50,7 +50,6 @@ export default class StatsApp extends NerdHudApp {
             timer_element.innerHTML = this.sys.formatRelativeTime(rt) + " until reset";
 
             if (rt < Date.now()) {
-                console.log("Reset detected.");
                 this.performReset();
                 this.save();
             }

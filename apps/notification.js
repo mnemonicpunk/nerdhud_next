@@ -29,7 +29,6 @@ export default class NotificationApp extends NerdHudApp {
             this.nextNotification();
         }
         if (type == "update") {
-            console.log("Update triggered at ", new Date(Date.now()));
             if ((this.current_notification != null) && (this.current_notification.timestamp < Date.now()-5000)) {
                 this.current_notification = null;
                 this.nextNotification();

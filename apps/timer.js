@@ -266,8 +266,6 @@ export default class TimerApp extends NerdHudApp {
                                     0, 0, 32, 32                // Destination (scaled to 32x32)
                                 );
 
-                                console.log("SPRITE SCALING: ", size, sprite, entity, frames);
-
                                 img.removeEventListener('load', load_func);
 
                                 // Replace the image source with the canvas content

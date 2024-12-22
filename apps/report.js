@@ -10,7 +10,7 @@ export default class ReportApp extends NerdHudApp {
         }
     }
     fileReport(url, data) {
-        console.log("FILING REPORT: ", url, data);
+        //console.log("FILING REPORT: ", url, data);
         return new Promise((resolve, reject) => {
             try {
                 if (typeof url !== "string" || typeof data !== "object" || data === null) {
