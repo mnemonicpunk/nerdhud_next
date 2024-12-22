@@ -77,6 +77,7 @@ window.addEventListener('message', (event) => {
 
 // Listen for messages from other parts of the extension
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log("RUNTIME MESSAGE: ", message)
     if (message.type === "hud_notification_cleared") {
         window.postMessage(message);
     }

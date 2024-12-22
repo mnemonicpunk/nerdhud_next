@@ -29,16 +29,11 @@ export default class NotificationApp extends NerdHudApp {
             this.nextNotification();
         }
         if (type == "update") {
-            if ((this.current_notification != null) && (this.current_notification.mode == "toast") && (this.current_notification.timestamp < Date.now()-5000)) {
+            console.log("Update triggered at ", new Date(Date.now()));
+            if ((this.current_notification != null) && (this.current_notification.timestamp < Date.now()-5000)) {
                 this.current_notification = null;
                 this.nextNotification();
             }
-        }
-        if (type == "enter_game") {    
-            this.queueNotification({
-                title: "Test notification!",
-                message: "Ich und mein Test. Testitestitest!"
-            });
         }
     }
     queueNotification(notification) {
@@ -50,11 +45,10 @@ export default class NotificationApp extends NerdHudApp {
             let n = this.queue.shift();
             this.current_notification = n;
 
-            let mode = document.hasFocus()?"toast":"notification";
             n.timestamp = Date.now();
-            n.mode = mode;
+            n.mode =  document.hasFocus()?"toast":"notification";
 
-            if (mode == "notification") {
+            if (n.mode == "notification") {
                 this.createNotification(n.title, n.message);
             }
         }
