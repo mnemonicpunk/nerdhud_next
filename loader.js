@@ -1,6 +1,8 @@
 // Helper function to resolve "builtin:" paths to Chrome extension URLs
 async function resolveURL(path) {
     path = window.nhud_repo + path;
+
+    console.log("RESOLVING URL: ", path);
     if (path.startsWith("builtin:")) {
         return await getChromeURL(path.replace('builtin:', ''));
     }
