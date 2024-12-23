@@ -60,6 +60,10 @@ export default class StatsApp extends NerdHudApp {
         }
     }
     performReset() {
+        if (!this.past_days) {
+            this.past_days = [];
+        }
+
         // push current stats to the past days
         this.past_days.push({
             time: this.reset_time,
@@ -73,7 +77,7 @@ export default class StatsApp extends NerdHudApp {
         // reset current stats
         this.orders = [];
         this.balance = {};
-        let new_rt = rt;
+        let new_rt = this.timestampToServerTime(this.reset_time);
         const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
         while (new_rt <= this.timestampToServerTime(Date.now())) {
             new_rt += oneDayInMs;
@@ -127,8 +131,10 @@ export default class StatsApp extends NerdHudApp {
         let income_currencies = "";
         for (let i=0; i < currency_list.length; i++) {
             let c = all_currencies[currency_list[i]];
-            let currency_display = '<img class="hud_icon_small" src="' + c.sprite.image +'"> <span data-currency="' + currency_list[i] + '">0</span>';
-            income_currencies += '<div class="hud_stat_entry">' + currency_display + '</div>'
+            if (c) {
+                let currency_display = '<img class="hud_icon_small" src="' + c.sprite.image +'"> <span data-currency="' + currency_list[i] + '">0</span>';
+                income_currencies += '<div class="hud_stat_entry">' + currency_display + '</div>'    
+            }
         }
 
         income_element.innerHTML = '<div class="hud_stat_header">Currencies and Income</div><div class="hud_stat_display" style="display: flex; flex-wrap: wrap; text-align: center; gap: 6px;">' + income_currencies + '</div><div class="hud_stat_display"><div class="hud_stat_entry" id="hud_reset_timer"></div></div></div>';
@@ -250,6 +256,7 @@ export default class StatsApp extends NerdHudApp {
         this.updateBreakdown();
     }
     updateCurrency(currency) {
+        if (!currency) { return; }
         for (let i=0; i < currency.length; i++) {
             let c = currency[i];
             if (!this.balance[c.currencyId]) {

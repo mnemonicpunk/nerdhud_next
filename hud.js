@@ -708,7 +708,11 @@ class NerdHUD {
         //console.dir(msg);
         for (let i in this.apps) {
             let app = this.apps[i];
-            app.event(msg.type, msg.data);
+            try {
+                app.event(msg.type, msg.data);
+            } catch(e) {
+                console.log("Error when handling event with app: ", msg, app);
+            }
         }
     }
     dispatchEvent(type, data) {
