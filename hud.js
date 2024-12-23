@@ -13,6 +13,7 @@ async function resolveURL(path) {
     if (path.startsWith("builtin:")) {
         return await getChromeURL(path.replace('builtin:', ''));
     }
+    return path;
 }
 
 async function getChromeURL(url) {
