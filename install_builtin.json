@@ -1,22 +1,23 @@
 {
     "libPixels": {
-        "url": "builtin:/lib/libPixels.js",
+        "url": "lib/libPixels.js",
         "version": "0.1.39"
     },
-    "hud": "builtin:hud.js",
+    "repo": "builtin:",
+    "hud": "hud.js",
     "apps": [
-        "builtin:apps/inventory.js",
-        "builtin:apps/market.js",
-        "builtin:apps/debug.js",
-        "builtin:apps/taskboard.js",
-        "builtin:apps/stats.js",
-        "builtin:apps/iteminfo.js",
-        "builtin:apps/shoppinglist.js",
-        "builtin:apps/storage.js",
-        "builtin:apps/timer.js",
-        "builtin:apps/report.js",
-        "builtin:apps/nerdmenu.js",
-        "builtin:apps/notification.js",
-        "builtin:apps/gw.js"
+        "apps/inventory.js",
+        "apps/market.js",
+        "apps/debug.js",
+        "apps/taskboard.js",
+        "apps/stats.js",
+        "apps/iteminfo.js",
+        "apps/shoppinglist.js",
+        "apps/storage.js",
+        "apps/timer.js",
+        "apps/report.js",
+        "apps/nerdmenu.js",
+        "apps/notification.js",
+        "apps/gw.js"
     ]
 }

@@ -42,7 +42,7 @@ export default class ShoppingListApp extends NerdHudApp {
     onCreate() {
         this.window = this.sys.createWindow({ 
             docked: "right",
-            icon: "builtin:img/nhud_icon_list.png",
+            icon: "img/nhud_icon_list.png",
             name: "shoppinglist",
             title: "Shopping List"
         });

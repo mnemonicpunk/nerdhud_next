@@ -30,7 +30,7 @@ export default class ItemInfoApp extends NerdHudApp {
     onCreate() {
         this.window = this.sys.createWindow({ 
             docked: "left",
-            icon: "builtin:img/nhud_icon_info.png",
+            icon: "img/nhud_icon_info.png",
             name: "iteminfo",
             title: "Item Info"
         });

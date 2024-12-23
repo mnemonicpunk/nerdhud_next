@@ -65,7 +65,7 @@ export default class TaskboardApp extends NerdHudApp {
     onCreate() {
         this.window = this.sys.createWindow({ 
             docked: "left",
-            icon: "builtin:img/nhud_icon_task.png",
+            icon: "img/nhud_icon_task.png",
             name: "taskboard",
             title: "Taskboard"
         });

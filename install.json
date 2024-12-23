@@ -1,22 +1,23 @@
 {
     "libPixels": {
-        "url": "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/lib/libPixels.js",
+        "url": "lib/libPixels.js",
         "version": "0.1.39"
     },
-    "hud": "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/hud.js",
+    "repo": "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/",
+    "hud": "hud.js",
     "apps": [
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/inventory.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/market.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/debug.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/taskboard.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/stats.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/iteminfo.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/shoppinglist.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/storage.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/timer.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/report.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/nerdmenu.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/notification.js",
-        "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/apps/gw.js"
+        "apps/inventory.js",
+        "apps/market.js",
+        "apps/debug.js",
+        "apps/taskboard.js",
+        "apps/stats.js",
+        "apps/iteminfo.js",
+        "apps/shoppinglist.js",
+        "apps/storage.js",
+        "apps/timer.js",
+        "apps/report.js",
+        "apps/nerdmenu.js",
+        "apps/notification.js",
+        "apps/gw.js"
     ]
 }

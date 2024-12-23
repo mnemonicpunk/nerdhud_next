@@ -23,7 +23,7 @@ export default class StorageApp extends NerdHudApp {
 
         this.window = this.sys.createWindow({ 
             docked: "right",
-            icon: "builtin:img/nhud_icon_storage.png",
+            icon: "img/nhud_icon_storage.png",
             name: "storage",
             title: "Storage"
         });

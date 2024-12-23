@@ -1,9 +1,9 @@
 // Helper function to resolve "builtin:" paths to Chrome extension URLs
 async function resolveURL(path) {
+    path = window.nhud_repo + path;
     if (path.startsWith("builtin:")) {
         return await getChromeURL(path.replace('builtin:', ''));
     }
-    return path;
 }
 
 async function getChromeURL(url) {
@@ -42,7 +42,10 @@ window.addEventListener('message', (msg) => {
 window.postMessage('libPixels_loader_ready');
 
 async function loadNerdHud(unresolved_url) {
-    const url = await resolveURL(unresolved_url);
+    let url = unresolved_url;
+    if (url.startsWith("builtin:")) {
+        url = await getChromeURL(unresolved_url.replace('builtin:', ''));
+    }
     
     // Add a unique query parameter to the URL to prevent caching
     const noCacheUrl = `${url}?_=${new Date().getTime()}`;
@@ -53,6 +56,7 @@ async function loadNerdHud(unresolved_url) {
     }
     const install = await response.json();
     window.nhud_install = install;
+    window.nhud_repo = install.repo;
 
     // Create a script element to load the HUDt
     const hudElement = document.createElement('script');

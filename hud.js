@@ -7,10 +7,10 @@ const ENTITY_NAME_OVERRIDES = {
 
 // Helper function to resolve "builtin:" paths to Chrome extension URLs
 async function resolveURL(path) {
+    path = window.nhud_repo + path;
     if (path.startsWith("builtin:")) {
         return await getChromeURL(path.replace('builtin:', ''));
     }
-    return path;
 }
 
 async function getChromeURL(url) {
@@ -172,7 +172,7 @@ class NerdHUD {
         this.logo = document.createElement('img');
         //this.logo.src = chrome.runtime.getURL("nerdhudnext_logo.png");
         this.logo.src = "#";
-        resolveURL("builtin:nerdhudnext_logo.png").then(url => {
+        resolveURL("nerdhudnext_logo.png").then(url => {
             this.logo.src = url;
         });
 

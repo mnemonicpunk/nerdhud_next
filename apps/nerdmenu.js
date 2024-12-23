@@ -6,7 +6,7 @@ export default class NerdMenuApp extends NerdHudApp {
     onCreate() {
         this.window = this.sys.createWindow({ 
             docked: "right",
-            icon: "builtin:img/nhud_icon_nerd.png",
+            icon: "img/nhud_icon_nerd.png",
             name: "nerd_menu",
             title: "Nerd Menu"
         });

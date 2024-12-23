@@ -14,7 +14,7 @@ export default class GWApp extends NerdHudApp {
         // create loading screen logo
         this.icons = document.createElement('img');
         this.icons.src = "#"; 
-        resolveURL("builtin:img/nhud_gw_icons.png").then(url => {
+        resolveURL("img/nhud_gw_icons.png").then(url => {
             this.icons.src = url;
         });
     }
