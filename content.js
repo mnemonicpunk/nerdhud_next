@@ -56,11 +56,11 @@ window.addEventListener('message', (event) => {
      }
      if (message.type === "put_storage") {
         const { data } = message;
-        console.log("DATA TO STORE: ", data);
         chrome.storage.local.set(data, (result) => {
             window.postMessage({
                 type: 'put_storage_response',
-                result
+                result,
+                success: true
             });
         });
      }
@@ -72,12 +72,23 @@ window.addEventListener('message', (event) => {
     if (message.type === "show_hud_notification") {
         chrome.runtime.sendMessage(message);
     }
+
+    if (message.type === "put_cloud_storage") {
+        chrome.runtime.sendMessage(message);
+    }
+
+    if (message.type === "get_cloud_storage") {
+        chrome.runtime.sendMessage(message);
+    }
 });
 
 // Listen for messages from other parts of the extension
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log("RUNTIME MESSAGE: ", message)
     if (message.type === "hud_notification_cleared") {
+        window.postMessage(message);
+    }
+
+    if (message.type === "get_cloud_storage_result") {
         window.postMessage(message);
     }
 });

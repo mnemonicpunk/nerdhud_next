@@ -76,7 +76,8 @@ async function putStorage(data) {
     return new Promise((resolve, reject) => {
         // Handler for messages
         function handleMessage(event) {
-            if (event.data.type === 'put_storage_response' && event.data.result) {
+            if (event.data.type === 'put_storage_response' && event.data.success) {
+                console.log("RECEIVED STORAGE RESULT CONFIRMATION: ", event.data.result)
                 window.removeEventListener('message', handleMessage); // Clean up listener
                 resolve(event.data.result);
             }
@@ -195,6 +196,12 @@ class NerdHUD {
         this._debounceTimeout = null;
         this._latestArgs = null;
         this._lastSaveTime = 0;
+
+        // handle cloud saving
+        this.cloudsaveTimer = null; // Debounce timer
+        this.cloudsaveLatestData = null; // Store the latest data
+        this.cloudsaveLastSaveTime = 0; // Timestamp of the last save
+        this.cloudsaveDebounceDelay = 5 * 60 * 1000; // 5 minutes in milliseconds
 
         // app function exports
         this.app_funcs = {};
@@ -399,8 +406,6 @@ class NerdHUD {
 
         // only set to in-game after loading app data to avoid clashes
         this.is_in_game = true;     
-        
-        
     }
     resize() {
         this.canvas.width = this.canvas.clientWidth;
@@ -654,6 +659,9 @@ class NerdHUD {
                 save_data[app.name] = this._known_good_app_data[app.name] || null; 
             });
             if (save_data) {
+                // add the current timestamp to the save data
+                save_data.timestamp = Date.now();
+
                 this.debounceSaveAppData(this.mid, save_data);
             }
             this._known_good_app_data = save_data;
@@ -684,6 +692,10 @@ class NerdHUD {
             this.username = msg.data.name;
             this.current_map = msg.data.map_name;
             this.enterGame();
+        }
+
+        if (msg.type == "get_cloud_storage_result") {
+            console.log("CLOUD LOAD: ", msg.data);
         }
 
         if (msg.type == "map_changed") {
@@ -724,24 +736,53 @@ class NerdHUD {
             data
         });
     }
-    loadAppData(mid, callback) {
+    async loadAppData(mid, callback) {
         console.log("Loading data for mid:", mid);
-        getStorage("NHN_" + mid).then((result) => {
-            /*if (chrome.runtime.lastError) {
-                console.error("Error loading data for mid:", mid);
-                console.dir(chrome.runtime.lastError);
-                // No action taken, let the caller handle the error
-            } else {*/
-                console.log("Data loaded for mid:", mid);
-                // Check if data exists
-                if (result && result["NHN_" + mid]) {
-                    console.log("Data found for mid:", mid);
-                    callback(result["NHN_" + mid]);
-                } else {
-                    console.log("No data found for mid:", mid);
-                    callback(null);
+        let result = await getStorage("NHN_" + mid);
+        let local_result = null;
+
+        // Check if data exists
+        if (result && result["NHN_" + mid]) {
+            console.log("Local data found for mid:", mid);
+            local_result = result["NHN_" + mid];
+        }
+
+        let cloud_result = await this.cloudloadAppData(mid);
+
+        if (cloud_result) {
+            if (!local_result) {
+                console.log("Cloud data loaded for mid: ", mid, cloud_result);
+                callback(cloud_result);
+            } else if (cloud_result.timestamp > local_result.timestamp) {
+                console.log("Using newer cloud data for mid: ", mid, cloud_result);
+            } else {
+                
+            }
+        }
+
+        console.log("Using local data for mid: ", mid, local_result);
+        callback(local_result);
+    }
+    async cloudloadAppData(mid) {
+        return new Promise((resolve, reject) => {
+            // Handler for messages
+            function handleMessage(event) {
+                if (event.data.type === 'get_cloud_storage_result' && (event.data.data !== undefined)) {
+                    window.removeEventListener('message', handleMessage); // Clean up listener
+                    resolve(event.data.data.data);
                 }
-            //}
+            }
+    
+            // Add event listener for the response
+            window.addEventListener('message', handleMessage);
+    
+            // Send out the message for resolving the URL
+            window.postMessage({
+                type: 'get_cloud_storage',
+                data: {
+                    mid
+                }
+            });
         });
     }
     async saveAppData(mid, data) {
@@ -762,6 +803,10 @@ class NerdHUD {
 
             // Update the last save time
             this._lastSaveTime = Date.now();
+
+            // now that we manage to save, schedule a cloud save to go out
+            this.scheduleCloudSave(mid, data);
+
             return true;
         } catch (error) {
             console.error("Error saving data for mid:", mid, error);
@@ -792,6 +837,61 @@ class NerdHUD {
             const { mid, data } = this._latestArgs;
             await this.saveAppData(mid, data);
         }, timeUntilNextSave);
+    }
+    async scheduleCloudSave(mid, data) {
+        console.log("Scheduling cloud save for: ", mid, data);
+
+        // Update the latest data
+        this.cloudsaveLatestData = data;
+
+        const now = Date.now();
+
+        // If 5 minutes have passed since the last save, save immediately
+        if (now - this.cloudsaveLastSaveTime >= this.cloudsaveDebounceDelay) {
+            await this.performCloudSave(mid, this.cloudsaveLatestData);
+            return;
+        }
+
+        // Clear any existing timer
+        if (this.cloudsaveTimer) {
+            clearTimeout(this.cloudsaveTimer);
+        }
+
+        // Schedule a new save after the remaining debounce delay
+        const remainingTime = this.cloudsaveDebounceDelay - (now - this.cloudsaveLastSaveTime);
+        this.cloudsaveTimer = setTimeout(() => this.performCloudSave(mid, this.cloudsaveLatestData), remainingTime);
+    }
+
+    async performCloudSave(mid, data) {
+        console.log("CLOUD SAVING: ", mid, data);
+        window.postMessage({
+            type: 'put_cloud_storage',
+            data: {
+                mid,
+                data
+            }
+        })
+        this.cloudsaveLastSaveTime = Date.now();
+
+        /*try {
+            const response = await fetch(`https://pixelnerds.xyz/api/hud/${mid}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(this.cloudsaveLatestData),
+            });
+
+            if (!response.ok) {
+                console.error("Cloud save failed:", response.statusText);
+            } else {
+                console.log("Cloud save successful!");
+                this.cloudsaveLastSaveTime = Date.now(); // Update last save time
+            }
+        } catch (error) {
+            console.error("Error during cloud save:", error);
+        } finally {
+            // Clear the timer after execution
+            this.cloudsaveTimer = null;
+        }*/
     }
     clearAppData() {
         this.saveAppData(this.mid, {}).then(() => { window.location.reload(); }); 

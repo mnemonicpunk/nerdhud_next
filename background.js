@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     
         // Get the current active tab ID dynamically
         chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-            const originTabId = tabs[0].id;
+            const originTabId = sender.tab.id;
     
             let callback = () => {
                 sendResponse({
@@ -67,13 +67,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             }, (notificationId) => {
                 if (chrome.runtime.lastError) {
                     console.error("Failed to create notification:", chrome.runtime.lastError);
-                } else {
-                    console.log("Notification created with ID:", notificationId);
-    
+                } else { 
                     // Automatically dismiss the notification after 5 seconds
                     setTimeout(() => {
                         chrome.notifications.clear(notificationId, () => {
-                            console.log("Notification dismissed after 5 seconds");
                             callback();
                         });
                     }, 5000); // 5000 milliseconds = 5 seconds
@@ -98,5 +95,54 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 }
             });
         });
-    }    
+        return true;
+    }   
+    
+    if (message.type === "put_cloud_storage") {
+        let data = message.data;
+        try {
+            const response = fetch(`https://pixelnerds.xyz/api/hud/save/${data.mid}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data.data),
+            }).then(response => {
+                if (!response.ok) {
+                    console.error("Cloud save failed:", response.statusText);
+                } else {
+                    console.log("Cloud save successful!", data);
+                }
+            })
+        } catch (error) {
+            console.error("Error during cloud save:", error);
+        }
+    }
+
+    if (message.type === "get_cloud_storage") {
+        let data = message.data;
+
+        fetch(`https://pixelnerds.xyz/api/hud/save/${data.mid}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        }).then(response => {
+            if (!response.ok) {
+                console.error("Cloud load failed:", response.statusText, message);
+                throw new Error("Response not OK");
+            }
+            return response.json(); // Only attempt JSON parsing for valid responses
+        }).then(loaded_data => {
+            console.log("Cloud load successful!", loaded_data);
+            chrome.tabs.sendMessage(sender.tab.id, {
+                type: "get_cloud_storage_result",
+                data: loaded_data
+            });
+        }).catch(error => {
+            console.error("Error during fetch or JSON parsing:", error);
+            chrome.tabs.sendMessage(sender.tab.id, {
+                type: "get_cloud_storage_result",
+                data: null
+            });
+        });        
+       
+        return true;
+    }
 });
