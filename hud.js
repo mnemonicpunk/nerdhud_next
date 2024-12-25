@@ -753,10 +753,11 @@ class NerdHUD {
             if (!local_result) {
                 console.log("Cloud data loaded for mid: ", mid, cloud_result);
                 callback(cloud_result);
-            } else if (cloud_result.timestamp > local_result.timestamp) {
+                return;
+            } else if ((cloud_result.timestamp > local_result.timestamp) || (!local_result.timestamp)) {
                 console.log("Using newer cloud data for mid: ", mid, cloud_result);
-            } else {
-                
+                callback(cloud_result);
+                return;
             }
         }
 
