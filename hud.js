@@ -750,7 +750,7 @@ class NerdHUD {
 
         let cloud_result = await this.cloudloadAppData(mid);
 
-        console.log("LOADED SAVE DATA: ", local_result, cloud_result, new Date(local_result.timestamp), new Date(cloud_result.timestamp));
+        console.log("LOADED SAVE DATA: ", local_result, cloud_result);
 
         if (cloud_result) {
             if (!local_result) {
