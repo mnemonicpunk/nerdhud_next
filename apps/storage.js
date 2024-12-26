@@ -27,7 +27,7 @@ export default class StorageApp extends NerdHudApp {
             name: "storage",
             title: "Storage"
         });
-        this.window.placeholder = "Your storages will bec checked in here automatically when you visit them!";
+        this.window.placeholder = "Your storages will be checked in here automatically when you visit them!";
     }
     onSave() {
         return {
@@ -39,13 +39,19 @@ export default class StorageApp extends NerdHudApp {
         this.updateStorages();
     }
     highlightItem(item) {
-        
         let storages = this.findStoragesWithItem(item);
         let mids = [];
         for (let i in storages) {
             mids.push(storages[i].mapEntity_id);
         }
         this.highlighted_storages = mids;
+    }
+    highlightStorage(mid) {
+        if ((!mid) || (!this.storages[mid])) {
+            this.highlighted_storages = [];
+            return;
+        }
+        this.highlighted_storages = [this.storages[mid].mapEntity_id];
     }
     onDrawEntity(ctx, entity, bounds, camera) {
         if ((this.highlighted_storages) && (this.highlighted_storages.includes(entity.mid))) {
@@ -171,6 +177,13 @@ export default class StorageApp extends NerdHudApp {
                     el = document.createElement('div');
                     el.dataset.storage = s;
                     el.style = "padding: 5px; margin: 5px;"
+
+                    el.addEventListener('mouseover', () => {
+                        this.highlightStorage(s);
+                    });
+                    el.addEventListener('mouseout', () => {
+                        this.highlightStorage();
+                    });
                     
                     entries_el.appendChild(el);
                 }

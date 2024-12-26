@@ -658,13 +658,14 @@ class NerdHUD {
             }, app => {
                 save_data[app.name] = this._known_good_app_data[app.name] || null; 
             });
-            if (save_data) {
+            // at least one data field aside from the timestamp needs to have a value
+            if (Object.entries(save_data).some(([key, value]) => key !== 'timestamp' && value !== null)) {
                 // add the current timestamp to the save data
                 save_data.timestamp = Date.now();
-
+                this._known_good_app_data = save_data;
                 this.debounceSaveAppData(this.mid, save_data);
             }
-            this._known_good_app_data = save_data;
+            
             this.data_needs_saving = false;
         }
     }
@@ -726,7 +727,7 @@ class NerdHUD {
             try {
                 app.event(msg.type, msg.data);
             } catch(e) {
-                console.log("Error when handling event with app: ", msg, app);
+                console.log("Error when handling event with app: ", msg, app, e);
             }
         }
     }
@@ -748,6 +749,8 @@ class NerdHUD {
         }
 
         let cloud_result = await this.cloudloadAppData(mid);
+
+        console.log("LOADED SAVE DATA: ", local_result, cloud_result, new Date(local_result.timestamp), new Date(cloud_result.timestamp));
 
         if (cloud_result) {
             if (!local_result) {
