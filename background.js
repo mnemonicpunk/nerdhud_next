@@ -125,8 +125,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             headers: { "Content-Type": "application/json" }
         }).then(response => {
             if (!response.ok) {
-                console.error("Cloud load failed:", response.statusText, message);
-                throw new Error("Response not OK");
+                console.log("Cloud load failed:", response.statusText, message);
+                chrome.tabs.sendMessage(sender.tab.id, {
+                    type: "get_cloud_storage_result",
+                    data: null
+                });
             }
             return response.json(); // Only attempt JSON parsing for valid responses
         }).then(loaded_data => {

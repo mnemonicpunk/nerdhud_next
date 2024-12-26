@@ -773,7 +773,7 @@ class NerdHUD {
             function handleMessage(event) {
                 if (event.data.type === 'get_cloud_storage_result' && (event.data.data !== undefined)) {
                     window.removeEventListener('message', handleMessage); // Clean up listener
-                    resolve(event.data.data.data);
+                    resolve(event.data.data?.data || null);
                 }
             }
     
