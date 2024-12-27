@@ -20,6 +20,7 @@ export default class StatsApp extends NerdHudApp {
         this.orders = [];
         this.balance = {}
         this.reset_time = 0;
+        this.levels = null;
         this.past_days = [];
     }
     event(type, data) {
@@ -39,6 +40,9 @@ export default class StatsApp extends NerdHudApp {
             this.reset_time = data.nextReset;
             this.save();
         }
+        if (type == "levels") {
+            this.levels = data;
+        }
 
     }
     update() {
@@ -57,6 +61,14 @@ export default class StatsApp extends NerdHudApp {
             
         } else {
             timer_element.innerHTML = "Visit taskboard to set reset time.";
+        }
+
+        let levels_element = this.elements.levels;
+        if (this.levels) {
+            let new_html = "Overall level: " + this.levels.overall.level;
+            if (levels_element.innerHTML != new_html) {
+                levels_element.innerHTML = new_html;
+            }
         }
     }
     performReset() {
@@ -143,6 +155,16 @@ export default class StatsApp extends NerdHudApp {
         this.elements.income = income_element;
 
         this.window.appendChild(income_element);
+
+        let levels_element = document.createElement('div');
+        levels_element.className = "hud_stat_pane";
+        levels_element.style = "text-align: center;"
+        if (this.levels) {
+            levels_element.innerHTML = "Overall level: " + this.levels.overall.level;
+        }
+        
+        this.elements.levels = levels_element;
+        this.window.appendChild(levels_element);
 
         // build delivery table
         let delivery_details = document.createElement('table');
