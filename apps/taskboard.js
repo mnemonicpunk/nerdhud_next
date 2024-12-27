@@ -69,7 +69,11 @@ export default class TaskboardApp extends NerdHudApp {
             name: "taskboard",
             title: "Taskboard"
         });
-        this.window.dataset.placeholder = "Visit the taskboard to register orders here!"
+        this.window.dataset.placeholder = "Visit the taskboard to register orders here!";
+
+        this.exportAppFunction("requested", (item) => {
+            return this.getRequested(item);
+        });
     }
     onSave() {
         return {
@@ -245,6 +249,14 @@ export default class TaskboardApp extends NerdHudApp {
             }
         }        
     }
+    getRequested(item) {
+        let amount = 0;
+        for (let i=0; i<this.orders.length; i++) {
+            let order = this.orders[i];
+            if(order.requestItems[0].itemId == item) {
+                amount += order.requestItems[0].quantity;
+            }
+        }
+        return amount;
+    }
 }
-
-//https://d31ss916pli4td.cloudfront.net/game/ui/skills/skills_icon_farming.png?v6

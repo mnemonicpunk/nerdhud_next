@@ -105,6 +105,7 @@ export default class ItemInfoApp extends NerdHudApp {
     setSelectedItem(item) {
         let price = this.sys.importAppFunction('market.price');
         let shopping_list_add = this.sys.importAppFunction('shoppinglist.add');
+        let requested = this.sys.importAppFunction('taskboard.requested');
 
         this.setMode("item_display");
         this.selected_item = item;
@@ -205,6 +206,18 @@ export default class ItemInfoApp extends NerdHudApp {
 
                 if (data.trade?.disableTrading == true) {
                     use_html += "<div>(Untradable)</div>";
+                }
+
+                let num_requested = requested(item);
+                if (num_requested>0) {
+                    let have_inventory = this.importAppFunction('inventory.have');
+                    let have_storage = this.importAppFunction('storage.have');
+
+                    let have = have_inventory(item) + have_storage(item);
+                    if (num_requested>have) {
+                        let tb_html = "You need " + (num_requested-have) + " more of this for the taskboard.";
+                        use_html+="<div>" + tb_html + "</div>";   
+                    }
                 }
 
                 // if no details are available, mark it as common item
