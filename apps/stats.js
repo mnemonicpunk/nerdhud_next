@@ -85,6 +85,7 @@ export default class StatsApp extends NerdHudApp {
         this.reset_time = new_rt;
 
         // update UI
+        this.createOrderCache();
         this.updateBreakdown();
         this.updateCurrency();
 
