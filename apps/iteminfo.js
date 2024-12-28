@@ -264,6 +264,11 @@ export default class ItemInfoApp extends NerdHudApp {
     setSearchSuggestions(items) {
         this.elements.search_options.innerHTML = "";
 
+        if (Object.keys(items).length === 0) {
+            this.elements.search_options.innerHTML = "<div class='hud_interactive_list_item' style='color: #aaa; padding: 11px; margin-right: 6px;'>No results found.</div>";
+            return;
+        }
+
         for (let i in items) {
             let el = document.createElement('div');
             el.className = "hud_interactive_list_item";

@@ -279,21 +279,22 @@ export default class StatsApp extends NerdHudApp {
         this.updateBreakdown();
     }
     updateCurrency(currency) {
-        if (!currency) { return; }
-        for (let i=0; i < currency.length; i++) {
-            let c = currency[i];
-            if (!this.balance[c.currencyId]) {
-                this.balance[c.currencyId] = {
-                    balance: c.balance,
-                    change: 0
+        if (currency) { 
+            for (let i=0; i < currency.length; i++) {
+                let c = currency[i];
+                if (!this.balance[c.currencyId]) {
+                    this.balance[c.currencyId] = {
+                        balance: c.balance,
+                        change: 0
+                    }
                 }
+
+                let balance = this.balance[c.currencyId];
+                let change = c.balance - balance.balance;
+
+                balance.balance = c.balance;
+                balance.change += change;
             }
-
-            let balance = this.balance[c.currencyId];
-            let change = c.balance - balance.balance;
-
-            balance.balance = c.balance;
-            balance.change += change;
         }
 
         // update balance change UI
