@@ -9,7 +9,6 @@ const ENTITY_NAME_OVERRIDES = {
 async function resolveURL(path) {
     path = window.nhud_repo + path;
 
-    console.log("RESOLVING URL: ", path);
     if (path.startsWith("builtin:")) {
         return await getChromeURL(path.replace('builtin:', ''));
     }
@@ -77,7 +76,6 @@ async function putStorage(data) {
         // Handler for messages
         function handleMessage(event) {
             if (event.data.type === 'put_storage_response' && event.data.success) {
-                console.log("RECEIVED STORAGE RESULT CONFIRMATION: ", event.data.result)
                 window.removeEventListener('message', handleMessage); // Clean up listener
                 resolve(event.data.result);
             }
@@ -695,10 +693,6 @@ class NerdHUD {
             this.enterGame();
         }
 
-        if (msg.type == "get_cloud_storage_result") {
-            console.log("CLOUD LOAD: ", msg.data);
-        }
-
         if (msg.type == "map_changed") {
             this.current_map = msg.data.map_name;
         }
@@ -749,8 +743,6 @@ class NerdHUD {
         }
 
         let cloud_result = await this.cloudloadAppData(mid);
-
-        console.log("LOADED SAVE DATA: ", local_result, cloud_result);
 
         if (cloud_result) {
             if (!local_result) {
@@ -867,7 +859,6 @@ class NerdHUD {
     }
 
     async performCloudSave(mid, data) {
-        console.log("CLOUD SAVING: ", mid, data);
         window.postMessage({
             type: 'put_cloud_storage',
             data: {
@@ -1000,7 +991,6 @@ class NerdHUD {
         };
     }
     createWindow(options) {
-        console.log("CREATING WINDOW: ", options);
         let el = document.createElement('div');
         el.className = "nerd_hud_window";
         
@@ -1058,7 +1048,6 @@ class NerdHUD {
 
             // create an icon for the left dock
             if (options.docked == "left") {
-                console.log("Docking window to the left: ", el);
                 el.className = "nerd_hud_window nerd_hud_docked_left";
                 this.dock_left.appendChild(icon);
                 this.windows_left.appendChild(el);
@@ -1066,7 +1055,6 @@ class NerdHUD {
 
             // create an icon for the left dock
             if (options.docked == "right") {
-                console.log("Docking window to the right: ", el);
                 el.className = "nerd_hud_window nerd_hud_docked_right";
                 this.dock_right.appendChild(icon);
                 this.windows_right.appendChild(el); 
@@ -1090,7 +1078,6 @@ class NerdHUD {
             setVisible
         });
 
-        console.log("CREATED WINDOW: ", el);
         return inner_el;
     }
     clickDockIcon(dock, name) {

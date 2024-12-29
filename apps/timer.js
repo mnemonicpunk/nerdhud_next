@@ -276,8 +276,6 @@ export default class TimerApp extends NerdHudApp {
                         if (entity.generic.layers[0].sprite.isSpritesheet) {
                             img.addEventListener('load', load_func);
                         }
-                       
-                        console.log("UPDATING ENTITY IMAGE");
                     }
                 } else {
                     img.src = this.sys.getItemData(group[0].item).image;

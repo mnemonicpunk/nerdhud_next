@@ -8,7 +8,6 @@ export default class StorageApp extends NerdHudApp {
     event(type, data) {
         super.event(type, data);
         if (type == "set_storage") {
-            console.log("GOT STORAGE UPDATE: ", data);
             this.trackStorage(data);
             this.save();
         }
