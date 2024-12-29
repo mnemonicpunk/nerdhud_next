@@ -18,7 +18,7 @@ export default class DebugApp extends NerdHudApp {
     event(type, data) {
         super.event(type, data);
     }
-    draw(ctx, width, height) {
+    /*draw(ctx, width, height) {
         const banner = "Nerd HUD Next 0.1";
         let dim = ctx.measureText(banner);
         ctx.fillStyle = "#000";
@@ -29,7 +29,7 @@ export default class DebugApp extends NerdHudApp {
 
         ctx.fillStyle = "#fff";
         ctx.fillText(banner, width/2-dim.width/2, 20);
-    }
+    }*/
     /*onDrawPlayer(ctx, entity, bounds) {
         ctx.fillStyle = "#fff";
         ctx.fillText(entity.mid, bounds.x + 20, bounds.y + 20);
