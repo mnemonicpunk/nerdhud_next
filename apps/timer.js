@@ -61,17 +61,19 @@ export default class TimerApp extends NerdHudApp {
             this.save();
         }
         if (type == "state_change") {
+            console.log("TIMER STATE CHANGE");
             if (this.sys.getCurrentMap().startsWith('shareInterior')) {
                 for (let e in data.entities) {
                     let entity = data.entities[e];
 
                     // special case for tracking bed covers
                     if (entity.entity == "ent_bed_covers") {
-                        if ((!this.hasTimer(entity.mid)) && (entity.generic.utcRefresh > Date.now())) {
-                            this.addTimer("entity", entity.mid, this.sys.getCurrentMap(), "ent_bed_queen", 1, entity.generic.utcRefresh || entity.generic.trackers.lastTimer)
-                        }
-                        if ((this.hasTimer(entity.mid)) && (entity.generic.utcRefresh <= Date.now())) {
+                        console.log("BED: ", entity);
+                        if ((this.hasTimer(entity.mid)) && (this.timers[entity.mid].finish_time <= Date.now())) {
                             this.removeTimer(entity.mid)
+                        }
+                        if ((!this.hasTimer(entity.mid)) && (entity.generic.utcRefresh > Date.now())) {
+                            this.addTimer("entity", entity.mid, this.sys.getCurrentMap(), "ent_bed_speck", 1, entity.generic.utcRefresh || entity.generic.trackers.lastTimer)
                         }
                     }
                 }
