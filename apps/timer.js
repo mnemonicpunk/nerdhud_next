@@ -98,19 +98,19 @@ export default class TimerApp extends NerdHudApp {
             'ent_mole_pixels'
         ];
 
-        for (let i in prefixes) {
+        for (let i=0; i < prefixes.length; i++) {
             let prefix = prefixes[i];
             if (entity.entity.startsWith(prefix)) {
                 return true;
             }
         }
-        for (let i in suffixes) {
+        for (let i=0; i < suffixes.length; i++) {
             let suffix = suffixes[i];
             if (entity.entity.endsWith(suffix)) {
                 return true;
             }
         }
-        for (let i in names) {
+        for (let i=0; i < names.length; i++) {
             let name = names[i];
             if (entity.entity == name) {
                 return true;
