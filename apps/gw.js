@@ -25,7 +25,7 @@ export default class GWApp extends NerdHudApp {
         }
     }
     onDrawEntity(ctx, entity, bounds, camera) {
-        if (!this.sys.getCurrentMap().startsWith('guildCropWars')) { return; }
+        if (!this.sys.getCurrentMap().startsWith('sporesports')) { return; }
        
         if ((entity.entity == "ent_guildwarscrops") || (entity.entity == "ent_allcrops")) {
         //if (entity.entity == "ent_guildwarscrops") {

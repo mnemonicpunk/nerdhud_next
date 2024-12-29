@@ -8,8 +8,35 @@ export default class StorageApp extends NerdHudApp {
     event(type, data) {
         super.event(type, data);
         if (type == "set_storage") {
-            this.storages[data.mapEntity_id] = data;
-            this.updateStorages(data);
+            console.log("GOT STORAGE UPDATE: ", data);
+            this.trackStorage(data);
+            this.save();
+        }
+    }
+    trackStorage(storage) {
+        // if the storage is empty, remove it from tracked storages instead
+        if (this.storageEmpty(storage)) {
+            this.removeStorage(storage);
+            this.updateStorages();
+        } else {
+            this.storages[storage.mapEntity_id] = storage;
+            this.updateStorages(storage);
+        }
+        
+    }
+    storageEmpty(storage) {
+        for (let slot_num in storage.storage.slots) {
+            let slot = storage.storage.slots[slot_num];
+            if (slot?.quantity > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+    removeStorage(storage) {
+        if (this.storages[storage.mapEntity_id]) {
+            delete this.storages[storage.mapEntity_id];
+            this.updateStorages();
             this.save();
         }
     }
@@ -81,43 +108,6 @@ export default class StorageApp extends NerdHudApp {
         let show_item = this.importAppFunction('iteminfo.show_item');
 
         if (!this.window) { return; }
-        //this.window.innerHTML = "";
-        /*for (let storage_num in this.storages) {
-            let storage = this.storages[storage_num];
-            let el = this.window.querySelector('[data-storage="' + storage_num + '"');
-            
-            let new_storage = false;
-            if (!el) {
-                new_storage = true;
-                el = document.createElement('div');
-                el.dataset.storage = storage_num;
-                el.style = "padding: 5px; margin: 5px;"
-                
-                this.window.appendChild(el);
-            }
-
-            // if the updated_storage is the one we just got, force an update on the contents as well
-            if (new_storage || (updated_storage?.mapEntity_id == storage_num)) {
-                el.innerHTML = "<div class='hud_list_heading'>" + (storage.storage.name || "Unnamed Storage") + "</div>";
-
-                let storage_container = document.createElement('div');
-                storage_container.style = "display: grid; grid-template-columns: repeat(6, 1fr);";
- 
-                for (let slot_num in storage.storage.slots) {
-                    let slot = storage.storage.slots[slot_num];
-                    let item_img = this.sys.getItemData(slot.item)?.image;
- 
-                    let item_el = document.createElement('div');
-                    item_el.style = "display: inline-block; text-align: center;";
-                    item_el.innerHTML = '<img class="hud_icon_large" src="' + item_img + '"><br>x' + slot.quantity + '<br><span style="font-size: 75%; color: #ddd"><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image +'">' + this.sys.formatCurrency(price(slot.item) * slot.quantity) + '</span>';
-                    storage_container.appendChild(item_el);
-
-                    //thtml += "<td style=''><img class='hud_icon_large' src='" + item_img + "'><br>x" + slot.quantity + "<td>";
-                }
- 
-                el.appendChild(storage_container);
-            }
-        }*/
 
         // sort storages by maps
         let map_groups = {};
@@ -189,7 +179,7 @@ export default class StorageApp extends NerdHudApp {
                 }
 
                 // if the updated_storage is the one we just got, force an update on the contents as well
-                if (new_storage || (updated_storage?.mapEntity_id == s)) {
+                if (new_storage || (updated_storage?.mapEntity_id == s) || (updated_storage?.mid == s)) {
                     let storage_container = document.createElement('div');
                     storage_container.style = "display: grid; grid-template-columns: repeat(6, 1fr);";
                     let storage_value = 0;
@@ -216,8 +206,24 @@ export default class StorageApp extends NerdHudApp {
                     el.appendChild(storage_container);
                 }
             }
+
+            // prune empty storages
+            let entries = entries_el.querySelectorAll('[data-storage]');
+            for (let storage_el of entries) {
+                let storage = this.storages[storage_el.dataset.storage] || null;
+
+                // if storage isn't being tracked anymore or is empty, prune element
+                if ((storage == null) || this.storageEmpty(storage)) {
+                    entries_el.removeChild(storage_el);
+                }
+            }
+            
+            // now select the elements again, if we no longer have any storages attached, prune the map element
+            entries = entries_el.querySelectorAll('[data-storage]');
+            if (!entries) {
+                this.window.removeChild(map_el);
+            }
         }
-        
     }
     have(item) {
         let count = 0;

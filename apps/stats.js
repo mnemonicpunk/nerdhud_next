@@ -88,7 +88,14 @@ export default class StatsApp extends NerdHudApp {
         
         // reset current stats
         this.orders = [];
-        this.balance = {};
+        //this.balance = {};
+
+        // for balance we only want to reset the change but keep the previous balance intact, so we won't lose the next balance update
+        for (let b in this.balance) {
+            let balance = this.balance[b];
+            balance.change = 0;
+        }
+
         let new_rt = this.timestampToServerTime(this.reset_time);
         const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
         while (new_rt <= this.timestampToServerTime(Date.now())) {
