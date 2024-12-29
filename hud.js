@@ -1,5 +1,5 @@
 const ENTITY_NAME_OVERRIDES = {
-    ent_saunarocks_charger: "VIP Charger",
+    ent_saunarocks_charger: "VIP Sauna",
     ent_cow_pickup: "Cow",
     ent_bed_covers: "Bed",
     ent_goosetrailer: "OG Ticket Redemption"

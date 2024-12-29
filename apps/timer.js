@@ -48,9 +48,11 @@ export default class TimerApp extends NerdHudApp {
             this.save();
         }
         if (type == "entity_started") {
-            this.removeTimer(data.mid);
-            this.addTimer("entity", data.mid, this.sys.getCurrentMap(), data.entity, 1, data.generic.utcRefresh || data.generic.trackers.lastTimer)
-            this.save();
+            if (!this.isEntityBlacklisted(data)) {
+                this.removeTimer(data.mid);
+                this.addTimer("entity", data.mid, this.sys.getCurrentMap(), data.entity, 1, data.generic.utcRefresh || data.generic.trackers.lastTimer)
+                this.save();
+            }
         }
         if (type == "cow_picked") {
             this.removeTimer(data.mid);
@@ -61,14 +63,12 @@ export default class TimerApp extends NerdHudApp {
             this.save();
         }
         if (type == "state_change") {
-            console.log("TIMER STATE CHANGE");
             if (this.sys.getCurrentMap().startsWith('shareInterior')) {
                 for (let e in data.entities) {
                     let entity = data.entities[e];
 
                     // special case for tracking bed covers
                     if (entity.entity == "ent_bed_covers") {
-                        console.log("BED: ", entity);
                         if ((this.hasTimer(entity.mid)) && (this.timers[entity.mid].finish_time <= Date.now())) {
                             this.removeTimer(entity.mid)
                         }
@@ -83,6 +83,40 @@ export default class TimerApp extends NerdHudApp {
             this.updateTimers();
             this.updateTimerUI();
         }
+    }
+    isEntityBlacklisted(entity) {
+        const prefixes = [];
+        const suffixes = [
+            '_start',
+            '_starter',
+            '_start_pixels',
+            '_starter_pixels',
+            'Start'
+        ];
+        const names = [
+            'ent_mole',
+            'ent_mole_pixels'
+        ];
+
+        for (let i in prefixes) {
+            let prefix = prefixes[i];
+            if (entity.entity.startsWith(prefix)) {
+                return true;
+            }
+        }
+        for (let i in suffixes) {
+            let suffix = suffixes[i];
+            if (entity.entity.endsWith(suffix)) {
+                return true;
+            }
+        }
+        for (let i in names) {
+            let name = names[i];
+            if (entity.entity == name) {
+                return true;
+            }
+        }
+        return false;
     }
     onCreate() {
         this.window = this.sys.createWindow({ 
