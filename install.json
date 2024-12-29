@@ -5,6 +5,7 @@
     },
     "repo": "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/",
     "hud": "hud.js",
+    "style": "styles.css",
     "apps": [
         "apps/inventory.js",
         "apps/market.js",

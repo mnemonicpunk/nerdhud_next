@@ -60,10 +60,10 @@ async function loadNerdHud(unresolved_url) {
     window.nhud_install = install;
     window.nhud_repo = install.repo;
 
-    // Create a script element to load the HUDt
-    const hudElement = document.createElement('script');
+   
 
     const HudUrl = await resolveURL(install.hud);
+    const StyleUrl = await resolveURL(install.style);
 
     // Calculate a timestamp that changes every 5 minutes
     const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -71,12 +71,26 @@ async function loadNerdHud(unresolved_url) {
 
     // Append the timestamp to the HUD URL
     const noCacheHudUrl = `${HudUrl}?_=${currentTimestamp}`;
+    const noCacheStyleUrl = `${StyleUrl}?_=${currentTimestamp}`;
+
+    // Create a script element to load the HUDt
+    const hudElement = document.createElement('script');
 
     hudElement.src = noCacheHudUrl;
 
     // Inject the script into the document head
     (document.head || document.documentElement).appendChild(hudElement);
     hudElement.remove(); // Clean up after execution
+
+    // Create a style element to load the HUDt
+    const styleElement = document.createElement('link');
+    styleElement.rel ="stylesheet";
+    styleElement.type = "text/css";
+
+    styleElement.href = noCacheStyleUrl;
+
+    // Inject the style into the document head
+    (document.head || document.documentElement).appendChild(styleElement);
 }
 
 loadNerdHud("https://raw.githubusercontent.com/mnemonicpunk/nerdhud_next/refs/heads/main/install.json");

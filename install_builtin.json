@@ -5,6 +5,7 @@
     },
     "repo": "builtin:",
     "hud": "hud.js",
+    "style": "styles.css",
     "apps": [
         "apps/inventory.js",
         "apps/market.js",

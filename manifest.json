@@ -25,7 +25,6 @@
         "https://play.pixels.xyz/*"
       ],
       "js": ["content.js"],
-      "css": ["styles.css"],
       "run_at": "document_start"
     }
   ],
@@ -34,7 +33,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["install.json", "install_builtin.json", "loader.js", "hud.js", "nerdhudnext_logo.png", "apps/*", "lib/libPixels.js", "img/*", "font/*"],
+      "resources": ["install.json", "install_builtin.json", "loader.js", "hud.js", "styles.css", "nerdhudnext_logo.png", "apps/*", "lib/libPixels.js", "img/*", "font/*"],
       "matches": ["<all_urls>"]
     }
   ]
