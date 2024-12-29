@@ -259,6 +259,7 @@ export default class TimerApp extends NerdHudApp {
                 group_el.className = 'hud_window_group_entry';
                 group_el.dataset.key = i;
                 group_el.style.display = "flex";
+                group_el.style.alignItems = "center";
                 group_el.style.verticalAlign = "middle";
 
                 let img = document.createElement('img');
@@ -333,6 +334,32 @@ export default class TimerApp extends NerdHudApp {
                 progress.style.float = "right";
                 details.appendChild(progress);
                 group_el.appendChild(details);
+
+                // append trash can for timer group deletion
+                let remove_btn = document.createElement('div');
+                remove_btn.className = "hud_button";
+                remove_btn.style = "padding: 6px; margin-left: 6px;";
+                remove_btn.innerHTML = "🗑️";
+                remove_btn.addEventListener('click', () => {
+                    let timer = group[0];
+                    
+                    let name = "";
+                    if (group[0].type != "entity") {
+                        name = this.sys.getItemName(group[0].item)
+                    } else {
+                        name = this.sys.getEntityName(group[0].item);
+                    }
+        
+                    let confirm_text = "Really delete timer for  " + name + " x" + group.length + "?";
+
+                    if (confirm(confirm_text)) {
+                        let timers = this.getTimerGroup(timer.type, timer.map, timer.item);
+                        this.removeTimerGroup(timers);
+                        this.save();
+                    }
+
+                })
+                group_el.appendChild(remove_btn);
 
                 land_el.querySelector('.hud_window_group_entries').appendChild(group_el);
 
@@ -419,6 +446,21 @@ export default class TimerApp extends NerdHudApp {
     removeTimer(mid) {
         if (this.timers[mid]) {
             delete this.timers[mid];
+        }
+    }
+    getTimerGroup(type, map, item) {
+        let group = [];
+        for (let i in this.timers) {
+            const timer = this.timers[i];
+            if ((type == timer.type) && (map == timer.map) && (item == timer.item)) {
+                group.push(timer);
+            }
+        }
+        return group;
+    }
+    removeTimerGroup(group) {
+        for (let i=0; i<group.length; i++) {
+            this.removeTimer(group[i].mid);
         }
     }
 }
