@@ -177,6 +177,8 @@ class NerdHUD {
         resolveURL("nerdhudnext_logo.png").then(url => {
             this.logo.src = url;
         });
+        this.logo_state = 0;
+        this.logo_timer = Date.now();
 
         // for loading screen purposes track stats
         this._libPixels_version = "";
@@ -567,14 +569,50 @@ class NerdHUD {
         }
 
         // show loading overlay
-        if ((this._loaded_libpixels == false) || (this._loaded_apps == false)) {
+        //if ((this._loaded_libpixels == false) || (this._loaded_apps == false)) {
+        if (this.logo_state < 3) {
+            let alpha = 1;
+
+            // Easing function (cubic ease-in-out)
+            function easeInOutCubic(t) {
+                return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            }
+            
+            if (this.logo_state === 0) {
+                if (Date.now() > this.logo_timer + 500) {
+                    this.logo_state = 1;
+                    this.logo_timer = Date.now();
+                } else {
+                    let t = (Date.now() - this.logo_timer) / 500; // Normalize time (0 to 1)
+                    alpha = easeInOutCubic(Math.min(t, 1)); // Apply easing
+                }
+            }
+            if (this.logo_state === 1) {
+                if ((Date.now() > this.logo_timer + 2000) && (this._loaded_libpixels && this._loaded_apps)) {
+                    this.logo_state = 2;
+                    this.logo_timer = Date.now();
+                }
+            }
+            if (this.logo_state === 2) {
+                if (Date.now() >= this.logo_timer + 500) {
+                    this.logo_state = 3;
+                    this.logo_timer = Date.now();
+                } else {
+                    let t = (Date.now() - this.logo_timer) / 500; // Normalize time (0 to 1)
+                    alpha = 1 - easeInOutCubic(Math.min(t, 1)); // Apply easing
+                }
+            }
+            if (this.logo_state == 3) {
+                return;
+            }
+
             ctx.save();
 
             ctx.fillStyle = "#000";
-            ctx.globalAlpha = 0.9;
+            ctx.globalAlpha = alpha * 0.9;
             ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-            ctx.globalAlpha = 1;
+            ctx.globalAlpha = alpha;
 
             let img = this.logo;
             let canvas = this.canvas;
