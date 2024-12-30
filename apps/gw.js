@@ -112,8 +112,8 @@ export default class GWApp extends NerdHudApp {
                 return; 
             }
 
-            ctx.strokeStyle = "#f00";
-            ctx.fillStyle = "#f00";
+            ctx.strokeStyle = "#00f";
+            ctx.fillStyle = "#00f";
     
             ctx.strokeRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
             ctx.globalAlpha = 0.2;

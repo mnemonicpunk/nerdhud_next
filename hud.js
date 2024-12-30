@@ -169,6 +169,7 @@ class NerdHUD {
         this.is_narrow_screen = false;
         this._game_modal = false;
         this._game_halfmodal = false;
+        this._game_storemodal = false;
 
         // create loading screen logo
         this.logo = document.createElement('img');
@@ -403,6 +404,11 @@ class NerdHUD {
         }, () => {
             this._game_halfmodal = false;
         });
+        this.watchClass("Store_storeDialog__K3NJB", 100, () => {
+            this._game_storemodal = true;
+        }, () => {
+            this._game_storemodal = false;
+        });
 
         // only set to in-game after loading app data to avoid clashes
         this.is_in_game = true;     
@@ -530,7 +536,7 @@ class NerdHUD {
             let entities = this.scene_state?.entities;
             let players = this.scene_state?.players;
 
-            if (this._game_modal || this._game_halfmodal) {
+            if (this._game_modal || this._game_halfmodal || this._game_storemodal) {
                 return;
             }
             if (entities&&players) {
