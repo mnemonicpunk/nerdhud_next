@@ -31,12 +31,6 @@
   
 }
 
-@media (min-resolution: 2dppx) { /* For high DPI screens */
-  #nerd-hud-ui {
-    zoom: 2;
-  }
-}
-
 @keyframes slideFadeIn {
   0% {
     transform: translateY(20px); /* Slide in from 20 pixels left */

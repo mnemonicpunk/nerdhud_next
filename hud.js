@@ -418,30 +418,37 @@ class NerdHUD {
         this.adjustDocks();
     }
     scaleUI() {
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
         // Check if the device has a high DPI (device pixel ratio >= 2)
         const isHighDPI = window.devicePixelRatio >= 2;
-        
-        if (isHighDPI) {
-            // Skip adjusting font size for high DPI devices
-            return;
+      
+        // If it's a high DPI, non-mobile device, set zoom to 2
+        if (isHighDPI && !isMobile) {
+          this.ui_root.style.zoom = 2; // Apply zoom factor for high DPI non-mobile devices
+          return;
         }
-        
-        // Create a test element to measure the font size
+      
+        // If it's a mobile device, do not apply any zoom adjustment
+        if (isMobile) {
+          return;
+        }
+      
+        // For all other devices, apply font size scaling logic
         const testElement = document.createElement("div");
         testElement.style.fontSize = "1rem";
         testElement.style.position = "absolute";
         testElement.style.visibility = "hidden";
         document.body.appendChild(testElement);
-        
+      
         // Get the computed font size of the test element
         const fontSize = parseFloat(window.getComputedStyle(testElement).fontSize);
-        
+      
         // Adjust zoom based on the computed font size, assuming default font size is 16px
         this.ui_root.style.zoom = fontSize / 16;
-        console.log("ZOOM IS NOW: ", this.ui_root.style.zoom);
-        
+      
         // Remove the test element from the DOM
-        testElement.remove();  
+        testElement.remove();
     }
     adjustDocks() {
         const slidingGroup = document.querySelector('.Hud_slidingGroup__ZaO10');
