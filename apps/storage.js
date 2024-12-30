@@ -65,6 +65,10 @@ export default class StorageApp extends NerdHudApp {
         this.updateStorages();
     }
     highlightItem(item) {
+        if (!item) {
+            this.highlighted_storages = [];
+            return;
+        }
         let storages = this.findStoragesWithItem(item);
         let mids = [];
         for (let i in storages) {

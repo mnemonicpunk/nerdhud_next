@@ -253,6 +253,8 @@ export default class ItemInfoApp extends NerdHudApp {
             bts.className = "hud_button";
             bts.innerHTML = "↩&nbsp;Search";
             bts.addEventListener('click', () => {
+                let highlight_storage = this.importAppFunction('storage.highlight');
+                highlight_storage();
                 this.setMode("search");
             })
 
