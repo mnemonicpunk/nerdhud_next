@@ -28,6 +28,13 @@
   height: 100%;
   z-index: 10000;
   pointer-events: none;
+  
+}
+
+@media (min-resolution: 2dppx) { /* For high DPI screens */
+  #nerd-hud-ui {
+    zoom: 2;
+  }
 }
 
 @keyframes slideFadeIn {

@@ -413,7 +413,35 @@ class NerdHUD {
         this.width = this.canvas.width;
         this.height = this.canvas.height;
 
+        this.scaleUI();
+
         this.adjustDocks();
+    }
+    scaleUI() {
+        // Check if the device has a high DPI (device pixel ratio >= 2)
+        const isHighDPI = window.devicePixelRatio >= 2;
+        
+        if (isHighDPI) {
+            // Skip adjusting font size for high DPI devices
+            return;
+        }
+        
+        // Create a test element to measure the font size
+        const testElement = document.createElement("div");
+        testElement.style.fontSize = "1rem";
+        testElement.style.position = "absolute";
+        testElement.style.visibility = "hidden";
+        document.body.appendChild(testElement);
+        
+        // Get the computed font size of the test element
+        const fontSize = parseFloat(window.getComputedStyle(testElement).fontSize);
+        
+        // Adjust zoom based on the computed font size, assuming default font size is 16px
+        this.ui_root.style.zoom = fontSize / 16;
+        console.log("ZOOM IS NOW: ", this.ui_root.style.zoom);
+        
+        // Remove the test element from the DOM
+        testElement.remove();  
     }
     adjustDocks() {
         const slidingGroup = document.querySelector('.Hud_slidingGroup__ZaO10');
