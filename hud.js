@@ -762,6 +762,7 @@ class NerdHUD {
             this.item_name_mapping = msg.data.item_name_mapping;
             this.mid = msg.data.mid;
             this.username = msg.data.name;
+            this.userguild = msg.data.guild;
             this.current_map = msg.data.map_name;
             this.enterGame();
         }

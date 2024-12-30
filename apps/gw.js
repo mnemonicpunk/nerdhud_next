@@ -34,7 +34,7 @@ export default class GWApp extends NerdHudApp {
             ctx.strokeStyle = "#888";
             ctx.fillStyle = "#888";
 
-            if (entity.generic.statics.guild == "nerd") {
+            if (entity.generic.statics.guild == this.sys.userguild) {
                 if (entity.generic.state == "grown") {
                     ctx.strokeStyle = "#0f0";
                     ctx.fillStyle = "#0f0";
@@ -122,9 +122,9 @@ export default class GWApp extends NerdHudApp {
         }
     }
     onDrawPlayer(ctx, entity, bounds) {
-        if (!this.sys.getCurrentMap().startsWith('guildCropWars')) { return; }
+        if (!this.sys.getCurrentMap().startsWith('sporesports')) { return; }
         
-        if ((entity.guild?.handle != "nerd") && (entity.guild?.handle != undefined)) {
+        if ((entity.guild?.handle != this.sys.userguild) && (entity.guild?.handle != undefined)) {
             ctx.strokeStyle = "#f00";
             ctx.fillStyle = "#f00";
         
