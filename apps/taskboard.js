@@ -209,11 +209,13 @@ export default class TaskboardApp extends NerdHudApp {
             cost_text = "Craft " + (order.requestItems[0].quantity - have) + " more!";
         }
 
+        order_slot.details_title.style.fontWeight = "normal";
         if (have >= order.requestItems[0].quantity) {
             title_color = '#F0E68C';
             cost_text = "Get " + (order.requestItems[0].quantity - in_inventory) + " from storage!";
         }
         if (in_inventory >= order.requestItems[0].quantity) {
+            order_slot.details_title.style.fontWeight = "900";
             title_color = '#17B169';
             cost_text = "Ready to deliver!";
         }
