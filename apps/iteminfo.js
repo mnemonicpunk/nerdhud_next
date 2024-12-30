@@ -106,9 +106,11 @@ export default class ItemInfoApp extends NerdHudApp {
         let price = this.sys.importAppFunction('market.price');
         let shopping_list_add = this.sys.importAppFunction('shoppinglist.add');
         let requested = this.sys.importAppFunction('taskboard.requested');
+        let highlight_storage = this.importAppFunction('storage.highlight');
 
         this.setMode("item_display");
         this.selected_item = item;
+        highlight_storage(item);
         this.elements.info.innerHTML = ""; //JSON.stringify(this.hud.getItemData(item));
         let data = this.sys.getItemData(item);
         if (data) {
