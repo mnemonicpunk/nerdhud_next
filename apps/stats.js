@@ -65,7 +65,14 @@ export default class StatsApp extends NerdHudApp {
 
         let levels_element = this.elements.levels;
         if (this.levels) {
-            let new_html = "Overall level: " + this.levels.overall.level;
+            let total_level = 0;
+            for (let l in this.levels) {
+                if (l != "overall") {
+                    total_level+= this.levels[l].level;
+                }
+            }
+
+            let new_html = "Total level: " + total_level;
             if (levels_element.innerHTML != new_html) {
                 levels_element.innerHTML = new_html;
             }
@@ -166,8 +173,16 @@ export default class StatsApp extends NerdHudApp {
         let levels_element = document.createElement('div');
         levels_element.className = "hud_stat_pane";
         levels_element.style = "text-align: center;"
+
+        let total_level = 0;
+        for (let l in this.levels) {
+            if (l != "overall") {
+                total_level+= this.levels[l].level;
+            }
+        }
+
         if (this.levels) {
-            levels_element.innerHTML = "Overall level: " + this.levels.overall.level;
+            levels_element.innerHTML = "Total level: " + total_level;
         }
         
         this.elements.levels = levels_element;
