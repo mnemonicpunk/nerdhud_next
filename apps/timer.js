@@ -5,6 +5,9 @@ export default class TimerApp extends NerdHudApp {
         this.timers = {};
         this.timerUI = {};
 
+        // track sauna energy
+        this.sauna_ticks = 0;
+
         this.highlights = [];
     }
     event(type, data) {
@@ -63,6 +66,7 @@ export default class TimerApp extends NerdHudApp {
             this.save();
         }
         if (type == "state_change") {
+            // special case for bed timer
             if (this.sys.getCurrentMap().startsWith('shareInterior')) {
                 for (let e in data.entities) {
                     let entity = data.entities[e];
@@ -70,10 +74,41 @@ export default class TimerApp extends NerdHudApp {
                     // special case for tracking bed covers
                     if (entity.entity == "ent_bed_covers") {
                         if ((this.hasTimer(entity.mid)) && (this.timers[entity.mid].finish_time <= Date.now())) {
-                            this.removeTimer(entity.mid)
+                            this.removeTimer(entity.mid);
+                            this.save();
                         }
                         if ((!this.hasTimer(entity.mid)) && (entity.generic.utcRefresh > Date.now())) {
                             this.addTimer("entity", entity.mid, this.sys.getCurrentMap(), "ent_bed_speck", 1, entity.generic.utcRefresh || entity.generic.trackers.lastTimer)
+                            this.save();
+                        }
+                    }
+                }
+            }
+
+            // special case for sauna pool timer
+            if (this.sys.getCurrentMap().startsWith('SaunaInterior')) {
+                for (let e in data.entities) {
+                    let entity = flattenEntity(data.entities[e]);
+
+                    // special case for tracking bed covers
+                    if (entity.entity == "ent_saunaenergy") {
+                        console.log("POOL: ", entity);
+                        const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+                        if (!entity.generic.trackers.lastStart) { console.log("SAUNA POOL HAS NO LASTSTART"); return; }
+                        if (this.sauna_ticks != entity.generic.trackers.bonusCount) {
+                            this.sauna_ticks = entity.generic.trackers.bonusCount;
+                            this.save();
+                        }
+                        
+
+                        if ((this.hasTimer(entity.mid)) && (this.timers[entity.mid].elapsed)) {
+                            this.removeTimer(entity.mid);
+                            this.save();
+                        }
+                        if ((!this.hasTimer(entity.mid)) && (entity.generic.trackers.lastStart > (Date.now() - oneDayInMs))) {
+                            this.addTimer("entity", entity.mid, this.sys.getCurrentMap(), entity.entity, 1, entity.generic.trackers.lastStart + oneDayInMs);
+                            this.save();
                         }
                     }
                 }
@@ -131,11 +166,13 @@ export default class TimerApp extends NerdHudApp {
     }
     onSave() {
         return {
-            timers: this.timers
+            timers: this.timers,
+            sauna_ticks: this.sauna_ticks
         }
-    }
+    }   
     onLoad(data) {
-        this.timers = data.timers;
+        this.timers = data.timers || {};
+        this.sauna_ticks = data.sauna_ticks || 0;
         this.updateTimers();
         this.updateTimerUI();
     }
@@ -163,6 +200,49 @@ export default class TimerApp extends NerdHudApp {
                 this.drawEntityTimer(ctx, bounds, entity, t, "#880");
             }
         }
+    }
+    draw(ctx, width, height) {
+        let timer_text = "";
+        
+        let vip_timer = this.getEntityTimer("ent_saunarocks_charger");
+        if (vip_timer) {
+            let vip_timer_text = "VIP Sauna";
+            if (vip_timer.elapsed) {
+                vip_timer_text += " ready!";
+            } else {
+                vip_timer_text += ": " + this.sys.formatRelativeTime(vip_timer.finish_time);
+            }
+            timer_text += vip_timer_text;
+        }
+
+        let pool_timer = this.getEntityTimer("ent_saunaenergy");
+        if (pool_timer) {
+            let pool_timer_text = "Pool: ";
+            if (pool_timer.elapsed) {
+                pool_timer_text += "240/240 energy";
+            } else {
+                pool_timer_text += (240 - (Math.min(this.sauna_ticks, 120) * 2)) + "/240 energy ( " + this.sys.formatRelativeTime(pool_timer.finish_time) + ")";
+            }
+            if (timer_text != "") {
+                timer_text += " || ";
+            }
+            timer_text += pool_timer_text;
+        }
+      
+        let dim = ctx.measureText(timer_text);
+        ctx.fillStyle = "#000";
+
+        ctx.globalAlpha = 0.4;
+        ctx.fillRect(width/2-dim.width/2 -5, 5, dim.width + 10, 20);
+        ctx.globalAlpha = 1;
+
+        ctx.fillText(timer_text, width/2-dim.width/2 - 1, 20);
+        ctx.fillText(timer_text, width/2-dim.width/2 + 1, 20);
+        ctx.fillText(timer_text, width/2-dim.width/2, 20 - 1);
+        ctx.fillText(timer_text, width/2-dim.width/2, 20 + 1);
+
+        ctx.fillStyle = "#fff";
+        ctx.fillText(timer_text, width/2-dim.width/2, 20);
     }
     drawEntityTimer(ctx, bounds, entity, timestamp, color) {
         let time = this.sys.formatRelativeTime(timestamp);
@@ -457,6 +537,15 @@ export default class TimerApp extends NerdHudApp {
             }
         }
         return group;
+    }
+    getEntityTimer(entity_name) {
+        for (let i in this.timers) {
+            let t = this.timers[i];
+            if ((t.type == "entity") && (t.item == entity_name)) {
+                return t;
+            }
+        }
+        return null;
     }
     removeTimerGroup(group) {
         for (let i=0; i<group.length; i++) {
