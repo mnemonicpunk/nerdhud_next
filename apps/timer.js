@@ -229,20 +229,22 @@ export default class TimerApp extends NerdHudApp {
             timer_text += pool_timer_text;
         }
       
-        let dim = ctx.measureText(timer_text);
-        ctx.fillStyle = "#000";
+        if (timer_text != "") {
+            let dim = ctx.measureText(timer_text);
+            ctx.fillStyle = "#000";
 
-        ctx.globalAlpha = 0.4;
-        ctx.fillRect(width/2-dim.width/2 -5, 5, dim.width + 10, 20);
-        ctx.globalAlpha = 1;
+            ctx.globalAlpha = 0.4;
+            ctx.fillRect(width/2-dim.width/2 -5, 5, dim.width + 10, 20);
+            ctx.globalAlpha = 1;
 
-        ctx.fillText(timer_text, width/2-dim.width/2 - 1, 20);
-        ctx.fillText(timer_text, width/2-dim.width/2 + 1, 20);
-        ctx.fillText(timer_text, width/2-dim.width/2, 20 - 1);
-        ctx.fillText(timer_text, width/2-dim.width/2, 20 + 1);
+            ctx.fillText(timer_text, width/2-dim.width/2 - 1, 20);
+            ctx.fillText(timer_text, width/2-dim.width/2 + 1, 20);
+            ctx.fillText(timer_text, width/2-dim.width/2, 20 - 1);
+            ctx.fillText(timer_text, width/2-dim.width/2, 20 + 1);
 
-        ctx.fillStyle = "#fff";
-        ctx.fillText(timer_text, width/2-dim.width/2, 20);
+            ctx.fillStyle = "#fff";
+            ctx.fillText(timer_text, width/2-dim.width/2, 20);
+        }
     }
     drawEntityTimer(ctx, bounds, entity, timestamp, color) {
         let time = this.sys.formatRelativeTime(timestamp);
