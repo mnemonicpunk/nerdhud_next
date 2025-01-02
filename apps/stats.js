@@ -43,7 +43,6 @@ export default class StatsApp extends NerdHudApp {
         if (type == "levels") {
             this.levels = data;
         }
-
     }
     update() {
         let timer_element = this.window.querySelector('#hud_reset_timer');

@@ -4,6 +4,7 @@ export default class StorageApp extends NerdHudApp {
         this.name = "storage";
         this.storages = {};
         this.highlighted_storages = [];
+        this.hovered_storage = null;
     }
     event(type, data) {
         super.event(type, data);
@@ -15,6 +16,42 @@ export default class StorageApp extends NerdHudApp {
             this.trackStorages(data);
             this.save();
         }
+        if (type == "hover") {
+            this.hoverStorage(data);
+        }
+    }
+    hoverStorage(mid) {
+        let storage = null;
+        for (let i in this.storages) {
+            if (this.storages[i].mapEntity_id == mid) {
+                storage = this.storages[i];
+            }
+        }
+
+        // if we are not already hovering the storage
+        if ((storage != null) && (this.hovered_storage != storage.mid)) {
+            this.constructStorageContainer(this.hover_window, this.storages[mid]);
+            this.hovered_storage = mid;
+            this.sys.showWindow('storage_hover', true);
+        } else {
+            if (this.hovered_storage != null) {
+                this.hovered_storage = null;
+                this.sys.showWindow('storage_hover', false);
+            }
+        }
+
+        console.log("STORAGE DATA: ", storage, mid);
+        
+
+        /*if (mid != null) {
+            if ((mid != this.hovered_storage) && (this.storages[mid])) {
+                
+            }
+        } else {
+            if (this.hovered_storage == null) {
+                
+            }
+        }*/
     }
     trackStorages(data) {
         let updated_storages = {};
@@ -59,6 +96,12 @@ export default class StorageApp extends NerdHudApp {
             title: "Storage"
         });
         this.window.placeholder = "Your storages will be checked in here automatically when you visit them!";
+    
+        this.hover_window = this.sys.createWindow({
+            name: 'storage_hover'
+        });
+
+
     }
     onSave() {
         return {
@@ -110,6 +153,35 @@ export default class StorageApp extends NerdHudApp {
             }
         }
         return ret;
+    }
+    constructStorageContainer(el, storage) {
+        let price = this.importAppFunction('market.price');
+        let show_item = this.importAppFunction('iteminfo.show_item');
+
+        let storage_container = document.createElement('div');
+        storage_container.style = "display: grid; grid-template-columns: repeat(6, 1fr);";
+        let storage_value = 0;
+
+        for (let slot_num in storage.storage.slots) {
+            let slot = storage.storage.slots[slot_num];
+            let item_img = this.sys.getItemData(slot.item)?.image;
+            let slot_value = price(slot.item) * slot.quantity;
+            storage_value += slot_value;
+
+            let item_el = document.createElement('div');
+            item_el.style = "display: inline-block; text-align: center; padding: 6px;";
+            item_el.innerHTML = '<img class="hud_icon_large" src="' + item_img + '"><br>x' + slot.quantity + (slot_value>0?'<br><span style="font-size: 75%; color: #ddd"><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image +'">' + this.sys.formatCurrency(slot_value) + '</span>':'');
+            item_el.addEventListener('click', (e) => {
+                show_item(slot.item);
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            storage_container.appendChild(item_el);
+
+            //thtml += "<td style=''><img class='hud_icon_large' src='" + item_img + "'><br>x" + slot.quantity + "<td>";
+        }
+        el.innerHTML = '<div class="hud_list_heading">' + (storage.storage.name || "Unnamed Storage") + '&nbsp;<span style="font-size: 75%; color: #ddd"><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image +'">' + this.sys.formatCurrency(storage_value) + '</span></div>';
+        el.appendChild(storage_container);
     }
     updateStorages(updated_storages) {
         let price = this.importAppFunction('market.price');
@@ -188,30 +260,7 @@ export default class StorageApp extends NerdHudApp {
 
                 // if the updated_storage is the one we just got, force an update on the contents as well
                 if (new_storage || (updated_storages && updated_storages[s])) {
-                    let storage_container = document.createElement('div');
-                    storage_container.style = "display: grid; grid-template-columns: repeat(6, 1fr);";
-                    let storage_value = 0;
-
-                    for (let slot_num in storage.storage.slots) {
-                        let slot = storage.storage.slots[slot_num];
-                        let item_img = this.sys.getItemData(slot.item)?.image;
-                        let slot_value = price(slot.item) * slot.quantity;
-                        storage_value += slot_value;
-
-                        let item_el = document.createElement('div');
-                        item_el.style = "display: inline-block; text-align: center; padding: 6px;";
-                        item_el.innerHTML = '<img class="hud_icon_large" src="' + item_img + '"><br>x' + slot.quantity + (slot_value>0?'<br><span style="font-size: 75%; color: #ddd"><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image +'">' + this.sys.formatCurrency(slot_value) + '</span>':'');
-                        item_el.addEventListener('click', (e) => {
-                            show_item(slot.item);
-                            e.preventDefault();
-                            e.stopPropagation();
-                        });
-                        storage_container.appendChild(item_el);
-
-                        //thtml += "<td style=''><img class='hud_icon_large' src='" + item_img + "'><br>x" + slot.quantity + "<td>";
-                    }
-                    el.innerHTML = '<div class="hud_list_heading">' + (storage.storage.name || "Unnamed Storage") + '&nbsp;<span style="font-size: 75%; color: #ddd"><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image +'">' + this.sys.formatCurrency(storage_value) + '</span></div>';
-                    el.appendChild(storage_container);
+                    this.constructStorageContainer(el, storage);
                 }
             }
 

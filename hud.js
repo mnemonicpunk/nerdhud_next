@@ -215,6 +215,10 @@ class NerdHUD {
         this.current_map = null;
         this.scene_state = null;
 
+        this.mouse_x = 0;
+        this.mouse_y = 0;
+        this.hovered_entity = null;
+
         // manage all app-created windows
         this.registered_windows = [];
 
@@ -229,6 +233,16 @@ class NerdHUD {
         this.ui_root = ui_root;
         ui_root.id = 'nerd-hud-ui';
         document.body.appendChild(ui_root);
+
+        document.querySelector('#game-container').addEventListener('mousemove', e => {
+            var rect = e.target.getBoundingClientRect();
+            var x = e.clientX - rect.left; //x position within the element.
+            var y = e.clientY - rect.top;  //y position within the element.
+
+            this.mouse_x = x;
+            this.mouse_y = y;
+            this.updateMouse();
+        })
 
         const dock_left = document.createElement('div');
         this.dock_left = dock_left;
@@ -423,6 +437,59 @@ class NerdHUD {
         this.scaleUI();
 
         this.adjustDocks();
+    }
+    updateMouse() {
+        if (!this.entity_bounds) { return; }
+
+        const x = this.mouse_x;
+        const y = this.mouse_y;
+
+        let hover = false;
+
+        for (let i in this.entity_bounds) {
+            const bounds = this.boundsToScreenCoords(this.entity_bounds[i]);
+            const rect = {
+                left: bounds.x - bounds.width/2,
+                right: bounds.x + bounds.width/2,
+                top: bounds.y - bounds.height/2,
+                bottom: bounds.y + bounds.height/2,
+            }
+
+            if ((x > rect.left) && (x < rect.right) && (y > rect.top) && (y < rect.bottom)) {
+                if (this.hovered_entity != i) {
+                    this.hovered_entity = i;
+                    console.log("DISPATCHING HOVER FOR: ", i)
+                    this.dispatchEvent("hover", i);
+                }
+                hover = true;
+            }
+        }
+
+        if ((!hover) && (this.hovered_entity != null)) {
+            this.hovered_entity = null;
+            this.dispatchEvent("hover", null);
+        }
+
+        this.dispatchEvent('mouse', {
+            mouse_x: this.mouse_x,
+            mouse_y: this.mouse_y,
+            screen_width: this.canvas.width,
+            screen_height: this.canvas.height
+        });
+
+        for (let i in this.registered_windows) {
+            let w = this.registered_windows[i];
+
+            if (!w.options.docked) {
+                if (this.mouse_x < this.canvas.width/2) {
+                    w.el.classList.remove('hover_left');
+                    w.el.classList.add('hover_right');
+                } else {
+                    w.el.classList.remove('hover_right');
+                    w.el.classList.add('hover_left')
+                }
+            }
+        }
     }
     scaleUI() {
         const isMobile = /Mobi|Android/i.test(navigator.userAgent);
@@ -794,6 +861,7 @@ class NerdHUD {
                 this.player_bounds = msg.data.player_bounds;
             }
      
+            this.updateMouse();
         }
 
         //console.dir(msg);
@@ -1160,6 +1228,14 @@ class NerdHUD {
         });
 
         return inner_el;
+    }
+    showWindow(name, state) {
+        for (let i = 0; i < this.registered_windows.length; i++) {
+            let w = this.registered_windows[i];
+            if (w.options.name == name) {
+                w.setVisible(state);
+            }
+        }
     }
     clickDockIcon(dock, name) {
         for (let i=0; i<this.registered_windows.length; i++) {

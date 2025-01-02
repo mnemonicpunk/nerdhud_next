@@ -77,6 +77,22 @@
   max-height: 60vh;
 }
 
+.hover_left {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  width: auto; /* Let content decide */
+  max-width: 60%; /* Optional constraint */
+}
+
+.hover_right {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  width: auto; /* Let content decide */
+  max-width: 60%; /* Optional constraint */
+}
+
 .nerd_hud_window_inner {
   width: 100%;
   max-height: calc(60vh - 20px);
