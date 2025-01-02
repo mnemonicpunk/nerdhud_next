@@ -7,21 +7,27 @@ export default class StorageApp extends NerdHudApp {
     }
     event(type, data) {
         super.event(type, data);
-        if (type == "set_storage") {
+        /*if (type == "set_storage") {
             this.trackStorage(data);
+            this.save();
+        }*/
+        if (type == "set_storages") {
+            this.trackStorages(data);
             this.save();
         }
     }
-    trackStorage(storage) {
-        // if the storage is empty, remove it from tracked storages instead
-        if (this.storageEmpty(storage)) {
-            this.removeStorage(storage);
-            this.updateStorages();
-        } else {
-            this.storages[storage.mapEntity_id] = storage;
-            this.updateStorages(storage);
+    trackStorages(data) {
+        let updated_storages = {};
+        for (let s in data) {
+            const storage = data[s];
+            if (this.storageEmpty(storage)) {
+                this.removeStorage(storage);
+            } else {
+                this.storages[storage.mapEntity_id] = storage;
+                updated_storages[storage.mapEntity_id] = storage;
+            }
         }
-        
+        this.updateStorages(updated_storages);
     }
     storageEmpty(storage) {
         for (let slot_num in storage.storage.slots) {
@@ -35,7 +41,6 @@ export default class StorageApp extends NerdHudApp {
     removeStorage(storage) {
         if (this.storages[storage.mapEntity_id]) {
             delete this.storages[storage.mapEntity_id];
-            this.updateStorages();
             this.save();
         }
     }
@@ -106,7 +111,7 @@ export default class StorageApp extends NerdHudApp {
         }
         return ret;
     }
-    updateStorages(updated_storage) {
+    updateStorages(updated_storages) {
         let price = this.importAppFunction('market.price');
         let show_item = this.importAppFunction('iteminfo.show_item');
 
@@ -182,7 +187,7 @@ export default class StorageApp extends NerdHudApp {
                 }
 
                 // if the updated_storage is the one we just got, force an update on the contents as well
-                if (new_storage || (updated_storage?.mapEntity_id == s) || (updated_storage?.mid == s)) {
+                if (new_storage || (updated_storages && updated_storages[s])) {
                     let storage_container = document.createElement('div');
                     storage_container.style = "display: grid; grid-template-columns: repeat(6, 1fr);";
                     let storage_value = 0;
