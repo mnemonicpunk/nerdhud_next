@@ -392,7 +392,7 @@ export default class TimerApp extends NerdHudApp {
                             }
                         }
 
-                        if (entity.generic.layers[0]?.sprite?.isSpritesheet) {
+                        if (entity?.generic?.layers[0]?.sprite?.isSpritesheet) {
                             img.addEventListener('load', load_func);
                         }
                     }
