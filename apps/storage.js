@@ -39,19 +39,6 @@ export default class StorageApp extends NerdHudApp {
                 this.sys.showWindow('storage_hover', false);
             }
         }
-
-        console.log("STORAGE DATA: ", storage, mid);
-        
-
-        /*if (mid != null) {
-            if ((mid != this.hovered_storage) && (this.storages[mid])) {
-                
-            }
-        } else {
-            if (this.hovered_storage == null) {
-                
-            }
-        }*/
     }
     trackStorages(data) {
         let updated_storages = {};

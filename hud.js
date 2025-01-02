@@ -446,19 +446,23 @@ class NerdHUD {
 
         let hover = false;
 
-        for (let i in this.entity_bounds) {
-            const bounds = this.boundsToScreenCoords(this.entity_bounds[i]);
+        // Convert this.entity_bounds to an array sorted by the `y` property
+        const sortedEntityBounds = Object.entries(this.entity_bounds)
+            .sort(([, a], [, b]) => a.y - b.y); // Sort by the `y` property
+
+        // Iterate through the sorted array
+        for (let [i, bounds] of sortedEntityBounds) {
+            const screenBounds = this.boundsToScreenCoords(bounds);
             const rect = {
-                left: bounds.x - bounds.width/2,
-                right: bounds.x + bounds.width/2,
-                top: bounds.y - bounds.height/2,
-                bottom: bounds.y + bounds.height/2,
-            }
+                left: screenBounds.x - screenBounds.width / 2,
+                right: screenBounds.x + screenBounds.width / 2,
+                top: screenBounds.y - screenBounds.height / 2,
+                bottom: screenBounds.y + screenBounds.height / 2,
+            };
 
             if ((x > rect.left) && (x < rect.right) && (y > rect.top) && (y < rect.bottom)) {
                 if (this.hovered_entity != i) {
                     this.hovered_entity = i;
-                    console.log("DISPATCHING HOVER FOR: ", i)
                     this.dispatchEvent("hover", i);
                 }
                 hover = true;
