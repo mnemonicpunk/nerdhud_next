@@ -119,23 +119,30 @@ export default class TaskboardApp extends NerdHudApp {
             };
     
             elements.main.addEventListener('click', () => {
-                let order = this.orders[slot];
+                // Retrieve the current request item dynamically
+                const currentRequestItems = this.orders[slot]?.requestItems[0];
+            
+                if (!currentRequestItems) {
+                    console.warn('No current request items found.');
+                    return;
+                }
+            
                 let market_entry = document.getElementsByClassName('Marketplace_filter__3ynr2');
                 if (market_entry[0]) {
                     const element = market_entry[0];
-                    const text = this.sys.getItemName(request_items.itemId);
-    
+                    const text = this.sys.getItemName(currentRequestItems.itemId);
+            
                     // Set the value programmatically
                     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(element, text);
-    
+            
                     // Create and dispatch an input event to simulate React's onChange handling
                     const inputEvent = new Event('input', { bubbles: true });
                     element.dispatchEvent(inputEvent);
                 } else {
                     let show_item = this.importAppFunction('iteminfo.show_item');
-                    show_item(request_items.itemId);
+                    show_item(currentRequestItems.itemId);
                 }
-            });
+            });            
     
             let img_holder = document.createElement('div');
             img_holder.appendChild(elements.details_img);
