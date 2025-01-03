@@ -46,6 +46,8 @@ export default class StatsApp extends NerdHudApp {
     }
     update() {
         let timer_element = this.window.querySelector('#hud_reset_timer');
+        let my_listings = this.importAppFunction('market.my_listings');
+        let price = this.importAppFunction('market.price');
         
         if (this.reset_time != 0) {
             let rt = this.timestampToServerTime(this.reset_time);
@@ -76,6 +78,44 @@ export default class StatsApp extends NerdHudApp {
                 levels_element.innerHTML = new_html;
             }
         }
+
+        let listings_entries = this.elements.listing_entries;
+        let listings = my_listings();
+        let listings_html = "";
+        if (listings && listings.length > 0) {
+            listings_html +='<table class="nerd_window_table" style="text-align: center;"><thead><tr><th></th><th>Market</th><th>Quantity</th><th>Price</th><th>Fee</th></tr></thead><tbody>';
+            for (let i=0; i<listings.length; i++) {
+                let listing = listings[i];
+
+                listings_html += '<tr>';
+
+                // add item image
+                listings_html += '<td><img class="hud_icon_medium" src="' + this.sys.getItemData(listing.itemId).image + '">&nbsp;' + this.sys.getItemName(listing.itemId) + '</td>';
+                
+                // add market price
+                listings_html += '<td><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image + '">' + price(listing.itemId) + '</td>';
+
+                // add quantity
+                listings_html += '<td>' + listing.quantity + '</td>';
+
+                // add asking price
+                listings_html += '<td><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image + '">' + this.sys.formatCurrency(listing.price) + '</td>';
+
+                // add fee
+                listings_html += '<td><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image + '">' + this.sys.formatCurrency(listing.price * listing.fee) + '</td>';
+
+                // end row
+                listings_html +='</tr>';
+            }
+            listings_html += '</tbody></table>';
+        } else {
+            listings_html = "You have no current market listings.";
+        }
+
+        if (listings_entries.innerHTML != listings_html) {
+            listings_entries.innerHTML = listings_html;
+        }
+        
     }
     performReset() {
         if (!this.past_days) {
@@ -186,6 +226,34 @@ export default class StatsApp extends NerdHudApp {
         
         this.elements.levels = levels_element;
         this.window.appendChild(levels_element);
+
+        let listings_element = document.createElement('div');
+        listings_element.className = "hud_window_group";
+        
+        let header_el = document.createElement('div');
+        header_el.className = "hud_window_group_header";
+        header_el.innerHTML = "My Market Listings";
+        listings_element.appendChild(header_el);
+
+        let entries_el = document.createElement('div');
+        entries_el.className = "hud_window_group_entries";
+        entries_el.style.display = "none";
+        listings_element.appendChild(entries_el);
+
+        this.elements.listings = listings_element;
+        this.elements.listing_entries = entries_el;
+        this.window.appendChild(listings_element);
+
+        // attach event handler
+        let collapsed = true;
+        listings_element.addEventListener('click', () => {
+            collapsed =! collapsed;
+            if (collapsed) {
+                entries_el.style.display = "none";
+            } else {
+                entries_el.style.display = "block";
+            }
+        });
 
         // build delivery table
         let delivery_details = document.createElement('table');
