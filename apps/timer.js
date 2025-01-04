@@ -119,6 +119,34 @@ export default class TimerApp extends NerdHudApp {
             this.updateTimerUI();
         }
     }
+    declareSettings() {
+        return {
+            title: 'Timers',
+            settings: [
+                {
+                    name: 'Display VIP Sauna timer',
+                    var: 'display_vip',
+                    type: 'bool',
+                    default: true,
+                    description: 'When this is enabled the VIP Sauna timer will be displayed at the top of the screen'
+                },
+                {
+                    name: 'Display pool reset timer and energy',
+                    var: 'display_pool',
+                    type: 'bool',
+                    default: true,
+                    description: 'When this is enabled the remaining energy and the time until your sauna pool resets will be displayed at the top of the screen'
+                },
+                {
+                    name: 'Display speck bed timer',
+                    var: 'display_bed',
+                    type: 'bool',
+                    default: true,
+                    description: 'When this is enabled the time until you can use your speck bed again will be displayed at the top of the screen'
+                },
+            ]
+        }
+    }
     isEntityBlacklisted(entity) {
         const prefixes = [];
         const suffixes = [
@@ -203,10 +231,11 @@ export default class TimerApp extends NerdHudApp {
         }
     }
     draw(ctx, width, height) {
+        const settings = this.getSettings();
         let timer_text = "";
         
         let vip_timer = this.getEntityTimer("ent_saunarocks_charger");
-        if (vip_timer) {
+        if (settings.display_vip && vip_timer) {
             let vip_timer_text = "VIP Sauna";
             if (vip_timer.elapsed) {
                 vip_timer_text += " ready!";
@@ -217,7 +246,7 @@ export default class TimerApp extends NerdHudApp {
         }
 
         let pool_timer = this.getEntityTimer("ent_saunaenergy");
-        if (pool_timer) {
+        if (settings.display_pool && pool_timer) {
             let pool_timer_text = "Pool: ";
             if (pool_timer.elapsed) {
                 pool_timer_text += "240/240 energy";
@@ -228,6 +257,20 @@ export default class TimerApp extends NerdHudApp {
                 timer_text += " || ";
             }
             timer_text += pool_timer_text;
+        }
+
+        let bed_timer = this.getEntityTimer("ent_bed_speck");
+        if (settings.display_bed && bed_timer) {
+            let bed_timer_text = "Bed";
+            if (bed_timer.elapsed) {
+                bed_timer_text += " ready!";
+            } else {
+                bed_timer_text += ": " + this.sys.formatRelativeTime(bed_timer.finish_time);
+            }
+            if (timer_text != "") {
+                timer_text += " || ";
+            }
+            timer_text += bed_timer_text;
         }
       
         if (timer_text != "") {
