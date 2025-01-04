@@ -148,7 +148,9 @@ export default class TimerApp extends NerdHudApp {
         }
     }
     isEntityBlacklisted(entity) {
-        const prefixes = [];
+        const prefixes = [
+            'ent_playertree'
+        ];
         const suffixes = [
             '_start',
             '_starter',
