@@ -9,6 +9,7 @@ export default class InventoryApp extends NerdHudApp {
         this._inventory_coords = [];
     }
     onCreate() {
+        super.onCreate();
         this.exportAppFunction('have', (item) => {
             return this.have(item);
         });

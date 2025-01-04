@@ -24,10 +24,39 @@ export default class GWApp extends NerdHudApp {
             //console.log("DEBUG: ", data);
         }
     }
+    declareSettings() {
+        return {
+            title: 'Spore Sports',
+            settings: [
+                {
+                    name: 'Display advanced crop data',
+                    var: 'display_soils',
+                    type: 'bool',
+                    default: true,
+                    description: 'When this is set to on it will display an advanced overlay in Spore Sports, showing who owns a soil, what state it is in and when it will be ready'
+                },
+                {
+                    name: 'Mark enemy guild members',
+                    var: 'display_enemies',
+                    type: 'bool',
+                    default: true,
+                    description: 'When this is set to on enemy guild members will be marked with a red rectangle in Spore Sports'
+                },
+                {
+                    name: 'Mark damaged stones',
+                    var: 'display_damaged_stones',
+                    type: 'bool',
+                    default: true,
+                    description: 'When this is set to on damaged stones will be marked with a blue rectangle in Spore Sports'
+                },
+            ]
+        }
+    }
     onDrawEntity(ctx, entity, bounds, camera) {
         if (!this.sys.getCurrentMap().startsWith('sporesports')) { return; }
+        const settings = this.getSettings();
        
-        if ((entity.entity == "ent_guildwarscrops") || (entity.entity == "ent_allcrops")) {
+        if (settings.display_soils && (entity.entity == "ent_guildwarscrops") || (entity.entity == "ent_allcrops")) {
         //if (entity.entity == "ent_guildwarscrops") {
             let icon = -1;
 
@@ -107,7 +136,7 @@ export default class GWApp extends NerdHudApp {
             
         }
 
-        if (entity.entity == "ent_mineralDeposit") {
+        if (settings.display_damaged_stones && (entity.entity == "ent_mineralDeposit")) {
             if (entity.generic.statics.health == 30) {
                 return; 
             }
@@ -123,6 +152,9 @@ export default class GWApp extends NerdHudApp {
     }
     onDrawPlayer(ctx, entity, bounds) {
         if (!this.sys.getCurrentMap().startsWith('sporesports')) { return; }
+
+        const settings = this.getSettings();
+        if (!settings.display_enemies) { return; }
         
         if ((entity.guild?.handle != this.sys.userguild) && (entity.guild?.handle != undefined)) {
             ctx.strokeStyle = "#f00";

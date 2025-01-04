@@ -154,6 +154,7 @@ export default class TimerApp extends NerdHudApp {
         return false;
     }
     onCreate() {
+        super.onCreate();
         this.window = this.sys.createWindow({ 
             docked: "right",
             icon: "img/nhud_icon_timer.png",

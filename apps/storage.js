@@ -69,6 +69,7 @@ export default class StorageApp extends NerdHudApp {
         }
     }
     onCreate() {
+        super.onCreate();
         this.exportAppFunction('have', (item) => {
             return this.have(item);
         });
@@ -85,7 +86,8 @@ export default class StorageApp extends NerdHudApp {
         this.window.placeholder = "Your storages will be checked in here automatically when you visit them!";
     
         this.hover_window = this.sys.createWindow({
-            name: 'storage_hover'
+            name: 'storage_hover',
+            hover: true
         });
 
 

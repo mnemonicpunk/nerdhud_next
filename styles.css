@@ -1,6 +1,16 @@
 @import url('font/NunitoSans-Italic-VariableFont_YTLC\,opsz\,wdth\,wght.ttf');
 @import url('font/NunitoSans-VariableFont_YTLC\,opsz\,wdth\,wght.ttf');
 
+:root {
+  --nhud-opacity: 0.7;
+  --nhud-bg-color: rgba(64, 64, 160, var(--nhud-opacity));
+  --nhud-window-bg: rgba(41, 40, 119, var(--nhud-opacity));
+  --nhud-window-border: rgba(47, 173, 177, var(--nhud-opacity));
+  --nhud-interactive-pane-bg: rgba(28, 57, 80, var(--nhud-opacity));
+  --nhud-interact-bg: rgba(47, 88, 177, var(--nhud-opacity));
+  --nhud-button: rgba(82, 125, 218, 0.7);
+  --nhud-button-hover: rgba(82, 125, 218, 1);
+}
 
 #nerd-hud-canvas {
   position: fixed;
@@ -69,12 +79,51 @@
 .nerd_hud_window {
   padding: 10px;
   border-radius: 10px;
-  background-color: rgba(64, 64, 160, 0.75);
+  background-color: var(--nhud-bg-color);
   color: #fff;
   position: absolute;
   font-size: 50%;
 
   max-height: 60vh;
+}
+
+.nerd_hud_fullscreen_window {
+  pointer-events: all;
+  position: absolute;
+  left: 44px;
+  top: 44px;
+  bottom: 44px;
+  right: 44px;
+  max-height: 100vh;
+  zoom: 1;
+  z-index: 99999;
+}
+
+
+
+.nerd_fullscreen_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Ensures proper spacing */
+  height: 44px;
+}
+
+.nerd_fullscreen_title {
+  flex: 1; /* Takes up all available space */
+  font-size: 1.2em; /* Adjust as needed for title size */
+}
+
+.nerd_fullscreen_content {
+  height: calc(100% - 44px);
+  width: 100%;
+}
+
+.nerd_fullscreen_header.hud_button {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hover_left {
@@ -100,6 +149,47 @@
   overflow: auto;
 }
 
+.nerd_hud_fullscreen_window .nerd_hud_window_inner {
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  max-height: calc(100% - 44px);
+}
+
+.nerd_fullscreen_content {
+  display: flex;
+  flex-direction: column; /* For stacking content vertically */
+  height: calc(100% - 44px); /* Adjust height minus header height */
+}
+
+.nerd_fullscreen_body {
+  display: flex;
+  flex: 1; /* Takes up available space */
+}
+
+.nerd_sidebar {
+  width: 30%; /* Sidebar width */
+  background-color: var(--nhud-bg-color);
+  border-right: 1px solid #ccc; /* Optional: Divider between sidebar and content */
+  padding: 10px; /* Optional: Add spacing inside */
+}
+
+.nerd_content {
+  width: 70%; /* Content area width */
+  padding: 10px; /* Optional: Add spacing inside */
+  overflow: auto; /* Ensures scrollability for large content */
+}
+
+.hud_tabs_entry {
+  padding: 11px;
+  background-color: var(--nhud-interact-pane-bg);
+}
+
+.hud_tabs_entry_active {
+  background-color: var(--nhud-window-border);
+}
+
+
 @media (min-resolution: 2dppx) and (hover: hover) {
   .nerd_hud_window {
     max-height: 30vh;
@@ -114,7 +204,7 @@
 {
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
   border-radius: 10px;
-  background-color: rgba(41, 40, 119, 0.3)
+  background-color: var(--nhud-window-bg)
 }
 
 .nerd_hud_window_inner::-webkit-scrollbar {
@@ -126,7 +216,7 @@
 .nerd_hud_window_inner::-webkit-scrollbar
 {
   width: 12px;
-  background-color: rgba(41, 40, 119, 0.3)
+  background-color: var(--nhud-window-bg)
 }
 
 .nerd_hud_window_inner::-webkit-scrollbar-thumb
@@ -140,7 +230,7 @@
 {
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
   border-radius: 10px;
-  background-color: rgba(41, 40, 119, 0.3)
+  background-color: var(--nhud-window-bg)
 }
 
 .nerd_hud_window_inner ::-webkit-scrollbar {
@@ -152,7 +242,7 @@
 .nerd_hud_window_inner ::-webkit-scrollbar
 {
   width: 12px;
-  background-color: rgba(41, 40, 119, 0.3)
+  background-color: var(--nhud-window-bg)
 }
 
 .nerd_hud_window_inner ::-webkit-scrollbar-thumb
@@ -163,13 +253,13 @@
 }
 
 .nerd_hud_window_inner progress[value] {
-  background-color: rgba(41, 40, 119, 0.3);
+  background-color: var(--nhud-window-bg);
   width: 100%;
   height: 6px;
 }
 
 .nerd_hud_window_inner progress[value]::-webkit-progress-bar {
-  background-color: rgba(41, 40, 119, 0.3);
+  background-color: var(--nhud-window-bg);
   border-radius: 6px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
 }
@@ -202,7 +292,7 @@
 }
 
 .nerd_hud_panel_right {
-  background-color: rgba(64, 64, 160, 0.75); 
+  background-color: var(--nhud-bg-color); 
   position: fixed; 
   bottom: calc(100% + 11px);
   padding: 11px;
@@ -272,14 +362,14 @@
 
 .hud_window_group {
   padding: 6px;
-  background-color: rgba(28, 57, 80, 0.278);
+  background-color: var(--nhud-interactive-pane-bg);
   border-radius: 11px;
   margin-top: 11px;
   margin-bottom: 11px;
 }
 
 .hud_window_group:hover {
-  background-color: rgba(47, 88, 177, 0.478)
+  background-color: var(--nhud-interact-bg);
 }
 
 .hud_window_group_header {
@@ -288,7 +378,7 @@
   margin-bottom: 6px;
   text-align: center;
   padding: 6px;
-  border-bottom: 3px solid rgba(47, 173, 177, 0.778);
+  border-bottom: 3px solid var(--nhud-window-border);
 }
 
 .hud_window_group_entry {
@@ -297,7 +387,7 @@
 
 .hud_data_table {
   padding: 6px;
-  background-color: rgba(28, 57, 80, 0.278);
+  background-color: var(--nhud-interactive-pane-bg);
   border-radius: 11px;
 }
 
@@ -310,7 +400,7 @@
 }
 
 .hud_stat_pane {
-  background-color: rgba(28, 57, 80, 0.278);
+  background-color: var(--nhud-interactive-pane-bg);
   border-radius: 11px;
   margin-bottom: 11px;
 }
@@ -332,19 +422,19 @@
 
 .hud_search_option {
   padding: 6px;
-  background-color: rgba(28, 57, 80, 0.278);
+  background-color: var(--nhud-interactive-pane-bg);
   border-radius: 6px;
   margin-bottom: 6px;
 }
 
 .nerd_hud_window input {
   padding: 11px;
-  background-color: rgba(47, 88, 177, 0.478);
+  background-color: var(--nhud-interact-bg);
   border-radius: 11px;
   outline: none;
   color: #fff;
   font-size: 150%;
-  border: 1px solid rgba(47, 173, 177, 0.778);
+  border: 1px solid var(--nhud-window-border);
   width: 100%;
 }
 
@@ -359,7 +449,7 @@
 }
 
 .hud_interactive_list_item:hover {
-  background-color: rgba(47, 88, 177, 0.678);
+  background-color: var(--nhud-interact-bg);
 }
 
 .hud_details_card {
@@ -375,12 +465,12 @@
   border-radius: 11px;
   text-align: center;
 
-  background-color: rgba(82, 125, 218, 0.623);
+  background-color: var(--nhud-button);
 
   margin-bottom: 6px;
   margin-top: 6px;
 }
 
 .hud_button:hover {
-  background-color: rgba(82, 125, 218, 0.815);
+  background-color: var(--nhud-button-hover);
 }

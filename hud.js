@@ -126,7 +126,9 @@ class NerdHudApp {
     constructor(sys) {
         this.sys = sys;
     }
-    onCreate() {}
+    onCreate() {
+        this.initializeSettings();
+    }
     event(type, data) {
 
     }
@@ -151,15 +153,51 @@ class NerdHudApp {
     onLoad() {
 
     }
+    onLoadSettings(settings) {
+        this.settings = settings;
+    }
+    onSaveSettings() {
+        return this.settings;
+    }
     save() {
         this.sys.dataDirty();
     }
     timestampToServerTime(timestamp) {
         return (timestamp + (libpixels.getServerTime() - Date.now())); 
     }
+    declareSettings() {
+        return null;
+    }
+    initializeSettings() {
+        let dec = this.declareSettings();
+        let settings = {};
+        if (dec != null) {
+            for (let i = 0; i < dec.settings.length; i++) {
+                let setting = dec.settings[i];
+                if (!setting.type && setting.default) {
+                    settings[setting.var] = null;
+                    continue;
+                }
+                if (setting.type == "text") {
+                    settings[setting.var] = setting.default;
+                }
+                if (setting.type == "number") {
+                    settings[setting.var] = parseInt(setting.default);
+                }
+                if (setting.type == "bool") {
+                    settings[setting.var] = !!setting.default;
+                }
+            }
+        }
+        this.settings = settings;
+    }    
+    getSettings() {
+        if (!this.settings) {
+            this.initializeSettings();
+        }
+        return this.settings;
+    }
 }
-
-
 
 class NerdHUD {
     constructor() {
@@ -405,6 +443,18 @@ class NerdHUD {
             }
             this._known_good_app_data = data;
             this._initial_app_data_load_finished = true;
+
+            this.loadAppSettings(this.mid).then(settings => {
+                if (!settings) { return; }
+                if (settings['hud']) {
+                    this.applyHudSettings(settings['hud']);
+                }
+                this.withApps(app => {
+                    if (settings[app.name]) {
+                        app.onLoadSettings(settings[app.name]);
+                    }
+                });
+            });
         });
 
         this.resize();
@@ -484,7 +534,7 @@ class NerdHUD {
         for (let i in this.registered_windows) {
             let w = this.registered_windows[i];
 
-            if (!w.options.docked) {
+            if (w.options.hover == true) {
                 if (this.mouse_x < this.canvas.width/2) {
                     w.el.classList.remove('hover_left');
                     w.el.classList.add('hover_right');
@@ -962,7 +1012,6 @@ class NerdHUD {
             return false;
         }
     }
-
     debounceSaveAppData(mid, data) {
         const now = Date.now();
 
@@ -1043,6 +1092,39 @@ class NerdHUD {
     }
     clearAppData() {
         this.saveAppData(this.mid, {}).then(() => { window.location.reload(); }); 
+    }
+    async loadAppSettings(mid) {
+        console.log("Loading data for mid:", mid);
+        let result = await getStorage("NHN_SETTINGS_" + mid);
+
+        // Check if data exists
+        if (result && result["NHN_SETTINGS_" + mid]) {
+            console.log("Settings found for mid:", mid);
+            return result["NHN_SETTINGS_" + mid];
+        }
+
+        return null;
+    }
+    async saveAppSettings(mid, data) {
+        if (!this._initial_app_data_load_finished) {
+            return;
+        }
+        try {
+            const dataToSave = {
+                ["NHN_SETTINGS_" + mid]: data
+            };
+
+            await new Promise((resolve, reject) => {
+                putStorage(dataToSave).then((result) => {
+                    resolve();
+                }).catch(reject);
+            });
+
+            return true;
+        } catch (error) {
+            console.error("Error saving settings for mid:", mid, error);
+            return false;
+        }
     }
     watchClass(className, interval, callback, nodeRemovedCallback = null) {
         const classNamesArray = className.split(/\s+/);
@@ -1222,7 +1304,36 @@ class NerdHUD {
         // create inner window to hand to the app for its use
         let inner_el = document.createElement('div');
         inner_el.className = "nerd_hud_window_inner";
-        el.appendChild(inner_el);
+
+        // if the window is a fullscreen window add the title and close button
+        if (options?.fullscreen) {
+            let header = document.createElement('div');
+            header.className = "nerd_fullscreen_header";
+
+            let header_title = document.createElement('div');
+            header_title.className = "nerd_fullscreen_title";
+            header_title.innerHTML = options?.title || "Unnamed Window";
+            header.appendChild(header_title);
+
+            let header_close_btn = document.createElement('div');
+            header_close_btn.className ='hud_button';
+            header_close_btn.innerHTML = "X";
+
+            header.appendChild(header_close_btn);
+
+            header_close_btn.addEventListener('click', () => {
+                setVisible(false);
+            })
+
+            inner_el.classList.add('nerd_fullscreen_content');
+
+            el.classList.add('nerd_hud_fullscreen_window');
+            el.appendChild(header);
+            el.appendChild(inner_el); 
+
+        } else {
+            el.appendChild(inner_el);
+        }
 
         this.registered_windows.push({
             el,
@@ -1415,6 +1526,77 @@ class NerdHUD {
             return this.app_funcs[func_name];
         }
         throw "Error importing app function " + func_name;
+    }
+    getSettingsDeclarations() {
+        let dec = [];
+
+        dec.push({
+            title: 'General',
+            app: 'hud',
+            settings: [
+                {
+                    name: 'Global Menu Opacity',
+                    var: 'opacity',
+                    type: 'slider',
+                    description: 'Sets the overall opacity of the Nerd HUD Next UI',
+                    default: 70,
+                    min: 50,
+                    max: 100
+                }
+            ]
+        })
+
+        this.withApps((app) => {
+            let s = app.declareSettings();
+            if (s != null) {
+                s.app = app.name;
+
+                // TO-DO: fill in current values
+
+                dec.push(s);
+            }
+        })
+
+        return dec;
+    }
+    getAllSettings() {
+        let settings = {
+            hud: this._hud_settings
+        };
+        this.withApps(app => {
+            let s = app.getSettings();
+            if (s) {
+                settings[app.name] = s;
+            }
+        });
+        return settings;
+    }
+    applyHudSettings(settings) {
+        this._hud_settings = settings;
+        for (let i in settings) {
+            let setting = settings[i];
+            if (i == "opacity") {
+                document.documentElement.style.setProperty('--nhud-opacity', (setting / 100));
+                console.log("ROOT OPACITY SET: ", getComputedStyle(document.documentElement).getPropertyValue('--nhud-opacity'));
+            }
+        }
+    }
+    applySettings(values) {
+        this.applyHudSettings(values['hud'] || {});
+        this.withApps(app => {
+            let settings = app.getSettings();
+            if (!values[app.name]) { return; }
+            for (let i in values[app.name]) {
+                settings[i] = values[app.name][i];
+            }
+            app.onLoadSettings(settings);
+        });
+        let save_settings = {};
+        save_settings['hud'] = values['hud'];
+        this.withApps(app => {
+            save_settings[app.name] = app.getSettings();
+        });
+        this.saveAppSettings(this.mid, save_settings);
     }
 }
 window.addEventListener('load', () => {

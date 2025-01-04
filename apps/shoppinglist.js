@@ -40,6 +40,7 @@ export default class ShoppingListApp extends NerdHudApp {
         this.updateList();
     }
     onCreate() {
+        super.onCreate();
         this.window = this.sys.createWindow({ 
             docked: "right",
             icon: "img/nhud_icon_list.png",

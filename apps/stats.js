@@ -156,6 +156,7 @@ export default class StatsApp extends NerdHudApp {
 
     }
     onCreate() {
+        super.onCreate();
         this.window = this.sys.createWindow({ 
             docked: "left",
             icon: "img/nhud_icon_coin.png",
