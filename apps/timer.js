@@ -131,14 +131,14 @@ export default class TimerApp extends NerdHudApp {
                     description: 'When this is enabled the VIP Sauna timer will be displayed at the top of the screen'
                 },
                 {
-                    name: 'Display pool reset timer and energy',
+                    name: 'Display Pool reset timer and energy',
                     var: 'display_pool',
                     type: 'bool',
                     default: true,
                     description: 'When this is enabled the remaining energy and the time until your sauna pool resets will be displayed at the top of the screen'
                 },
                 {
-                    name: 'Display speck bed timer',
+                    name: 'Display Speck bed timer',
                     var: 'display_bed',
                     type: 'bool',
                     default: true,
