@@ -6,6 +6,13 @@ const STATE = {
     harvest: 4
 }
 
+const SPORE_COL = {
+    itm_mushroomSeeds_01: "#ffffff", // Normal
+    itm_mushroomSeeds_02: "#3e86f6", // Magic
+    itm_mushroomSeeds_03: "#ffff00", // Rare
+    itm_mushroomSeeds_04: "#ff3c00"  // Unique
+};
+
 export default class GWApp extends NerdHudApp {
     constructor(sys) {
         super(sys);
@@ -106,6 +113,23 @@ export default class GWApp extends NerdHudApp {
             ctx.strokeRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
             ctx.globalAlpha = 0.5;
             ctx.fillRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
+
+            if (entity.generic?.statics?.seedItem && SPORE_COL[entity.generic.statics.seedItem]) {
+                console.log("DRAWING CIRCLE");
+                ctx.globalAlpha = 1;
+                ctx.fillStyle = SPORE_COL[entity.generic.statics.seedItem];
+                
+                // Calculate the center of the circle
+                const centerX = bounds.x;
+                const centerY = bounds.y;
+                const radius = Math.min(bounds.width, bounds.height) / 4; // Adjust radius to fit within bounds
+            
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); // Full circle
+                ctx.fill();
+            }            
+
+            ctx.globalAlpha = 0.5;
 
             if (icon != -1) {
                 let rect = {
