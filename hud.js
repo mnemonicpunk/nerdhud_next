@@ -1037,7 +1037,6 @@ class NerdHUD {
         }, timeUntilNextSave);
     }
     async scheduleCloudSave(mid, data) {
-        console.log("Scheduling cloud save for: ", mid, data);
 
         // Update the latest data
         this.cloudsaveLatestData = data;

@@ -93,7 +93,7 @@ async function loadNerdHud(unresolved_url) {
     (document.head || document.documentElement).appendChild(styleElement);
 }
 
-loadNerdHud("https://raw.githubusercontent.com/mnemonicpunk/nerdhud_next/refs/heads/main/install.json");
-//loadNerdHud("builtin:install_builtin.json");
+//loadNerdHud("https://raw.githubusercontent.com/mnemonicpunk/nerdhud_next/refs/heads/main/install.json");
+loadNerdHud("builtin:install_builtin.json");
 
 
