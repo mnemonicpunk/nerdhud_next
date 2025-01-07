@@ -99,6 +99,34 @@ export default class GWApp extends NerdHudApp {
         ctx.restore();
     }    
     onDrawEntity(ctx, entity, bounds, camera) {
+        if (entity.entity == "ent_spore_chamber") {
+            let points = entity.generic.trackers.points || 0;
+            let uniques = entity.generic.trackers.uniqueItems || 0;
+
+            let spore_info = "Points: " + points + " // Unique Items: " + uniques;
+            if (spore_info == "") { return; }
+            
+            let dim = ctx.measureText(spore_info);
+
+            let x = bounds.x;
+            let y = bounds.y+bounds.height/2;
+
+            ctx.fillStyle = "#000";
+            ctx.globalAlpha = 0.5;
+
+            ctx.fillRect(x - dim.width/2 - 2, y - 11, dim.width + 4, 16);
+
+            ctx.globalAlpha = 1;
+
+            ctx.fillStyle = "#000";
+            ctx.fillText(spore_info, x - dim.width/2 - 1, y);
+            ctx.fillText(spore_info, x - dim.width/2 + 1, y);
+            ctx.fillText(spore_info, x - dim.width/2, y - 1);
+            ctx.fillText(spore_info, x - dim.width/2, y + 1);
+            ctx.fillStyle = "#fff";
+            ctx.fillText(spore_info, x - dim.width/2, y);
+        }
+
         if (!this.sys.getCurrentMap().startsWith('sporesports')) { return; }
         const settings = this.getSettings();
        
@@ -212,6 +240,8 @@ export default class GWApp extends NerdHudApp {
             ctx.fillRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
 
         }
+
+        
     }
     onDrawPlayer(ctx, entity, bounds) {
         if (!this.sys.getCurrentMap().startsWith('sporesports')) { return; }
