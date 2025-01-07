@@ -60,12 +60,19 @@ export default class GWApp extends NerdHudApp {
                     default: true,
                     description: 'When this is set to on damaged stones will be marked with a blue rectangle in Spore Sports'
                 },
+                {
+                    name: 'Low energy warning',
+                    var: 'display_energy_warning',
+                    type: 'bool',
+                    default: true,
+                    description: 'When this is set to on a vignette effect will indicate < 50 energy in Spore Sports'
+                },
             ]
         }
     }
     draw(ctx, width, height) {
         if (!this.sys.getCurrentMap().startsWith('sporesports')) { return; }
-        if (this.energy > 50) { return; }
+        if ((this.energy > 50)) { return; }
 
         // Save the current canvas state
         ctx.save();
