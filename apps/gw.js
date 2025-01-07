@@ -17,6 +17,7 @@ export default class GWApp extends NerdHudApp {
     constructor(sys) {
         super(sys);
         this.name = "gw";
+        this.energy = 1000;
 
         // create loading screen logo
         this.icons = document.createElement('img');
@@ -29,6 +30,9 @@ export default class GWApp extends NerdHudApp {
         super.event(type, data);
         if (type == "state_change") {
             //console.log("DEBUG: ", data);
+        }
+        if (type == "energy") {
+            this.energy = data;
         }
     }
     declareSettings() {
@@ -59,6 +63,34 @@ export default class GWApp extends NerdHudApp {
             ]
         }
     }
+    draw(ctx, width, height) {
+        if (!this.sys.getCurrentMap().startsWith('sporesports')) { return; }
+        if (this.energy > 50) { return; }
+
+        // Save the current canvas state
+        ctx.save();
+    
+        // Create a radial gradient for the vignette
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.sqrt((width / 2) ** 2 + (height / 2) ** 2); // Diagonal distance for smooth fading
+    
+        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+    
+        // Define gradient color stops with stronger edges and a touch of red
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 0)'); // Fully transparent at the center
+        gradient.addColorStop(0.7, 'rgba(50, 0, 0, 0.6)'); // Slightly red and semi-transparent towards edges
+        gradient.addColorStop(1, 'rgba(100, 0, 0, 1)'); // Strong red-black at the corners
+    
+        // Set the gradient as the fill style
+        ctx.fillStyle = gradient;
+    
+        // Draw a rectangle covering the whole screen
+        ctx.fillRect(0, 0, width, height);
+    
+        // Restore the previous canvas state
+        ctx.restore();
+    }    
     onDrawEntity(ctx, entity, bounds, camera) {
         if (!this.sys.getCurrentMap().startsWith('sporesports')) { return; }
         const settings = this.getSettings();
