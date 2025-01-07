@@ -56,10 +56,7 @@ export default class StatsApp extends NerdHudApp {
 
             if (rt < Date.now()) {
                 this.performReset();
-                this.save();
             }
-
-            
         } else {
             timer_element.innerHTML = "Visit taskboard to set reset time.";
         }
@@ -118,43 +115,48 @@ export default class StatsApp extends NerdHudApp {
         
     }
     performReset() {
+        // Initialize past_days if null
         if (!this.past_days) {
             this.past_days = [];
         }
-
-        // push current stats to the past days
+    
+        // Push current stats to the past days
         this.past_days.push({
             time: this.reset_time,
-            order: this.orders,
-            balance: this.balance
-        })
+            orders: [...this.orders], // Clone orders array to avoid mutation issues
+            balance: { ...this.balance }, // Clone balance object
+        });
+    
+        // Trim to the last 7 days
         while (this.past_days.length > 7) {
             this.past_days.shift();
         }
-        
-        // reset current stats
+    
+        // Reset orders and balance changes
         this.orders = [];
-        //this.balance = {};
-
-        // for balance we only want to reset the change but keep the previous balance intact, so we won't lose the next balance update
-        for (let b in this.balance) {
-            let balance = this.balance[b];
-            balance.change = 0;
+        this.order_cache = {};
+        for (let key in this.balance) {
+            if (this.balance.hasOwnProperty(key)) {
+                this.balance[key].change = 0; // Reset changes but keep previous balance intact
+            }
         }
-
-        let new_rt = this.timestampToServerTime(this.reset_time);
-        const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-        while (new_rt <= this.timestampToServerTime(Date.now())) {
-            new_rt += oneDayInMs;
+    
+        // Calculate the next reset time
+        const oneDayInMs = 24 * 60 * 60 * 1000;
+        let newResetTime = this.timestampToServerTime(this.reset_time);
+        while (newResetTime <= Date.now()) {
+            newResetTime += oneDayInMs;
         }
-        this.reset_time = new_rt;
-
-        // update UI
-        this.createOrderCache();
-        this.updateBreakdown();
+        this.reset_time = newResetTime;
+    
+        // Update dependent UI components AFTER resetting data
         this.updateCurrency();
-
-    }
+        this.createOrderCache(); // Ensure this works with an empty orders array
+        this.updateBreakdown(); // Update UI based on the new reset state
+    
+        // Save the new state
+        this.save();
+    }    
     onCreate() {
         super.onCreate();
         this.window = this.sys.createWindow({ 
