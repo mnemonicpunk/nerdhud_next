@@ -266,7 +266,7 @@ export default class TaskboardApp extends NerdHudApp {
         let amount = 0;
         for (let i=0; i<this.orders.length; i++) {
             let order = this.orders[i];
-            if(order.requestItems[0].itemId == item) {
+            if(order?.requestItems[0]?.itemId == item) {
                 amount += order.requestItems[0].quantity;
             }
         }
