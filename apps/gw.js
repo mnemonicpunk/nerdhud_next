@@ -99,7 +99,7 @@ export default class GWApp extends NerdHudApp {
         ctx.restore();
     }    
     onDrawEntity(ctx, entity, bounds, camera) {
-        if (entity.entity == "ent_spore_chamber") {
+        if ((entity.entity == "ent_spore_chamber") || (entity.entity == "ent_goo_pot") || (entity.entity == "ent_guano_mixer")) {
             let points = entity.generic.trackers.points || 0;
             let uniques = entity.generic.trackers.uniqueItems || 0;
 
