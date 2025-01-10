@@ -251,7 +251,8 @@ class NerdHUD {
         this.mid = "";
         this.username = "";
         this.current_map = null;
-        this.scene_state = null;
+        this.scene_state = { entities: {}, players: {}};
+        this._state_has_changed = false;
 
         this.mouse_x = 0;
         this.mouse_y = 0;
@@ -661,7 +662,7 @@ class NerdHUD {
             if (this._game_modal || this._game_halfmodal || this._game_storemodal) {
                 return;
             }
-            if (entities&&players) {
+            if (entities) {
                 // let apps draw entity specific content
                 for (let i in this.entity_bounds) {
                     let bounds = this.boundsToScreenCoords(this.entity_bounds[i]);
@@ -688,7 +689,11 @@ class NerdHUD {
                         }
                     }
                 }
+            } else {
+                console.log("NO ENTITIES TO DRAW");
+            }
 
+            if (players) {
                 // let apps draw player specific content
                 for (let i in this.player_bounds) {
                     let bounds = this.boundsToScreenCoords(this.player_bounds[i]);
@@ -845,6 +850,14 @@ class NerdHUD {
                 type: "update",
                 data: null
             });
+
+            if (this._state_has_changed) {
+                this.handleMessage({
+                    type: 'state_change',
+                    data: this.scene_state
+                });
+                this._state_has_changed = false;
+            }
         }
 
         this.adjustDocks();
@@ -897,13 +910,26 @@ class NerdHUD {
 
         if (msg.type == "map_changed") {
             this.current_map = msg.data.map_name;
+            this.scene_state = { entities: {}, players: {}};
         }
 
         // if we are not yet ingame discard any other messages
         if (!this.is_in_game) { return; }
 
-        if (msg.type == "state_change") {
+        /*if (msg.type == "state_change") {
             this.scene_state = msg.data;
+        }*/
+
+        if (msg.type == "entity_change") {
+            let e = msg.data;
+            this.scene_state.entities[e.mid] = e;
+            this._state_has_changed = true;
+        }
+
+        if (msg.type == "player_change") {
+            let e = msg.data;
+            this.scene_state.players[e.mid] = e;
+            this._state_has_changed = true;
         }
 
         if (msg.type == "camera") {
