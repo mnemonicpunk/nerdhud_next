@@ -19,12 +19,14 @@ export default class InventoryApp extends NerdHudApp {
 
         let _self = this;
         this.sys.watchClass("Hud_slidingGroup__ZaO10 Hud_expanded__QJoAM", 100, () => {
+            this.sys._showing_inventory = true;
             this._show_inventory_ui = true;
             this._inventory_coords = Array.from(document.querySelectorAll('.Hud_item__YGtIC')).map(element => {
                 const rect = element.getBoundingClientRect();
                 return { x: rect.left + window.scrollX, y: rect.top + window.scrollY, width: rect.width, height: rect.height };
             });
         }, () => {
+            this.sys._showing_inventory = false;
             this._show_inventory_ui = false;
             this._inventory_coords = [];
         });
