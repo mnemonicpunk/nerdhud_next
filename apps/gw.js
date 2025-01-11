@@ -177,12 +177,30 @@ export default class GWApp extends NerdHudApp {
                 }
             }
 
+            if (entity.generic.statics.isEvolved) {
+                if (!this.lastComputedTime || this.lastComputedTime !== Math.floor(Date.now() / 16.67)) {
+                    this.lastComputedTime = Math.floor(Date.now() / 16.67); // Approx. 60 FPS, convert to frame time
+            
+                    const modTime = (Date.now() % 3000) / 3000; // Normalize to a value between 0 and 1
+            
+                    // Calculate RGB values
+                    const r = Math.floor(255 * Math.sin(2 * Math.PI * modTime + 0) ** 2);
+                    const g = Math.floor(255 * Math.sin(2 * Math.PI * modTime + (2 * Math.PI / 3)) ** 2);
+                    const b = Math.floor(255 * Math.sin(2 * Math.PI * modTime + (4 * Math.PI / 3)) ** 2);
+            
+                    this.cachedColor = `rgb(${r}, ${g}, ${b})`; // Cache the computed color
+                }
+            
+                ctx.strokeStyle = this.cachedColor; // Use the cached color
+
+                ctx.strokeRect( 1 + (bounds.x - bounds.width/2), 1 + (bounds.y - bounds.height/2), bounds.width-2, bounds.height-2);
+            }
+
             ctx.strokeRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
             ctx.globalAlpha = 0.5;
             ctx.fillRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
 
             if (entity.generic?.statics?.seedItem && SPORE_COL[entity.generic.statics.seedItem]) {
-                console.log("DRAWING CIRCLE");
                 ctx.globalAlpha = 1;
                 ctx.fillStyle = SPORE_COL[entity.generic.statics.seedItem];
                 
