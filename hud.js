@@ -216,9 +216,9 @@ class NerdHUD {
             height: 0
         }
 
-        if (libpixels) {
+        /*if (undefined !== libpixels) {
             libpixels.debug_message = false;
-        }
+        }*/
 
         // create loading screen logo
         this.logo = document.createElement('img');
