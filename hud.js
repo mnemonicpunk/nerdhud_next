@@ -210,6 +210,10 @@ class NerdHUD {
         this._game_halfmodal = false;
         this._game_storemodal = false;
 
+        if (libpixels) {
+            libpixels.debug_message = false;
+        }
+
         // create loading screen logo
         this.logo = document.createElement('img');
         //this.logo.src = chrome.runtime.getURL("nerdhudnext_logo.png");
@@ -897,6 +901,10 @@ class NerdHUD {
         this.data_needs_saving = true;
     }
     handleMessage(msg) {
+        if (msg.type == "pixels_message") {
+            console.log("PIXELS MESSAGE: ", msg.type, msg.data);
+        }
+
         // this will kickstart the extension proper
         if (msg.type == "enter_game") {
             this.game_library = msg.data.game_library;
@@ -1565,7 +1573,16 @@ class NerdHUD {
                     type: 'slider',
                     description: 'Sets the overall opacity of the Nerd HUD Next UI',
                     default: 70,
-                    min: 50,
+                    min: 10,
+                    max: 100
+                },
+                {
+                    name: 'Global Overlay Opacity',
+                    var: 'overlay_opacity',
+                    type: 'slider',
+                    description: 'Sets the opacity of overlay elements on the gameplay',
+                    default: 70,
+                    min: 10,
                     max: 100
                 }
             ]
@@ -1583,6 +1600,17 @@ class NerdHUD {
         })
 
         return dec;
+    }
+    getHudSettings() {
+        return this._hud_settings;
+    }
+    getOverlayOpacity() {
+        let opacity = 1;
+        let hud_settings = this.getHudSettings();
+        if (hud_settings?.overlay_opacity) {
+            opacity = hud_settings.overlay_opacity / 100;
+        }
+        return opacity;
     }
     getAllSettings() {
         let settings = {

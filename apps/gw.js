@@ -100,6 +100,9 @@ export default class GWApp extends NerdHudApp {
     }    
     onDrawEntity(ctx, entity, bounds, camera) {
         if (this.sys._showing_inventory) { return; }
+
+        let opacity = this.sys.getOverlayOpacity();
+        
         if ((entity.entity == "ent_spore_chamber") || (entity.entity == "ent_goo_pot") || (entity.entity == "ent_guano_mixer")) {
             let points = entity.generic.trackers.points || 0;
             let uniques = entity.generic.trackers.uniqueItems || 0;
@@ -113,11 +116,11 @@ export default class GWApp extends NerdHudApp {
             let y = bounds.y+bounds.height/2;
 
             ctx.fillStyle = "#000";
-            ctx.globalAlpha = 0.5;
+            ctx.globalAlpha = 0.5 * opacity;
 
             ctx.fillRect(x - dim.width/2 - 2, y - 11, dim.width + 4, 16);
 
-            ctx.globalAlpha = 1;
+            ctx.globalAlpha = 1 * opacity;
 
             ctx.fillStyle = "#000";
             ctx.fillText(spore_info, x - dim.width/2 - 1, y);
@@ -198,11 +201,11 @@ export default class GWApp extends NerdHudApp {
             }
 
             ctx.strokeRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
-            ctx.globalAlpha = 0.5;
+            ctx.globalAlpha = 0.5 * opacity;
             ctx.fillRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
 
             if (entity.generic?.statics?.seedItem && SPORE_COL[entity.generic.statics.seedItem]) {
-                ctx.globalAlpha = 1;
+                ctx.globalAlpha = 1 * opacity;
                 ctx.fillStyle = SPORE_COL[entity.generic.statics.seedItem];
                 
                 // Calculate the center of the circle
@@ -215,7 +218,7 @@ export default class GWApp extends NerdHudApp {
                 ctx.fill();
             }            
 
-            ctx.globalAlpha = 0.5;
+            ctx.globalAlpha = 0.5 * opacity;
 
             if (icon != -1) {
                 let rect = {
@@ -232,7 +235,7 @@ export default class GWApp extends NerdHudApp {
                 let time = this.sys.formatRelativeTime(entity.generic.displayInfo.utcTarget);
                 let dim = ctx.measureText(time);
 
-                ctx.globalAlpha = 1;
+                ctx.globalAlpha = 1 * opacity;
 
                 ctx.fillStyle = "#000";
                 ctx.fillText(time, bounds.x-1  - dim.width/2, bounds.y);
@@ -255,7 +258,7 @@ export default class GWApp extends NerdHudApp {
             ctx.fillStyle = "#00f";
     
             ctx.strokeRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
-            ctx.globalAlpha = 0.2;
+            ctx.globalAlpha = 0.2 * opacity;
             ctx.fillRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
 
         }
@@ -266,6 +269,7 @@ export default class GWApp extends NerdHudApp {
         if (!this.sys.getCurrentMap().startsWith('sporesports')) { return; }
 
         const settings = this.getSettings();
+        let opacity = this.sys.getOverlayOpacity();
         if (!settings.display_enemies) { return; }
         
         if ((entity.guild?.handle != this.sys.userguild) && (entity.guild?.handle != undefined)) {
@@ -273,7 +277,7 @@ export default class GWApp extends NerdHudApp {
             ctx.fillStyle = "#f00";
         
             ctx.strokeRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
-            ctx.globalAlpha = 0.1;
+            ctx.globalAlpha = 0.1 * opacity;
             ctx.fillRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
         }
     }
