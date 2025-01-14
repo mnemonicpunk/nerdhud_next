@@ -209,6 +209,12 @@ class NerdHUD {
         this._game_modal = false;
         this._game_halfmodal = false;
         this._game_storemodal = false;
+        this._inventory_dimensions = {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0
+        }
 
         if (libpixels) {
             libpixels.debug_message = false;
@@ -660,6 +666,26 @@ class NerdHUD {
         
         // draw entities if necessary
         if (this.is_in_game) {
+            function doOverlap(rect1, rect2) {
+                const l1 = { x: rect1.x, y: rect1.y }; // Top-left corner of rect1
+                const r1 = { x: rect1.x + rect1.width, y: rect1.y + rect1.height }; // Bottom-right corner of rect1
+                const l2 = { x: rect2.x, y: rect2.y }; // Top-left corner of rect2
+                const r2 = { x: rect2.x + rect2.width, y: rect2.y + rect2.height }; // Bottom-right corner of rect2
+
+
+                // If one rectangle is to the left of the other
+                if (l1.x > r2.x || l2.x > r1.x) {
+                    return  false;
+                }
+            
+                // If one rectangle is above the other
+                if (r1.y < l2.y || r2.y < l1.y) {
+                    return false;
+                }
+            
+                return true;
+            }
+
             let entities = this.scene_state?.entities;
             let players = this.scene_state?.players;
 
@@ -670,10 +696,24 @@ class NerdHUD {
                 // let apps draw entity specific content
                 for (let i in this.entity_bounds) {
                     let bounds = this.boundsToScreenCoords(this.entity_bounds[i]);
-                    
-                    
-                    // if the entity is on screen, allow apps to draw an overlay for them
-                    if ((bounds.x > 0) && (bounds.x < this.canvas.width) && (bounds.y > 0) && (bounds.y < this.canvas.height)) {
+                    const inv = this._inventory_dimensions;
+
+                    // Check if the entity is on screen
+                    const isOnScreen = 
+                        bounds.x > 0 && 
+                        bounds.x < this.canvas.width && 
+                        bounds.y > 0 && 
+                        bounds.y < this.canvas.height;
+
+                    const overlapsInventory = doOverlap({
+                        x: bounds.x - bounds.width/2,
+                        y: bounds.y - bounds.height/2,
+                        width: bounds.width,
+                        height: bounds.height
+                    }, inv);
+
+                    // If the entity is on screen and does not overlap inventory, allow overlay
+                    if (isOnScreen && !overlapsInventory) {
                         for (let j in this.apps) {
                             
                             let app = this.apps[j];
@@ -701,10 +741,24 @@ class NerdHUD {
                 // let apps draw player specific content
                 for (let i in this.player_bounds) {
                     let bounds = this.boundsToScreenCoords(this.player_bounds[i]);
+                    const inv = this._inventory_dimensions;
 
-                    
-                    // if the entity is on screen, allow apps to draw an overlay for them
-                    if ((bounds.x > 0) && (bounds.x < this.canvas.width) && (bounds.y > 0) && (bounds.y < this.canvas.height)) {
+                    // Check if the entity is on screen
+                    const isOnScreen = 
+                        bounds.x > 0 && 
+                        bounds.x < this.canvas.width && 
+                        bounds.y > 0 && 
+                        bounds.y < this.canvas.height;
+
+                    const overlapsInventory = doOverlap({
+                        x: bounds.x - bounds.width/2,
+                        y: bounds.y - bounds.height/2,
+                        width: bounds.width,
+                        height: bounds.height
+                    }, inv);
+
+                    // If the entity is on screen and does not overlap inventory, allow overlay
+                    if (isOnScreen && !overlapsInventory) {
                         for (let j in this.apps) {
                             
                             let app = this.apps[j];
@@ -865,6 +919,22 @@ class NerdHUD {
         }
 
         this.adjustDocks();
+
+        // Select the first element with the class "Hud_slidingGroup__ZaO10"
+        const inventory_element = document.querySelector('.Hud_slidingGroup__ZaO10');
+
+        if (inventory_element) {
+            // Get the element's onscreen dimensions
+            const rect = inventory_element.getBoundingClientRect();
+
+            // Store the dimensions in the variable
+            this._inventory_dimensions = {
+                x: rect.left,
+                y: rect.top,
+                width: rect.width,
+                height: rect.height
+            };
+        }
 
         if (this.data_needs_saving) {
             let save_data = {};
