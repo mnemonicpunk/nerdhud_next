@@ -135,7 +135,7 @@ export default class GWApp extends NerdHudApp {
             let dim = ctx.measureText(spore_info);
 
             let x = bounds.x;
-            let y = bounds.y+bounds.height/2;
+            let y = bounds.y+bounds.height/2 - 16;
 
             ctx.fillStyle = "#000";
             ctx.globalAlpha = 0.5 * opacity;
