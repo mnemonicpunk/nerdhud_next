@@ -193,6 +193,21 @@ export default class TimerApp extends NerdHudApp {
         });
         this.window.dataset.placeholder = "Craft or plant something to make a timer appear here!";
 
+        this.exportAppFunction("add_timer", (type, mid, map, item, quantity, time) => {
+            return this.addTimer(type, mid, map, item, quantity, time)
+
+        });
+        this.exportAppFunction("has_timer", (mid) => {
+            return this.hasTimer(mid);
+        });
+        this.exportAppFunction("remove_timer", (mid) => {
+            return this.removeTimer(mid)
+        });
+        this.exportAppFunction("get_entity_timer", (mid) => {
+            return this.getEntityTimer(mid)
+        });
+
+
         this.updateTimerUI();
     }
     onSave() {
@@ -398,6 +413,12 @@ export default class TimerApp extends NerdHudApp {
 
                     if (entity) {
                         let sprite = entity.sprite.image;
+
+                        // SPECIAL CASE FOR SPORE CHAMBER //
+                        if (group[0].item == "ent_spore_chamber") {
+                            sprite = "https://d31ss916pli4td.cloudfront.net/uploadedAssets/i/itm_guildwarscharm/953cf680-dbea-4543-951b-52ee04a86be7.png";
+                        }
+                        //
                     
                         img.crossOrigin = "anonymous"; // Set cross-origin attribute
                         img.src = sprite;

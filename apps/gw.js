@@ -28,11 +28,33 @@ export default class GWApp extends NerdHudApp {
     }
     event(type, data) {
         super.event(type, data);
-        if (type == "state_change") {
-            //console.log("DEBUG: ", data);
-        }
         if (type == "energy") {
             this.energy = data;
+        }
+        if (type == "state_change") {
+            // special case for bed timer
+            if (this.sys.getCurrentMap().startsWith('cavehub')) {
+                const hasTimer = this.sys.importAppFunction('timer.has_timer');
+                const addTimer = this.sys.importAppFunction('timer.add_timer');
+                const removeTimer = this.sys.importAppFunction('timer.remove_timer');
+                const getEntityTimer = this.sys.importAppFunction('timer.get_entity_timer');
+
+                for (let e in data.entities) {
+                    let entity = data.entities[e];
+
+                    // special case for tracking bed covers
+                    if ((entity.entity == "ent_spore_chamber") || (entity.entity == "ent_goo_pot") || (entity.entity == "ent_guano_mixer")) {
+                        if ((hasTimer(entity.mid)) && (getEntityTimer(entity.entity).finish_time <= Date.now())) {
+                            removeTimer(entity.mid);
+                            this.save();
+                        }
+                        if ((!hasTimer(entity.mid)) && (entity.generic.trackers.utcRefresh > Date.now())) {
+                            addTimer("entity", entity.mid, this.sys.getCurrentMap(), entity.entity, 1, entity.generic.utcRefresh)
+                            this.save();
+                        }
+                    }
+                }
+            }
         }
     }
     declareSettings() {
