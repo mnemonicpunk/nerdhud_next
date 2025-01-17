@@ -48,7 +48,7 @@ export default class GWApp extends NerdHudApp {
                             removeTimer(entity.mid);
                             this.save();
                         }
-                        if ((!hasTimer(entity.mid)) && (entity.generic.trackers.utcRefresh > Date.now())) {
+                        if ((!hasTimer(entity.mid)) && (entity.generic.utcRefresh > Date.now())) {
                             addTimer("entity", entity.mid, this.sys.getCurrentMap(), entity.entity, 1, entity.generic.utcRefresh)
                             this.save();
                         }
