@@ -16,7 +16,7 @@ export default class StorageApp extends NerdHudApp {
             this.trackStorages(data);
             this.save();
         }
-        if (type == "hover") {
+        if (type == "hover_entity") {
             this.hoverStorage(data);
         }
     }

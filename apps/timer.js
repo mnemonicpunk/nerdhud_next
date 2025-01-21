@@ -291,7 +291,7 @@ export default class TimerApp extends NerdHudApp {
         }
       
         if (timer_text != "") {
-            let dim = ctx.measureText(timer_text);
+            /*let dim = ctx.measureText(timer_text);
             ctx.fillStyle = "#000";
 
             ctx.globalAlpha = 0.4;
@@ -304,7 +304,8 @@ export default class TimerApp extends NerdHudApp {
             ctx.fillText(timer_text, width/2-dim.width/2, 20 + 1);
 
             ctx.fillStyle = "#fff";
-            ctx.fillText(timer_text, width/2-dim.width/2, 20);
+            ctx.fillText(timer_text, width/2-dim.width/2, 20);*/
+            this.drawTextCentered(ctx, timer_text, width/2, 20, '#fff', '#000');
         }
     }
     drawEntityTimer(ctx, bounds, entity, timestamp, color) {
