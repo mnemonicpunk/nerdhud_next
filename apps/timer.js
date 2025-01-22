@@ -124,6 +124,13 @@ export default class TimerApp extends NerdHudApp {
             title: 'Timers',
             settings: [
                 {
+                    name: 'Display remaining time on active industries/crops',
+                    var: 'display_active_timers',
+                    type: 'bool',
+                    default: true,
+                    description: 'When this is enabled any industries with an active timer will overlay the remaining time on them on screen'
+                },
+                {
                     name: 'Display VIP Sauna timer',
                     var: 'display_vip',
                     type: 'bool',
@@ -226,6 +233,8 @@ export default class TimerApp extends NerdHudApp {
         this.highlights = mids;
     }
     onDrawEntity(ctx, entity, bounds, camera) {
+        const settings = this.getSettings();
+
         if ((this.highlights) && (this.highlights.includes(entity.mid))) {
             ctx.strokeStyle = "#ccf";
             ctx.strokeRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
@@ -235,8 +244,10 @@ export default class TimerApp extends NerdHudApp {
         }
 
         if ((this.timers[entity.mid]) && (!this.timers[entity.mid].elapsed)) {
-            let t = this.timestampToServerTime(this.timers[entity.mid].finish_time);
-            this.drawEntityTimer(ctx, bounds, entity, t, "#444");
+            if (settings.display_active_timers) {
+                let t = this.timestampToServerTime(this.timers[entity.mid].finish_time);
+                this.drawEntityTimer(ctx, bounds, entity, t, "#444");
+            }
         } else {
             if (entity.generic?.statics.thetimer) {
                 let t = this.timestampToServerTime(entity.generic?.statics.thetimer);

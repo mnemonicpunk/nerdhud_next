@@ -125,6 +125,7 @@ function flattenEntity(entity) {
 class NerdHudApp {
     constructor(sys) {
         this.sys = sys;
+        this._settings_ready = false;
     }
     onCreate() {
         this.initializeSettings();
@@ -155,6 +156,7 @@ class NerdHudApp {
     }
     onLoadSettings(settings) {
         this.settings = settings;
+        this._settings_ready = false;
     }
     onSaveSettings() {
         return this.settings;
@@ -170,33 +172,41 @@ class NerdHudApp {
     }
     initializeSettings() {
         let dec = this.declareSettings();
-        let settings = {};
-        if (dec != null) {
-            for (let i = 0; i < dec.settings.length; i++) {
-                let setting = dec.settings[i];
-                if (!setting.type && setting.default) {
-                    settings[setting.var] = null;
-                    continue;
-                }
-                if (setting.type == "text") {
-                    settings[setting.var] = setting.default;
-                }
-                if (setting.type == "number") {
-                    settings[setting.var] = parseInt(setting.default);
-                }
-                if (setting.type == "bool") {
-                    settings[setting.var] = !!setting.default;
-                }
+        if (!dec) return; // If no settings are declared, do nothing
+    
+        // If settings already exist, preserve them
+        this.settings = this.settings || {};
+    
+        for (let i = 0; i < dec.settings.length; i++) {
+            let setting = dec.settings[i];
+            // If the setting is already explicitly set, preserve it
+            if (this.settings.hasOwnProperty(setting.var)) {
+                continue;
+            }
+    
+            // Otherwise, initialize it to the default value
+            if (!setting.type && setting.default) {
+                this.settings[setting.var] = null;
+                continue;
+            }
+            if (setting.type == "text") {
+                this.settings[setting.var] = setting.default;
+            }
+            if (setting.type == "number") {
+                this.settings[setting.var] = parseInt(setting.default);
+            }
+            if (setting.type == "bool") {
+                this.settings[setting.var] = !!setting.default;
             }
         }
-        this.settings = settings;
-    }    
+    }  
     getSettings() {
-        if (!this.settings) {
+        if (this._settings_ready == false) {
             this.initializeSettings();
+            this._settings_ready = true;
         }
         return this.settings;
-    }
+    }    
     drawTextCentered(ctx, text, x, y, color = '#fff', frame = null) {
         let dim = ctx.measureText(text);
 
