@@ -5,6 +5,15 @@ export default class NotificationApp extends NerdHudApp {
         this.queue = [];
         this.current_notification = null;
     }
+    onCreate() {
+        super.onCreate();
+        this.exportAppFunction("show", (title, message) => {
+            return this.queueNotification({
+                title,
+                message
+            });
+        });
+    }
     event(type, data) {
         super.event(type, data);
         if (type == "timer_group_finished") {

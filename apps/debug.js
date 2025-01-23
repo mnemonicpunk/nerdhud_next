@@ -22,7 +22,6 @@ export default class DebugApp extends NerdHudApp {
 
         if (type == "hover_player") {
             this.hover_player_data = data;
-            console.log("HOVERING PLAYER: ", data);
         }
     }
     /*draw(ctx, width, height) {
