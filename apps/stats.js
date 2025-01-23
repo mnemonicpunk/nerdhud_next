@@ -96,7 +96,7 @@ export default class StatsApp extends NerdHudApp {
                 listings_html += '<td>' + listing.quantity + '</td>';
 
                 // add asking price
-                listings_html += '<td><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image + '">' + this.sys.formatCurrency(listing.price) + '</td>';
+                listings_html += '<td><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image + '">' + listing.price + '</td>';
 
                 // add fee
                 listings_html += '<td><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image + '">' + this.sys.formatCurrency(listing.price * listing.fee) + '</td>';
