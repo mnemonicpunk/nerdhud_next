@@ -88,10 +88,13 @@ export default class MarketApp extends NerdHudApp {
             }
 
             if (old && (l.marketPrice < l.price) && (l.marketPrice < old.marketPrice)) {
-                const show_notification = this.importAppFunction("notification.show");
-                const title = "Listing " + this.sys.getItemName(l.itemId) + " undercut on market!";
-                const message = "Your price is " + l.price + ", current price is " + l.marketPrice + "!";
-                show_notification(title, message);
+                const settings = this.getSettings();
+                if (settings.undercut_warnings) {
+                    const show_notification = this.importAppFunction("notification.show");
+                    const title = "Listing " + this.sys.getItemName(l.itemId) + " undercut on market!";
+                    const message = "Your price is " + l.price + ", current price is " + l.marketPrice + "!";
+                    show_notification(title, message);
+                }
             }
         }
     }
