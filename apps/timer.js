@@ -131,6 +131,13 @@ export default class TimerApp extends NerdHudApp {
                     description: 'When this is enabled any industries with an active timer will overlay the remaining time on them on screen'
                 },
                 {
+                    name: 'Display time until an industry can be used again',
+                    var: 'display_use_timers',
+                    type: 'bool',
+                    default: false,
+                    description: 'When this is enabled any industries that are in use by another player or otherwise on cooldown will show a timer until they can be used again with a red background'
+                },
+                {
                     name: 'Display VIP Sauna timer',
                     var: 'display_vip',
                     type: 'bool',
@@ -249,7 +256,10 @@ export default class TimerApp extends NerdHudApp {
                 this.drawEntityTimer(ctx, bounds, entity, t, "#444");
             }
         } else {
-            if (entity.generic?.statics.thetimer) {
+            if (settings.display_use_timers && entity.generic?.statics.finishTime) {
+                let t = this.timestampToServerTime(entity.generic?.statics.finishTime);
+                this.drawEntityTimer(ctx, bounds, entity, t, "#f44");
+            } else if (entity.generic?.statics.thetimer) {
                 let t = this.timestampToServerTime(entity.generic?.statics.thetimer);
                 this.drawEntityTimer(ctx, bounds, entity, t, "#f44");
             } else if (entity.generic?.statics.firedUntil) {
