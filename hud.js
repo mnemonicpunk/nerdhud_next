@@ -530,65 +530,67 @@ class NerdHUD {
         this.adjustDocks();
     }
     updateMouse() {
-        if (!this.entity_bounds) { return; }
-
         const x = this.mouse_x;
         const y = this.mouse_y;
 
-        let hover_entity = false;
+        if (!!this.entity_bounds) { 
+            let hover_entity = false;
 
-        // Convert this.entity_bounds to an array sorted by the `y` property
-        const sortedEntityBounds = Object.entries(this.entity_bounds)
-            .sort(([, a], [, b]) => a.y - b.y); // Sort by the `y` property
+            // Convert this.entity_bounds to an array sorted by the `y` property
+            const sortedEntityBounds = Object.entries(this.entity_bounds)
+                .sort(([, a], [, b]) => a.y - b.y); // Sort by the `y` property
 
-        // Iterate through the sorted array
-        for (let [i, bounds] of sortedEntityBounds) {
-            const screenBounds = this.boundsToScreenCoords(bounds);
-            const rect = {
-                left: screenBounds.x - screenBounds.width / 2,
-                right: screenBounds.x + screenBounds.width / 2,
-                top: screenBounds.y - screenBounds.height / 2,
-                bottom: screenBounds.y + screenBounds.height / 2,
-            };
+            // Iterate through the sorted array
+            for (let [i, bounds] of sortedEntityBounds) {
+                const screenBounds = this.boundsToScreenCoords(bounds);
+                const rect = {
+                    left: screenBounds.x - screenBounds.width / 2,
+                    right: screenBounds.x + screenBounds.width / 2,
+                    top: screenBounds.y - screenBounds.height / 2,
+                    bottom: screenBounds.y + screenBounds.height / 2,
+                };
 
-            if ((x > rect.left) && (x < rect.right) && (y > rect.top) && (y < rect.bottom)) {
-                if (this.hovered_entity != i) {
-                    this.hovered_entity = i;
-                    this.dispatchEvent("hover_entity", i);
+                if ((x > rect.left) && (x < rect.right) && (y > rect.top) && (y < rect.bottom)) {
+                    if (this.hovered_entity != i) {
+                        this.hovered_entity = i;
+                        this.dispatchEvent("hover_entity", i);
+                    }
+                    hover_entity = true;
                 }
-                hover_entity = true;
             }
         }
 
-        let hover_player = false;
+        if (!!this.player_bounds) { 
+            let hover_player = false;
 
-        // Convert this.player_bounds to an array sorted by the `y` property
-        const sortedPlayerBounds = Object.entries(this.player_bounds)
-            .sort(([, a], [, b]) => a.y - b.y); // Sort by the `y` property
+            // Convert this.player_bounds to an array sorted by the `y` property
+            const sortedPlayerBounds = Object.entries(this.player_bounds)
+                .sort(([, a], [, b]) => a.y - b.y); // Sort by the `y` property
 
-        // Iterate through the sorted array
-        for (let [i, bounds] of sortedPlayerBounds) {
-            const screenBounds = this.boundsToScreenCoords(bounds);
-            const rect = {
-                left: screenBounds.x - screenBounds.width / 2,
-                right: screenBounds.x + screenBounds.width / 2,
-                top: screenBounds.y - screenBounds.height / 2,
-                bottom: screenBounds.y + screenBounds.height / 2,
-            };
+            // Iterate through the sorted array
+            for (let [i, bounds] of sortedPlayerBounds) {
+                const screenBounds = this.boundsToScreenCoords(bounds);
+                const rect = {
+                    left: screenBounds.x - screenBounds.width / 2,
+                    right: screenBounds.x + screenBounds.width / 2,
+                    top: screenBounds.y - screenBounds.height / 2,
+                    bottom: screenBounds.y + screenBounds.height / 2,
+                };
 
-            if ((x > rect.left) && (x < rect.right) && (y > rect.top) && (y < rect.bottom)) {
-                if (this.hovered_player != i) {
-                    this.hovered_player = i;
-                    let player_data = this.scene_state.players[i];
-                    this.dispatchEvent("hover_player", player_data);
+                if ((x > rect.left) && (x < rect.right) && (y > rect.top) && (y < rect.bottom)) {
+                    if (this.hovered_player != i) {
+                        this.hovered_player = i;
+                        let player_data = this.scene_state.players[i];
+                        this.dispatchEvent("hover_player", player_data);
+                    }
+                    hover_player = true;
                 }
-                hover_player = true;
             }
-        }
 
-        if ((!hover_player) && (this.hovered_player != null)) {
-            this.hovered_player = null;
-            this.dispatchEvent("hover_player", null);
+            if ((!hover_player) && (this.hovered_player != null)) {
+                this.hovered_player = null;
+                this.dispatchEvent("hover_player", null);
+            }
         }
 
         this.dispatchEvent('mouse', {
