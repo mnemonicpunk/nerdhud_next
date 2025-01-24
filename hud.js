@@ -558,6 +558,11 @@ class NerdHUD {
                     hover_entity = true;
                 }
             }
+
+            if ((!hover_entity) && (this.hovered_entity != null)) {
+                this.hovered_entity = null;
+                this.dispatchEvent("hover_entity", null);
+            }
         }
 
         if (!!this.player_bounds) { 
