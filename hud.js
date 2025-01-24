@@ -627,7 +627,7 @@ class NerdHUD {
       
         // If it's a high DPI, non-mobile device, set zoom to 2
         if (isHighDPI && !isMobile) {
-          this.ui_root.style.zoom = 2; // Apply zoom factor for high DPI non-mobile devices
+          //this.ui_root.style.zoom = 2; // Apply zoom factor for high DPI non-mobile devices
           return;
         }
       

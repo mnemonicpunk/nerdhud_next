@@ -84,7 +84,7 @@
   position: absolute;
   font-size: 50%;
 
-  max-height: 60vh;
+  max-height: 80vh;
 }
 
 .nerd_hud_fullscreen_window {
@@ -144,7 +144,7 @@
 
 .nerd_hud_window_inner {
   width: 100%;
-  max-height: calc(60vh - 20px);
+  max-height: calc(80vh - 20px);
   box-sizing: border-box;
   overflow: auto;
 }
@@ -190,15 +190,15 @@
 }
 
 
-@media (min-resolution: 2dppx) and (hover: hover) {
+/*@media (min-resolution: 2dppx) and (hover: hover) {
   .nerd_hud_window {
-    max-height: 30vh;
+    max-height: 40vh;
   }
 
   .nerd_hud_window_inner {
-    max-height: calc(30vh - 20px);
+    max-height: calc(40vh - 20px);
   }
-}
+}*/
 
 .nerd_hud_window_inner::-webkit-scrollbar-track
 {
