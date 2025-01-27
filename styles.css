@@ -474,3 +474,25 @@
 .hud_button:hover {
   background-color: var(--nhud-button-hover);
 }
+
+.hud_search_tab {
+  position: relative; /* Ensure the tab is positioned relative to its container */
+  bottom: calc(100% + 18px);
+  z-index: 1;          /* Ensures the tab stays above other content */
+  display: inline;
+  margin-left: 4px;
+
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  background: var(--nhud-window-bg);
+
+  border: 1px solid var(--nhud-button);
+}
+
+.hud_search_tab_active {
+  background: var(--nhud-button-hover);
+}

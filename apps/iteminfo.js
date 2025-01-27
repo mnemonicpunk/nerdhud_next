@@ -19,6 +19,7 @@ export default class ItemInfoApp extends NerdHudApp {
         this.elements = {};
 
         this.selected_item = "";
+        this.selected_tab = "item";
     }
     event(type, data) {
         super.event(type, data);
@@ -38,6 +39,7 @@ export default class ItemInfoApp extends NerdHudApp {
         this.window.dataset.placeholder = "This window shows all kinds of information about an item."
         this.createItemInfoWindow();
         this.setMode("search");
+        this.setTab("item");
         //this.setSelectedItem('itm_shears_04');
 
         this.exportAppFunction("show_item", (item) => {
@@ -52,11 +54,26 @@ export default class ItemInfoApp extends NerdHudApp {
         this.exportAppFunction("crafting_energy_cost", (item) => {
             return this.getCraftingEnergyCostFor(item);
         });
+
+        this.industry_name_mapping = {};
+        
+        fetch('https://pixelnerds.xyz/api/industries').then(async res => {
+            let text = await res.text();
+            let json = await this.sys.decompressData(text);
+
+            for (let i = 0; i <json.length; i++) {
+                let industry = json[i];
+                this.industry_name_mapping[industry.type] = industry.name;
+            }
+        });
     }
     createItemInfoWindow() {
         let elements = {
             search: document.createElement('div'),
-            info: document.createElement('div')
+            info: document.createElement('div'),
+            tabs: document.createElement('div'),
+            tab_item: document.createElement('div'),
+            tab_industry: document.createElement('div')
         }
         this.elements = elements;
 
@@ -64,19 +81,19 @@ export default class ItemInfoApp extends NerdHudApp {
         this.window.appendChild(elements.info);
 
         let search_entry = document.createElement('div');
-        search_entry.style = "position: fixed; bottom: calc(100% + 11px); height: 44px;";
+        search_entry.style = "position: fixed; bottom: calc(100% + 23px); height: 44px;";
         let search_options = elements.search_options = document.createElement('div');
         search_options.className = "hud_interactive_list";
         search_options.style = "max-height: calc(50vh - 44px);";
-        let search_entry_text = document.createElement('input');
+        let search_entry_text = elements.search_entry_text = document.createElement('input');
         search_entry_text.placeholder = "Item name";
+
+        search_entry.appendChild(elements.tabs);
 
         search_options.innerHTML = 'Type an item name or part of it to show options.'
 
         search_entry_text.addEventListener('input', (e) => {
-            let matches = this.sys.findItemsByName(search_entry_text.value);
-
-            this.setSearchSuggestions(matches);
+            this.setSearchSuggestions(search_entry_text.value);
 
             e.preventDefault();
             e.stopPropagation();
@@ -92,6 +109,21 @@ export default class ItemInfoApp extends NerdHudApp {
         elements.search.appendChild(search_options);
         elements.search.appendChild(search_entry);
         
+        // create tabs
+        elements.tab_item.addEventListener('click', () => {
+            this.setTab("item");
+        });
+        elements.tab_industry.addEventListener('click', () => {
+            this.setTab("industry");
+        });
+
+        elements.tabs.appendChild(elements.tab_item);
+        elements.tabs.appendChild(elements.tab_industry);
+
+        elements.tab_item.innerHTML = "Items";
+        elements.tab_item.className = "hud_search_tab";
+        elements.tab_industry.innerHTML = "Industries";
+        elements.tab_industry.className = "hud_search_tab";
     }
     setMode(mode) {
         if (mode == "item_display") {
@@ -102,6 +134,19 @@ export default class ItemInfoApp extends NerdHudApp {
             this.elements.search.style.display = "block";
             this.elements.info.style.display = "none";
         }
+    }
+    setTab(tab) {
+        this.selected_tab = tab;
+        if (tab == "item") {
+            this.elements.tab_item.classList.add("hud_search_tab_active");
+            this.elements.tab_industry.classList.remove("hud_search_tab_active");
+        }
+        if (tab == "industry") {
+            this.elements.tab_item.classList.remove("hud_search_tab_active");
+            this.elements.tab_industry.classList.add("hud_search_tab_active");
+        }
+
+        this.elements.search_entry_text.dispatchEvent(new Event("input"));
     }
     setSelectedItem(item) {
         let price = this.sys.importAppFunction('market.price');
@@ -266,7 +311,89 @@ export default class ItemInfoApp extends NerdHudApp {
             this.elements.info.appendChild(bts);
         }
     }
-    setSearchSuggestions(items) {
+    setSelectedIndustry(industry) {
+        const PIXELNERDS_LOGO = "https://pixelnerds.xyz/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.bd8c914b.png&w=640&q=75"
+
+        this.setMode("item_display");
+        this.selected_industry = industry;
+
+        this.elements.info.innerHTML = ""; //JSON.stringify(this.hud.getItemData(item));
+        let data = this.sys.getItemData(industry);
+
+        this.elements.info.innerHTML = "Loading data for " + this.industry_name_mapping[industry] + "...";
+
+        fetch('https://pixelnerds.xyz/api/industries/?type=' + this.selected_industry).then(async res => {
+            let text = await res.text();
+            let data = await this.sys.decompressData(text);
+
+            this.elements.info.innerHTML = "";
+
+            let back_btn = document.createElement('div');
+            back_btn.className = "hud_button";
+            back_btn.innerHTML = "↩&nbsp;Search";
+            back_btn.addEventListener('click', () => {
+                this.setMode("search");
+            });
+
+            this.elements.info.appendChild(back_btn);
+
+            let table = document.createElement('table');
+            table.className = "hud_data_table";
+            table.style = "padding: 11px";
+            table.innerHTML = "<thead style='font-weight: bold;'><tr><td>Land</td><td>Available/Total</td><td>Players</td></tr></thead>";
+
+            for (let i=0; i<data.items.length; i++) {
+                const industry = data.items[i];
+                const el = document.createElement('tr');
+
+                let image = industry.image;
+                if (image.startsWith('/')) {
+                    image = "https://pixelnerds.xyz" + image;
+                }
+
+                el.innerHTML = '<td>' + industry.land + ' (' + industry.outside + ')</td><td><img class="hud_icon_medium" src="' + image + '"> ' + industry.available + '/' + industry.count + '</td><td>👤' + industry.playerCount + '</td>'; 
+                table.appendChild(el);
+            }
+            this.elements.info.appendChild(table);
+
+            let powered_el = document.createElement('div');
+            powered_el.style ="text-align: center; color: #ccc; font-weight: 50; margin-top: 11px;"
+
+            let powered_text = document.createElement('div');
+            let powered_img = document.createElement('img');
+
+            powered_el.appendChild(powered_text);
+            powered_el.appendChild(powered_img);
+            powered_img.style = "max-width: 100%; height: auto;"
+
+            powered_text.innerHTML = "POWERED BY";
+            powered_img.src = PIXELNERDS_LOGO;
+            powered_img.addEventListener('click', () => {
+                window.open('https://pixelnerds.xyz', '_blank');
+            });
+
+            this.elements.info.appendChild(powered_el);
+        });
+    }
+    setSearchSuggestions(search_term) {
+        let matches = this.sys.findItemsByName(search_term);
+
+        let items = null;
+        if (this.selected_tab == "item") {
+            items = this.sys.findItemsByName(search_term);
+        }
+        if (this.selected_tab == "industry") {
+            let matches = {};
+            for (let i in this.industry_name_mapping) {
+                let ind = this.industry_name_mapping[i];
+                if (ind.toLowerCase().includes(search_term)) {
+                    matches[i] = ind;
+                }
+
+            }
+            items = matches;
+        }
+
         this.elements.search_options.innerHTML = "";
 
         if (Object.keys(items).length === 0) {
@@ -282,7 +409,12 @@ export default class ItemInfoApp extends NerdHudApp {
             el.innerHTML = items[i];
 
             el.addEventListener('click', () => {
-                this.setSelectedItem(el.dataset.item);
+                if (this.selected_tab == "item") {
+                    this.setSelectedItem(el.dataset.item);
+                }
+                if (this.selected_tab == "industry") {
+                    this.setSelectedIndustry(el.dataset.item);
+                }
             });
 
             this.elements.search_options.appendChild(el);

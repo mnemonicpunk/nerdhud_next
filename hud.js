@@ -1784,6 +1784,44 @@ class NerdHUD {
         });
         this.saveAppSettings(this.mid, save_settings);
     }
+    async decompressData(compressedData) {
+        // Remove any surrounding quotes from the string (if present)
+        compressedData = compressedData.replace(/^"|"$/g, '');
+    
+        // Decode the base64 string into binary data
+        const binaryData = atob(compressedData);
+    
+        // Convert the binary data to a Uint8Array
+        const byteArray = new Uint8Array(binaryData.length);
+        for (let i = 0; i < binaryData.length; i++) {
+            byteArray[i] = binaryData.charCodeAt(i);
+        }
+    
+        // Create a stream for decompression using the CompressionStream API
+        const decompressedStream = new DecompressionStream('deflate');
+        const readableStream = new ReadableStream({
+            start(controller) {
+                controller.enqueue(byteArray);
+                controller.close();
+            }
+        });
+    
+        // Use the decompressed stream to read and get the unzipped content
+        const decompressed = readableStream.pipeThrough(decompressedStream);
+    
+        // Convert the decompressed stream to text
+        const reader = decompressed.getReader();
+        let result = '';
+        let done, value;
+        while ({ done, value } = await reader.read(), !done) {
+            result += new TextDecoder().decode(value);
+        }
+    
+        // Parse and return the JSON data
+        return JSON.parse(result);
+    }
+    
+      
 }
 window.addEventListener('load', () => {
     const nerd_hud = new NerdHUD();
