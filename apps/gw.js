@@ -203,6 +203,7 @@ export default class GWApp extends NerdHudApp {
                 }
             }
 
+            ctx.save();
             if (entity.generic.statics.isEvolved) {
                 if (!this.lastComputedTime || this.lastComputedTime !== Math.floor(Date.now() / 16.67)) {
                     this.lastComputedTime = Math.floor(Date.now() / 16.67); // Approx. 60 FPS, convert to frame time
@@ -220,7 +221,24 @@ export default class GWApp extends NerdHudApp {
                 ctx.strokeStyle = this.cachedColor; // Use the cached color
 
                 ctx.strokeRect( 1 + (bounds.x - bounds.width/2), 1 + (bounds.y - bounds.height/2), bounds.width-2, bounds.height-2);
+                ctx.strokeRect( 2 + (bounds.x - bounds.width/2), 2 + (bounds.y - bounds.height/2), bounds.width-4, bounds.height-4);
+
+
+                ctx.fillStyle = this.cachedColor;
+
+                ctx.globalAlpha = 1 * opacity;
+
+                // Calculate the center of the circle
+                const centerX = bounds.x;
+                const centerY = bounds.y;
+                const radius = Math.min(bounds.width, bounds.height) / 3; // Adjust radius to fit within bounds
+            
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2); // Full circle
+                ctx.fill();
+            
             }
+            ctx.restore();
 
             ctx.strokeRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
             ctx.globalAlpha = 0.5 * opacity;
