@@ -322,7 +322,7 @@ export default class ItemInfoApp extends NerdHudApp {
 
         this.elements.info.innerHTML = "Loading data for " + this.industry_name_mapping[industry] + "...";
 
-        fetch('https://pixelnerds.xyz/api/industries/?type=' + this.selected_industry).then(async res => {
+        fetch('https://pixelnerds.xyz/api/industries?type=' + this.selected_industry).then(async res => {
             let text = await res.text();
             let data = await this.sys.decompressData(text);
 
