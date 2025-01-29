@@ -22,6 +22,7 @@ export default class StatsApp extends NerdHudApp {
         this.reset_time = 0;
         this.levels = null;
         this.past_days = [];
+        this.map_limits = {};
     }
     event(type, data) {
         super.event(type, data);
@@ -42,6 +43,10 @@ export default class StatsApp extends NerdHudApp {
         }
         if (type == "levels") {
             this.levels = data;
+        }
+        if (type == "map_limits") {
+            this.map_limits = data;
+            this.updateMapLimits();
         }
     }
     update() {
@@ -65,7 +70,6 @@ export default class StatsApp extends NerdHudApp {
         if (this.levels) {
             let new_html = "Total level: " + this.levels.total.level;
             if (levels_element.innerHTML != new_html) {
-                console.log("LEVELS: ", this.levels.total);
                 levels_element.innerHTML = new_html;
             }
         }
@@ -107,6 +111,48 @@ export default class StatsApp extends NerdHudApp {
             listings_entries.innerHTML = listings_html;
         }
         
+    }
+    updateMapLimits() {
+        let total_value = 0;
+        let total_count = 0;
+        let limits = [];
+
+        for (let i in this.map_limits) {
+            let l = this.map_limits[i];
+            if (!((i.endsWith("-boost")) || (i == "total"))) {
+                total_value += (l.used / l.max);
+                total_count++;
+
+                limits.push({
+                    name: String(i).charAt(0).toUpperCase() + String(i).slice(1),
+                    percent: (l.used / l.max)
+                });
+            }
+        }
+
+        limits.unshift({
+            name: "Total",
+            percent: total_value / total_count
+        })
+
+        let entries_el = this.elements.limits_entries;
+        entries_el.innerHTML = "";
+
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 0,
+        })
+
+        for (let i=0; i < limits.length; i++) {
+            let limit = limits[i];
+            let el = document.createElement('div');
+            el.innerHTML = '<div>' + limit.name + ' (' + formatter.format(limit.percent*100) + '%)</div><progress max="100" value="' + (limit.percent<=1? limit.percent*100:100) + '">';
+            if (limit.percent > 1) {
+                el.style = "color: #faa";
+            }
+            entries_el.appendChild(el);
+        }
     }
     performReset() {
         // Initialize past_days if null
@@ -242,6 +288,34 @@ export default class StatsApp extends NerdHudApp {
                 entries_el.style.display = "none";
             } else {
                 entries_el.style.display = "block";
+            }
+        });
+
+        let limits_element = document.createElement('div');
+        limits_element.className = "hud_window_group";
+        
+        let limits_header_el = document.createElement('div');
+        limits_header_el.className = "hud_window_group_header";
+        limits_header_el.innerHTML = "Current Map Limits";
+        limits_element.appendChild(limits_header_el);
+
+        let limits_entries_el = document.createElement('div');
+        limits_entries_el.className = "hud_window_group_entries";
+        limits_entries_el.style.display = "none";
+        limits_element.appendChild(limits_entries_el);
+
+        this.elements.limits = limits_element;
+        this.elements.limits_entries = limits_entries_el;
+        this.window.appendChild(limits_element);
+
+        // attach event handler
+        let limits_collapsed = true;
+        limits_element.addEventListener('click', () => {
+            limits_collapsed =! limits_collapsed;
+            if (limits_collapsed) {
+                limits_entries_el.style.display = "none";
+            } else {
+                limits_entries_el.style.display = "block";
             }
         });
 

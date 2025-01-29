@@ -60,6 +60,8 @@ export default class MarketApp extends NerdHudApp {
             this.last_update = Date.now();
             fetch("https://pixels-server.pixels.xyz/cache/marketplace/listings/count").then(async (response) => {
                 this.price_data = await response.json();
+            }).catch(e => {
+                console.log("The following error occurred when trying to get market prices: ", e);
             });
             //https://pixels-server.pixels.xyz/v1/marketplace/player/6568291f4bba74cc5516123a
             
@@ -71,6 +73,8 @@ export default class MarketApp extends NerdHudApp {
                     const new_listings = await response.json();
                     this.updateListings(new_listings);
                     this.my_listings = new_listings;
+                }).catch(e => {
+                    console.log("The following error occurred when trying to get player marketplace listings: ", e);
                 });
 
             }

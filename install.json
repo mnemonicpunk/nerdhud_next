@@ -1,7 +1,7 @@
 {
     "libPixels": {
         "url": "lib/libPixels.js",
-        "version": "0.2.5"
+        "version": "0.2.9"
     },
     "repo": "https://raw.githack.com/mnemonicpunk/nerdhud_next/refs/heads/main/",
     "hud": "hud.js",
