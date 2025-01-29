@@ -220,7 +220,7 @@ export default class TaskboardApp extends NerdHudApp {
         order_slot.details_title.style.fontWeight = "normal";
         if (have >= request_items.quantity) {
             title_color = '#F0E68C';
-            cost_text = "Get " + (request_items.quantity - in_inventory) + " from storage!";
+            cost_text = 'Get ' + (request_items.quantity - in_inventory) + ' from storage! <img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image + '">&nbsp;' + this.sys.formatCurrency(price(request_items.itemId) * (request_items.quantity));
         }
         if (in_inventory >= request_items.quantity) {
             order_slot.details_title.style.fontWeight = "900";
