@@ -51,8 +51,11 @@ export default class StatsApp extends NerdHudApp {
     }
     update() {
         let timer_element = this.window.querySelector('#hud_reset_timer');
+        let net_worth_element = this.window.querySelector('#hud_net_worth');
         let my_listings = this.importAppFunction('market.my_listings');
         let price = this.importAppFunction('market.price');
+        let inventory_value = this.importAppFunction('inventory.total_value');
+        let storage_value = this.importAppFunction('storage.total_value');
         
         if (this.reset_time != 0) {
             let rt = this.timestampToServerTime(this.reset_time);
@@ -64,6 +67,11 @@ export default class StatsApp extends NerdHudApp {
             }
         } else {
             timer_element.innerHTML = "Visit taskboard to set reset time.";
+        }
+
+        let net_worth_html = 'Net Worth: <img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image + '"> ' + this.sys.formatCurrency(inventory_value() + storage_value());
+        if (net_worth_element.innerHTML != net_worth_html) {
+            net_worth_element.innerHTML = net_worth_html;
         }
 
         let levels_element = this.elements.levels;
@@ -246,7 +254,7 @@ export default class StatsApp extends NerdHudApp {
             }
         }
 
-        income_element.innerHTML = '<div class="hud_stat_header">Currencies and Income</div><div class="hud_stat_display" style="display: flex; flex-wrap: wrap; text-align: center; gap: 6px;">' + income_currencies + '</div><div class="hud_stat_display"><div class="hud_stat_entry" id="hud_reset_timer"></div></div></div>';
+        income_element.innerHTML = '<div class="hud_stat_header">Currencies and Income</div><div class="hud_stat_display" style="display: flex; flex-wrap: wrap; text-align: center; gap: 6px;">' + income_currencies + '</div><div class="hud_stat_display"><div class="hud_stat_entry" id="hud_reset_timer"></div></div><div class="hud_stat_display"><div class="hud_stat_entry" id="hud_net_worth"></div></div></div>';
 
         this.elements.income = income_element;
 

@@ -3,6 +3,7 @@ export default class StorageApp extends NerdHudApp {
         super(sys);
         this.name = "storage";
         this.storages = {};
+        this.storage_values = {};
         this.highlighted_storages = [];
         this.hovered_storage = null;
     }
@@ -68,6 +69,17 @@ export default class StorageApp extends NerdHudApp {
             this.save();
         }
     }
+    getStorageValue(mid) {
+        return this.storage_values[mid] || 0;
+    }
+    getTotalStorageValue() {
+        let value = 0;
+        for (let i in this.storages) {
+            const storage = this.storages[i];
+            value += this.getStorageValue(storage.mid);
+        }
+        return value;
+    }
     onCreate() {
         super.onCreate();
         this.exportAppFunction('have', (item) => {
@@ -75,6 +87,9 @@ export default class StorageApp extends NerdHudApp {
         });
         this.exportAppFunction('highlight', (item) => {
             return this.highlightItem(item);
+        });
+        this.exportAppFunction('total_value', () => {
+            return this.getTotalStorageValue();
         });
 
         this.window = this.sys.createWindow({ 
@@ -171,6 +186,8 @@ export default class StorageApp extends NerdHudApp {
         }
         el.innerHTML = '<div class="hud_list_heading">' + (storage.storage.name || "Unnamed Storage") + '&nbsp;<span style="font-size: 75%; color: #ddd"><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image +'">' + this.sys.formatCurrency(storage_value) + '</span></div>';
         el.appendChild(storage_container);
+
+        this.storage_values[storage.mid] = storage_value;
     }
     updateStorages(updated_storages) {
         let price = this.importAppFunction('market.price');

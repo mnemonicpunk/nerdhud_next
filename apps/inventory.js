@@ -16,6 +16,9 @@ export default class InventoryApp extends NerdHudApp {
         this.exportAppFunction('slot', (num) => {
             return this.getItemSlot(num);
         });
+        this.exportAppFunction('total_value', () => {
+            return this.getTotalValue();
+        });
 
         let _self = this;
         this.sys.watchClass("Hud_slidingGroup__ZaO10 Hud_expanded__QJoAM", 100, () => {
@@ -72,6 +75,16 @@ export default class InventoryApp extends NerdHudApp {
             } 
         }
         return count;
+    }
+    getTotalValue() {
+        let price = this.importAppFunction('market.price');
+        
+        let value = 0;
+        for (let i in this.inventory.slots) {
+            let slot = this.inventory.slots[i];
+            value += price(slot.item) * slot.quantity;
+        }
+        return value;
     }
     getItemSlot(num) {
         return this.inventory.slots[num];
