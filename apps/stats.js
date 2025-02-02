@@ -127,20 +127,26 @@ export default class StatsApp extends NerdHudApp {
 
         for (let i in this.map_limits) {
             let l = this.map_limits[i];
-            if (!((i.endsWith("-boost")) || (i == "total"))) {
+            if (!(i.endsWith("-boost") || (i == "total")|| (i == "billboards"))) {
                 total_value += (l.used / l.max);
                 total_count++;
 
                 limits.push({
+                    id: i,
                     name: String(i).charAt(0).toUpperCase() + String(i).slice(1),
-                    percent: (l.used / l.max)
+                    percent: (l.used / l.max),
+                    used: l.used,
+                    max: l.max
                 });
             }
         }
 
         limits.unshift({
+            id: "total",
             name: "Total",
-            percent: total_value / total_count
+            percent: total_value / total_count,
+            used: total_value,
+            max: total_count
         })
 
         let entries_el = this.elements.limits_entries;
@@ -152,15 +158,26 @@ export default class StatsApp extends NerdHudApp {
             minimumFractionDigits: 0,
         })
 
-        for (let i=0; i < limits.length; i++) {
-            let limit = limits[i];
-            let el = document.createElement('div');
-            el.innerHTML = '<div>' + limit.name + ' (' + formatter.format(limit.percent*100) + '%)</div><progress max="100" value="' + (limit.percent<=1? limit.percent*100:100) + '">';
-            if (limit.percent > 1) {
-                el.style = "color: #faa";
+        if (limits.length >= 1) {
+            for (let i=0; i < limits.length; i++) {
+                let limit = limits[i];
+                let el = document.createElement('div');
+    
+                let breakdown = "";
+                if (limit.id != "total") {
+                    breakdown = ", " + limit.used + "/" + limit.max;
+                }
+    
+                el.innerHTML = '<div>' + limit.name + ' (' + formatter.format(limit.percent*100) + '%' + breakdown + ')</div><progress max="100" value="' + (limit.percent<=1? limit.percent*100:100) + '">';
+                if (limit.percent > 1) {
+                    el.style = "color: #faa";
+                }
+                entries_el.appendChild(el);
             }
-            entries_el.appendChild(el);
+        } else {
+            entries_el.innerHTML = "This location does not have map limits.";
         }
+        
     }
     performReset() {
         // Initialize past_days if null
