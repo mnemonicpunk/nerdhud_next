@@ -4,6 +4,11 @@ export default class NotificationApp extends NerdHudApp {
         this.name = "notification";
         this.queue = [];
         this.current_notification = null;
+
+        this.icon = null;
+        resolveURL('img/nhud_icon_nerd.png').then(path => {
+            this.icon = path;
+        })
     }
     onCreate() {
         super.onCreate();
@@ -65,7 +70,8 @@ export default class NotificationApp extends NerdHudApp {
         window.postMessage({
             type: "show_hud_notification",
             title: title,
-            message: message
+            message: message,
+            icon: this.icon
         });
     }
     draw(ctx, width, height, camera) {
