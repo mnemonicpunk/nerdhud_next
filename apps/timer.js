@@ -287,9 +287,9 @@ export default class TimerApp extends NerdHudApp {
         if (settings.display_pool && pool_timer) {
             let pool_timer_text = "Pool: ";
             if (pool_timer.elapsed) {
-                pool_timer_text += "240/240 energy";
+                pool_timer_text += "120/120 energy";
             } else {
-                pool_timer_text += (240 - (Math.min(this.sauna_ticks, 120) * 2)) + "/240 energy ( " + this.sys.formatRelativeTime(pool_timer.finish_time) + ")";
+                pool_timer_text += (121 - (Math.min(this.sauna_ticks, 120))) + "/120 energy ( " + this.sys.formatRelativeTime(pool_timer.finish_time) + ")";
             }
             if (timer_text != "") {
                 timer_text += " || ";
