@@ -5,8 +5,11 @@ export default class ReportApp extends NerdHudApp {
     }
     event(type, data) {
         super.event(type, data);
-        if (type == "taskboard") {
+        if (type == "report_order") {
             this.fileReport('https://pixelnerds.xyz/api/hud/save/taskboard/' + this.sys.mid, data);
+        }
+        if (type == "mine_started") {
+            this.fileReport('https://pixelnerds.xyz/api/hud/save/mine/' + this.sys.mid, data);
         }
     }
     fileReport(url, data) {

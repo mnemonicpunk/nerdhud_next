@@ -5,6 +5,7 @@ export default class TaskboardApp extends NerdHudApp {
         this.orders = [];
         this._order_cache = {};
         this.reset_time = 0;
+        this.levels = null;
     }
     event(type, data) {
         super.event(type, data);
@@ -22,6 +23,10 @@ export default class TaskboardApp extends NerdHudApp {
 
                 if ((!old_order.deliveredAt) && (new_order.deliveredAt)) {
                     this.dispatchEvent('order_delivered', new_order);
+                    this.dispatchEvent('report_order', {
+                        levels: this.levels,
+                        taskboard: data
+                    });
                 }
 
                 /*let cost = cec(new_order.requestItems[0].itemId)
@@ -60,6 +65,9 @@ export default class TaskboardApp extends NerdHudApp {
         }
         if (type == "set_storage") {
             this.updateOrders();
+        }
+        if (type == "levels") {
+            this.levels = data;
         }
     }
     onCreate() {
