@@ -6,8 +6,7 @@ export default class ShoppingListApp extends NerdHudApp {
     }
     event(type, data) {
         super.event(type, data);
-        if (type == "inventory_slot") {
-            
+        if (type == "inventory_slot") {   
             // we're only interested in slots with contents anyway, so if there is none ignore
             if (data.value) {
                 let inventory_slot = this.sys.importAppFunction('inventory.slot');
@@ -28,6 +27,12 @@ export default class ShoppingListApp extends NerdHudApp {
                     }
                 }
             }
+        }
+        if (type == "marketplace_purchase") {
+            this.changeListItem(data.itemId, -data.quantity);
+        }
+        if (type == "item_obtain") {
+            this.changeListItem(data.itemId, -data.quantity);
         }
     }
     onSave() {

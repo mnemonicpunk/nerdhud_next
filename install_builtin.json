@@ -1,7 +1,7 @@
 {
     "libPixels": {
         "url": "lib/libPixels.js",
-        "version": "0.2.10"
+        "version": "0.2.13"
     },
     "repo": "builtin:",
     "hud": "hud.js",
