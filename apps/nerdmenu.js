@@ -75,9 +75,29 @@ export default class NerdMenuApp extends NerdHudApp {
             this.showSettingsMenu();
         });
 
+        // 
+        let pixelsmetrics_btn = document.createElement('div');
+        pixelsmetrics_btn.innerHTML = '<img src="https://pixelsmetrics.xyz/_next/image?url=%2Fimages%2Fpopberry.png&w=64&q=75" style="width: 64px; height: auto;">&nbsp;Pixels Metrics';
+        pixelsmetrics_btn.className = "hud_button";
+        pixelsmetrics_btn.addEventListener('click', () => {
+            window.open('https://pixelsmetrics.xyz', '_blank');
+        });
+
+        // "https://pixelnerds.xyz/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.bd8c914b.png&w=640&q=75"
+        let pixelnerds_btn = document.createElement('div');
+        pixelnerds_btn.innerHTML = '<img src="https://pixelnerds.xyz/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.bd8c914b.png&w=640&q=75" style="max-width: 100%; height: auto;">';
+        pixelnerds_btn.className = "hud_button";
+        pixelnerds_btn.addEventListener('click', () => {
+            window.open('https://pixelnerds.xyz', '_blank');
+        });
+
+
+        this.window.appendChild(pixelnerds_btn);
+        this.window.appendChild(pixelsmetrics_btn);
         this.window.appendChild(cap);
         this.window.appendChild(cs);
         this.window.appendChild(settings_btn);
+        
 
         // hide the docks when chat is visible
         this.sys.watchClass("ChatWindow_chatwindow__iDeJq", 1000, () => {
