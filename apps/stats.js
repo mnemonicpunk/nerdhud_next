@@ -158,7 +158,7 @@ export default class StatsApp extends NerdHudApp {
             minimumFractionDigits: 0,
         })
 
-        if (limits.length >= 1) {
+        if (limits.length > 1) {
             for (let i=0; i < limits.length; i++) {
                 let limit = limits[i];
                 let el = document.createElement('div');
