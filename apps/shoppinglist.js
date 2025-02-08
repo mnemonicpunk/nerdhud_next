@@ -28,9 +28,9 @@ export default class ShoppingListApp extends NerdHudApp {
                 }
             }
         }
-        if (type == "marketplace_purchase") {
+        /*if (type == "marketplace_purchase") {
             this.changeListItem(data.itemId, -data.quantity);
-        }
+        }*/
         if (type == "item_obtain") {
             this.changeListItem(data.itemId, -data.quantity);
         }

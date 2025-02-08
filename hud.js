@@ -465,6 +465,9 @@ class NerdHUD {
         });
     }
     enterGame() {
+        // if we were already in-game it means we didn't reload between logins, do that now
+        if (this.is_in_game) { window.location.reload(); }
+
         console.log("Creating app instances...");
 
         this.withApps(app => {
