@@ -585,7 +585,7 @@ export default class TimerApp extends NerdHudApp {
         }
         
     }
-    addTimer(type, mid, map, item, quantity, time) {
+    addTimer(type, mid, map, item, quantity, time, options=null) {
         const timer = {
             type,
             mid,
@@ -594,7 +594,8 @@ export default class TimerApp extends NerdHudApp {
             quantity,
             start_time: this.timestampToServerTime(Date.now()),
             finish_time: this.timestampToServerTime(time),
-            elapsed: false
+            elapsed: false,
+            options
         }
         this.timers[mid] = timer;
     }

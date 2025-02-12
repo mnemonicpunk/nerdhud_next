@@ -1570,7 +1570,7 @@ class NerdHUD {
         return this.game_library.currencies[cur];
     }
     getItemName(itm) {
-        return this.item_name_mapping[itm] || this.game_library.items[itm].name || itm;
+        return this.item_name_mapping[itm] || this.game_library.items[itm]?.name || itm;
     }
     getEntityName(entity) {
         let name = "";
