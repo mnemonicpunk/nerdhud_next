@@ -22,7 +22,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://play.pixels.xyz/*"
+        "https://play.pixels.xyz/*",
+        "https://staging.pixels.xyz/*"
       ],
       "js": ["content.js"],
       "run_at": "document_start"

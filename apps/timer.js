@@ -43,7 +43,7 @@ export default class TimerApp extends NerdHudApp {
             this.save();
         }
         if (type == "mine_started") {
-            this.addTimer("mine", data.mid, this.sys.getCurrentMap(), data.generic.trackers.rolledItem, data.generic.trackers.quantity, data.generic.statics.thetimer);
+            this.addTimer("mine", data.mid, this.sys.getCurrentMap(), data.entity, 1, data.generic.statics.thetimer);
             this.save();
         }
         if (type == "mine_picked") {
@@ -429,7 +429,7 @@ export default class TimerApp extends NerdHudApp {
 
                 let img = document.createElement('img');
                 img.className = "hud_icon_large";
-                if (group[0].type == "entity") {
+                if (group[0].type == "entity" || group[0].type == "mine") {
                     let lib  = this.sys.getGameLibrary();
                     let entity = lib.entities[group[0].item];
 
@@ -515,7 +515,7 @@ export default class TimerApp extends NerdHudApp {
                     let timer = group[0];
                     
                     let name = "";
-                    if (group[0].type != "entity") {
+                    if ((group[0].type != "entity") && (group[0].type != "mine")) {
                         name = this.sys.getItemName(group[0].item)
                     } else {
                         name = this.sys.getEntityName(group[0].item);
@@ -548,7 +548,7 @@ export default class TimerApp extends NerdHudApp {
             group_el.dataset.highlights = mids;
 
             let name = "";
-            if (group[0].type != "entity") {
+            if ((group[0].type != "entity") && (group[0].type != "mine")) {
                 name = this.sys.getItemName(group[0].item)
             } else {
                 name = this.sys.getEntityName(group[0].item);

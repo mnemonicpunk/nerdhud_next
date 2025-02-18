@@ -8,9 +8,11 @@ export default class ReportApp extends NerdHudApp {
         if (type == "report_order") {
             this.fileReport('https://pixelnerds.xyz/api/hud/save/taskboard/' + this.sys.mid, data);
         }
-        if (type == "mine_started") {
+
+        // mining reports deactivated for the time being
+        /*if (type == "mine_started") {
             this.fileReport('https://pixelnerds.xyz/api/hud/save/mine/' + this.sys.mid, data);
-        }
+        }*/
     }
     fileReport(url, data) {
         //console.log("FILING REPORT: ", url, data);
