@@ -18,6 +18,8 @@ export default class NotificationApp extends NerdHudApp {
                 message
             });
         });
+
+        this.queueNotification("Want to support Nerd HUD Next?", "Use creator code ILIKEMONEY to get 5% off Pixel purchases!")
     }
     event(type, data) {
         super.event(type, data);
