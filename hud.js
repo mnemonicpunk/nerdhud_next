@@ -317,7 +317,7 @@ class NerdHUD {
         ui_root.id = 'nerd-hud-ui';
         document.body.appendChild(ui_root);
 
-        /*document.querySelector('#game-container').addEventListener('mousemove', e => {
+        document.querySelector('#game-container').addEventListener('mousemove', e => {
             var rect = e.target.getBoundingClientRect();
             var x = e.clientX - rect.left; //x position within the element.
             var y = e.clientY - rect.top;  //y position within the element.
@@ -325,7 +325,7 @@ class NerdHUD {
             this.mouse_x = x;
             this.mouse_y = y;
             this.updateMouse();
-        })*/
+        })
 
         const dock_left = document.createElement('div');
         this.dock_left = dock_left;
