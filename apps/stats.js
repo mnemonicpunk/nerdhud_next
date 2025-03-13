@@ -260,7 +260,7 @@ export default class StatsApp extends NerdHudApp {
         //let pixel_display = '<img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_pixel').sprite.image +'"> <span data-currency="cur_pixel">0</span>';
         
         let all_currencies = this.sys.getGameLibrary().currencies;
-        let currency_list = ['cur_coins', 'cur_pixel', 'cur_guildtoken', 'cur_mistletoe_white', 'cur_mistletoe_green', 'cur_mistletoe']
+        let currency_list = ['cur_coins', 'cur_pixel', 'cur_speedup', 'cur_guildtoken']
 
         let income_currencies = "";
         for (let i=0; i < currency_list.length; i++) {
