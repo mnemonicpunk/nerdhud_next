@@ -168,7 +168,7 @@ export default class StorageApp extends NerdHudApp {
 
         for (let slot_num in storage.storage.slots) {
             let slot = storage.storage.slots[slot_num];
-            let item_img = this.sys.getItemData(slot.item)?.image;
+            let item_img = this.sys.getItemImage(slot.item);
             let slot_value = price(slot.item) * slot.quantity;
             storage_value += slot_value;
 

@@ -89,7 +89,7 @@ export default class ShoppingListApp extends NerdHudApp {
         let add_header = document.createElement('div');
         add_header.justifyContent = "center";
 
-        add_header.innerHTML = '<div style="padding: 11px; text-align: center;"><img class="hud_icon_large" src="' + this.sys.getItemData(item).image +'">&nbsp;' + this.sys.getItemName(item) + '</div>';
+        add_header.innerHTML = '<div style="padding: 11px; text-align: center;"><img class="hud_icon_large" src="' + this.sys.getItemImage(item) +'">&nbsp;' + this.sys.getItemName(item) + '</div>';
 
         let add_entry_num = document.createElement('input');
         
@@ -238,7 +238,7 @@ export default class ShoppingListApp extends NerdHudApp {
                     table.appendChild(el);
                 }
 
-                let new_desc = '<img class="hud_icon_medium" src="' + this.sys.getItemData(itemId).image +'"></img>&nbsp;' + amount + "x " + this.sys.getItemName(itemId);
+                let new_desc = '<img class="hud_icon_medium" src="' + this.sys.getItemImage(itemId) +'"></img>&nbsp;' + amount + "x " + this.sys.getItemName(itemId);
                 let new_cost = '<img class="hud_icon_small" src="' + this.sys.getCurrencyData("cur_coins").sprite.image +'">&nbsp;' + this.sys.formatCurrency(price(itemId) * amount);
                 
                 if (el.childNodes[0].innerHTML != new_desc) {

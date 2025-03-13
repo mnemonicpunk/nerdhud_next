@@ -93,7 +93,7 @@ export default class StatsApp extends NerdHudApp {
                 listings_html += '<tr>';
 
                 // add item image
-                listings_html += '<td><img class="hud_icon_medium" src="' + this.sys.getItemData(listing.itemId).image + '">&nbsp;' + this.sys.getItemName(listing.itemId) + '</td>';
+                listings_html += '<td><img class="hud_icon_medium" src="' + this.sys.getItemImage(listing.itemId) + '">&nbsp;' + this.sys.getItemName(listing.itemId) + '</td>';
                 
                 // add market price
                 listings_html += '<td><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image + '">' + price(listing.itemId) + '</td>';

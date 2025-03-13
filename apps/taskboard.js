@@ -194,7 +194,7 @@ export default class TaskboardApp extends NerdHudApp {
         }
     
         // update where necessary
-        let img_src = this.sys.getItemData(request_items.itemId)?.image || "#";
+        let img_src = this.sys.getItemImage(request_items.itemId) || "#";
         let title_text = have + "/" + request_items.quantity + "&nbsp;" + this.sys.getItemName(request_items.itemId);
         let reward_text = '<img class="hud_icon_small" src="' + this.sys.getCurrencyData(order.reward?.currency?.currencyId || "cur_coins").sprite.image + '">&nbsp;' + order.reward?.currency?.amount + '&nbsp;&nbsp;&nbsp;<img class="hud_icon_small" src="https://d31ss916pli4td.cloudfront.net/game/ui/skills/skills_icon_' + order.reward?.skill?.skillType + '.png?v6">&nbsp;' + order.reward?.skill?.xp;
         let countdown_text = "";

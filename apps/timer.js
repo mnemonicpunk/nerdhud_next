@@ -486,7 +486,7 @@ export default class TimerApp extends NerdHudApp {
                         }
                     }
                 } else {
-                    img.src = this.sys.getItemData(group[0].item)?.image || "#";
+                    img.src = this.sys.getItemImage(group[0].item) || "#";
                 }
                 
                 img.style.marginRight = '6px';

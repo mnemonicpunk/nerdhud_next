@@ -10,6 +10,8 @@ const ENTITY_NAME_OVERRIDES = {
     ent_mine_04: "Mine T4"
 }
 
+const CDN_URL = "https://d31ss916pli4td.cloudfront.net";
+
 // Helper function to resolve "builtin:" paths to Chrome extension URLs
 async function resolveURL(path) {
     path = window.nhud_repo + path;
@@ -1569,6 +1571,11 @@ class NerdHUD {
     getItemData(itm) {
         if (!this.game_library) { return null; }
         return this.game_library.items[itm];
+    }
+    getItemImage(itm) {
+        let url = this.getItemData(itm)?.image || "";
+        if (url.startsWith('cdn:')) { url = CDN_URL + url.slice(4); }
+        return url;
     }
     getCurrencyData(cur) {
         return this.game_library.currencies[cur];

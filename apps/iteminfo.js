@@ -157,7 +157,7 @@ export default class ItemInfoApp extends NerdHudApp {
         this.setMode("item_display");
         this.selected_item = item;
         highlight_storage(item);
-        this.elements.info.innerHTML = ""; //JSON.stringify(this.hud.getItemData(item));
+        this.elements.info.innerHTML = "";
         let data = this.sys.getItemData(item);
         if (data) {
             this.elements.info.innerHTML = "";
@@ -167,7 +167,7 @@ export default class ItemInfoApp extends NerdHudApp {
             let html = "";
 
             // add image
-            html += '<div style="display: flex; justify-content: center; padding: 6px; font-weight: bold; align-item: center; margin-bottom: 11px; border-bottom: 1px solid rgba(47, 173, 177, 0.778);"><img class="hud_icon_large" style="margin-right: 11px;" src="' + data.image + '">';
+            html += '<div style="display: flex; justify-content: center; padding: 6px; font-weight: bold; align-item: center; margin-bottom: 11px; border-bottom: 1px solid rgba(47, 173, 177, 0.778);"><img class="hud_icon_large" style="margin-right: 11px;" src="' + this.sys.getItemImage(item) + '">';
 
             let item_price = price(data.id);
 
@@ -205,7 +205,7 @@ export default class ItemInfoApp extends NerdHudApp {
                     let plant_html = "<div>";
                     if (data.onUse.plant.fruit) {
                         let fruit = data.onUse.plant.fruit;
-                        plant_html += 'Used to plant <img class="hud_icon_medium" src="' + this.sys.getItemData(fruit).image + '">&nbsp;' + this.sys.getItemName(fruit);
+                        plant_html += 'Used to plant <img class="hud_icon_medium" src="' + this.sys.getItemImage(fruit) + '">&nbsp;' + this.sys.getItemName(fruit);
                     } else {
                         plant_html += "This seed does not work anymore.";
                     }
@@ -317,7 +317,7 @@ export default class ItemInfoApp extends NerdHudApp {
         this.setMode("item_display");
         this.selected_industry = industry;
 
-        this.elements.info.innerHTML = ""; //JSON.stringify(this.hud.getItemData(item));
+        this.elements.info.innerHTML = "";
         let data = this.sys.getItemData(industry);
 
         this.elements.info.innerHTML = "Loading data for " + this.industry_name_mapping[industry] + "...";
@@ -542,7 +542,7 @@ export default class ItemInfoApp extends NerdHudApp {
             let html = "";
 
             // add image
-            html += '<img class="hud_icon_small" style="margin-right: 11px;" src="' + data.image + '">';
+            html += '<img class="hud_icon_small" style="margin-right: 11px;" src="' + this.sys.getItemImage(item.id) + '">';
 
             // add name
             html += '<div>' + item.quantity + 'x&nbsp;' + this.sys.getItemName(data.id) + '</div></div>'
