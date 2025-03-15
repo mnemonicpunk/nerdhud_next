@@ -153,6 +153,7 @@ export default class ItemInfoApp extends NerdHudApp {
         let shopping_list_add = this.sys.importAppFunction('shoppinglist.add');
         let requested = this.sys.importAppFunction('taskboard.requested');
         let highlight_storage = this.importAppFunction('storage.highlight');
+        let have = this.importAppFunction('storage.have');
 
         this.setMode("item_display");
         this.selected_item = item;
@@ -170,9 +171,19 @@ export default class ItemInfoApp extends NerdHudApp {
             html += '<div style="display: flex; justify-content: center; padding: 6px; font-weight: bold; align-item: center; margin-bottom: 11px; border-bottom: 1px solid rgba(47, 173, 177, 0.778);"><img class="hud_icon_large" style="margin-right: 11px;" src="' + this.sys.getItemImage(item) + '">';
 
             let item_price = price(data.id);
+            let in_storage = have(data.id);
 
             // add name
-            html += '<div>' + this.sys.getItemName(data.id) + (item_price>0?'<br><img class="hud_icon_small" src="' + this.sys.getCurrencyData("cur_coins").sprite.image +'">&nbsp;' + this.sys.formatCurrency(item_price):'') + '</div></div>';
+            html += '<div>' + this.sys.getItemName(data.id) + '<br>';
+            
+            // add market price
+            html += (item_price>0?'<div style="display:inline; margin-right: 11px"><img class="hud_icon_small" src="' + this.sys.getCurrencyData("cur_coins").sprite.image +'">&nbsp;' + this.sys.formatCurrency(item_price) + '</div>':'');
+           
+            // add storage amount
+            html += (in_storage>0?'<div style="display:inline;"><img class="hud_icon_small" src="' + this.sys.getItemImage("itm_woodchest_04") +'">&nbsp;' + this.sys.formatCurrency(in_storage) + '</div>':'');
+
+            // finish
+            html += '</div></div>';
 
             // frame tier and requirement
             html += '<div style="display: flex; justify-content: space-between; align-items: center;">';
