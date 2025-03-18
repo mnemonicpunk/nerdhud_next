@@ -58,7 +58,8 @@ export default class MarketApp extends NerdHudApp {
 
         if (this.last_update + (1000 * settings.market_refresh_seconds) < Date.now()) {
             this.last_update = Date.now();
-            fetch("https://pixels-server.pixels.xyz/cache/marketplace/listings/count").then(async (response) => {
+
+            fetch("https://pixels-server.pixels.xyz/cache/marketplace/listings/count?nhud=true").then(async (response) => {
                 this.price_data = await response.json();
             }).catch(e => {
                 console.log("The following error occurred when trying to get market prices: ", e);
@@ -69,7 +70,8 @@ export default class MarketApp extends NerdHudApp {
         if (this.last_my_listings_update + (1000 * settings.my_listings_refresh_seconds) < Date.now()) {
             if (this.sys.mid) {
                 this.last_my_listings_update = Date.now();
-                fetch("https://pixels-server.pixels.xyz/v1/marketplace/player/" + this.sys.mid).then(async (response) => {
+
+                fetch("https://pixels-server.pixels.xyz/v1/marketplace/player/" + this.sys.mid + "?nhud=true",).then(async (response) => {
                     const new_listings = await response.json();
                     this.updateListings(new_listings);
                     this.my_listings = new_listings;

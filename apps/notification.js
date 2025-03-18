@@ -23,7 +23,8 @@ export default class NotificationApp extends NerdHudApp {
     }
     event(type, data) {
         super.event(type, data);
-        if (type == "enter_game") {
+        // turned off for now until the creator codes return
+        /*if (type == "enter_game") {
             window.setTimeout(() => {
                 
                 this.queueNotification({
@@ -32,7 +33,7 @@ export default class NotificationApp extends NerdHudApp {
                 });
 
             }, 5000)
-        }
+        }*/
         if (type == "timer_group_finished") {
 
             let t = data[0];
