@@ -364,6 +364,11 @@ export default class ItemInfoApp extends NerdHudApp {
 
                 el.innerHTML = '<td>' + industry.land + ' (' + industry.outside + ')</td><td><img class="hud_icon_medium" src="' + image + '"> ' + industry.available + '/' + industry.count + '</td><td>👤' + industry.playerCount + '</td>'; 
                 table.appendChild(el);
+
+                el.addEventListener('click', e => {
+                    this.sys.contextLandClick(industry.land);
+                })
+                
             }
             this.elements.info.appendChild(table);
 

@@ -538,6 +538,17 @@ export default class TimerApp extends NerdHudApp {
                 group_el.addEventListener('mouseover', () => {
                     this.highlightMids(group_el.dataset.highlights.split(','))
                 });
+                group_el.addEventListener('click', e => {
+                    e.stopPropagation();
+                    
+                    let map = group[0].map;
+                    let match = map.match(/^pixelsNFTFarm-(\d{1,4})$/);
+                    
+                    if (match) {
+                        let land_number = parseInt(match[1], 10);
+                        this.sys.contextLandClick(land_number);
+                    }
+                });
             }
 
             let elapsed = group.filter(item => item.elapsed == true).length;

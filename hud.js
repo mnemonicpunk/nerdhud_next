@@ -1850,6 +1850,20 @@ class NerdHUD {
             let show_item = this.importAppFunction('iteminfo.show_item');
             show_item(itemId);
         }
+    }
+    contextLandClick(land_number) {
+        let land_entry = document.getElementsByClassName('LandAndTravel_numberInput__Re9sf');
+        if (land_entry[0]) {
+            const element = land_entry[0];
+            const text = land_number;
+    
+            // Set the value programmatically
+            Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(element, text);
+    
+            // Create and dispatch an input event to simulate React's onChange handling
+            const inputEvent = new Event('input', { bubbles: true });
+            element.dispatchEvent(inputEvent);
+        }
     } 
 }
 window.addEventListener('load', () => {
