@@ -176,9 +176,8 @@ export default class StorageApp extends NerdHudApp {
             item_el.style = "display: inline-block; text-align: center; padding: 6px;";
             item_el.innerHTML = '<img class="hud_icon_medium" src="' + item_img + '"><br>x' + slot.quantity + (slot_value>0?'<br><span style="font-size: 75%; color: #ddd"><img class="hud_icon_small" src="' + this.sys.getCurrencyData('cur_coins').sprite.image +'">' + this.sys.formatCurrency(slot_value) + '</span>':'');
             item_el.addEventListener('click', (e) => {
-                show_item(slot.item);
-                e.preventDefault();
                 e.stopPropagation();
+                this.sys.contextItemClick(slot.item);
             });
             storage_container.appendChild(item_el);
 

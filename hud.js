@@ -1834,8 +1834,23 @@ class NerdHUD {
         // Parse and return the JSON data
         return JSON.parse(result);
     }
+    contextItemClick(itemId) {
+        let market_entry = document.getElementsByClassName('Marketplace_filter__3ynr2');
+        if (market_entry[0]) {
+            const element = market_entry[0];
+            const text = this.getItemName(itemId);
     
-      
+            // Set the value programmatically
+            Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(element, text);
+    
+            // Create and dispatch an input event to simulate React's onChange handling
+            const inputEvent = new Event('input', { bubbles: true });
+            element.dispatchEvent(inputEvent);
+        } else {
+            let show_item = this.importAppFunction('iteminfo.show_item');
+            show_item(itemId);
+        }
+    } 
 }
 window.addEventListener('load', () => {
     const nerd_hud = new NerdHUD();

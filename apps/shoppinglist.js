@@ -207,18 +207,7 @@ export default class ShoppingListApp extends NerdHudApp {
                     el.dataset.item = itemId;
 
                     el.addEventListener('click', () => {
-                        let market_entry = document.getElementsByClassName('Marketplace_filter__3ynr2');
-                        if (market_entry[0]) {
-                            const element = market_entry[0];
-                            const text = this.sys.getItemName(itemId);
-
-                            // Set the value programmatically
-                            Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(element, text);
-
-                            // Create and dispatch an input event to simulate React's onChange handling
-                            const inputEvent = new Event('input', { bubbles: true });
-                            element.dispatchEvent(inputEvent);
-                        }
+                        this.sys.contextItemClick(itemId);
                     })
                     
                     let desc = document.createElement('td');
@@ -250,7 +239,5 @@ export default class ShoppingListApp extends NerdHudApp {
             }
             this.list_el.appendChild(table);
         }
-
-
     }
 }

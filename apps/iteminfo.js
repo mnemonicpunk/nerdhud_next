@@ -560,6 +560,11 @@ export default class ItemInfoApp extends NerdHudApp {
 
             item_el.innerHTML = html;
 
+            item_el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.sys.contextItemClick(item.id);
+            });
+
             items_el.appendChild(item_el);
         }
         el.appendChild(items_el);
