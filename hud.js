@@ -1599,11 +1599,12 @@ class NerdHUD {
         if (!this.item_name_mapping) { return {}; }
         if (!(typeof name === 'string' || name instanceof String)) { return {} }
 
-
-
         let ret = {};
-        for (let i in this.item_name_mapping) {
-            let item = this.item_name_mapping[i];
+
+        const items = this.getGameLibrary().items;
+
+        for (let i in items) {
+            let item = this.getItemName(i);
             if ((item) && (item.toLowerCase().includes(name.toLowerCase()))) {
                 ret[i] = item;
             }
