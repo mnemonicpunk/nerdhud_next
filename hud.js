@@ -1834,18 +1834,27 @@ class NerdHUD {
         // Parse and return the JSON data
         return JSON.parse(result);
     }
+    inputText(element, text) {
+        // Set the value programmatically
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(element, text);
+
+        // Create and dispatch an input event to simulate React's onChange handling
+        const inputEvent = new Event('input', { bubbles: true });
+        element.dispatchEvent(inputEvent);
+    }
     contextItemClick(itemId) {
         let market_entry = document.getElementsByClassName('Marketplace_filter__3ynr2');
+        let store_entry = document.getElementsByClassName('Store_filter__qtqd7');
         if (market_entry[0]) {
             const element = market_entry[0];
             const text = this.getItemName(itemId);
+            
+            this.inputText(element, text);
+        } else if (store_entry[0]) {
+            const element = store_entry[0];
+            const text = this.getItemName(itemId);
     
-            // Set the value programmatically
-            Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(element, text);
-    
-            // Create and dispatch an input event to simulate React's onChange handling
-            const inputEvent = new Event('input', { bubbles: true });
-            element.dispatchEvent(inputEvent);
+            this.inputText(element, text);
         } else {
             let show_item = this.importAppFunction('iteminfo.show_item');
             show_item(itemId);
@@ -1857,12 +1866,7 @@ class NerdHUD {
             const element = land_entry[0];
             const text = land_number;
     
-            // Set the value programmatically
-            Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(element, text);
-    
-            // Create and dispatch an input event to simulate React's onChange handling
-            const inputEvent = new Event('input', { bubbles: true });
-            element.dispatchEvent(inputEvent);
+            this.inputText(element, text);
         }
     } 
 }
