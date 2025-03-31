@@ -542,7 +542,7 @@ export default class TimerApp extends NerdHudApp {
                     e.stopPropagation();
                     
                     let map = group[0].map;
-                    let match = map.match(/^pixelsNFTFarm-(\d{1,4})$/);
+                    let match = map.match(/^pixelsNFTFarm-(\d{1,4})$/) || map.match(/^nftHouse(\d{1,4})$/);
                     
                     if (match) {
                         let land_number = parseInt(match[1], 10);
