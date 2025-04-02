@@ -566,7 +566,7 @@ export default class TimerApp extends NerdHudApp {
             }
 
             group_el.childNodes[1].childNodes[0].innerHTML = name + "&nbsp;(" + elapsed + "/" + group.length +")&nbsp;" + this.sys.formatRelativeTime(latest.finish_time);
-            group_el.childNodes[1].childNodes[1].value = progress;
+            group_el.childNodes[1].childNodes[1].value = Math.min(progress, 100);
         }
 
         // prune timer groups that no longer have timers in them
