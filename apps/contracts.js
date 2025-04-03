@@ -23,27 +23,8 @@ export default class ContractsApp extends NerdHudApp {
                     });
                 }
 
-                /*let cost = cec(new_order.requestItems[0].itemId)
-
-                    
-                let report = {
-                    item: new_order.requestItems[0].itemId,
-                    quantity: new_order.requestItems[0].quantity,
-                    energy_cost: cost.energy * new_order.requestItems[0].quantity,
-                    unknown_costs: cost.uncertain_num * new_order.requestItems[0].quantity,
-                    reward_currency: new_order.reward.currency.currencyId,
-                    reward_amount: new_order.reward.currency.amount
-
-                };
-
-                cost_report.push(report);
-
-                cost_report_str += this.sys.getItemName(report.item) + " x" + report.quantity + " costs " + report.energy_cost + " energy for " + report.reward_amount + " " + (report.reward_currency == "cur_coins"?"Coins":"Pixels") + "." + (report.unknown_costs>0?" " + report.unknown_costs + " ingredients with unknown costs ignored.":"") + "\n";
-                */
+               
             }
-            
-
-            //console.log("COST REPORT: ", cost_report, cost_report_str);
 
             this.orders = data.orders;
             this.reset_time = data.nextReset;
@@ -53,6 +34,13 @@ export default class ContractsApp extends NerdHudApp {
         }
         if (type == "update") {
             this.updateOrders();
+
+            const settings = this.getSettings();
+            if (this.settings.remove_refresh == true) {
+                document.querySelector('.commons_pushbutton__7Tpa3.SellOrdersResetButton_paidResetButton__T5c4x')?.remove();
+            
+                
+            }
         }
         if (type == "inventory") {
             this.updateOrders();
@@ -77,6 +65,27 @@ export default class ContractsApp extends NerdHudApp {
         this.exportAppFunction("requested", (item) => {
             return this.getRequested(item);
         });
+
+        const observer = new MutationObserver(() => {
+            const button = document.querySelector('.commons_pushbutton__7Tpa3.SellOrdersResetButton_paidResetButton__T5c4x');
+            if (button) {
+                button.remove();
+            }
+        });
+    }
+    declareSettings() {
+        return {
+            title: 'Contracts',
+            settings: [
+                {
+                    name: 'Remove Contracts Refresh Button',
+                    var: 'remove_refresh',
+                    type: 'bool',
+                    default: false,
+                    description: 'Removes the refresh button in Merchant Fleets to prevent accidental refreshes. (Requires reload to take effect.)'
+                }
+            ]
+        }
     }
     onSave() {
         return {
@@ -274,12 +283,12 @@ export default class ContractsApp extends NerdHudApp {
     
                 // Add click handler for this row.
                 row.addEventListener('click', () => {
-                    const currentRequestItem = item;
-                    if (!currentRequestItem) {
+                    const currentItemId = row.dataset.itemId;
+                    if (!currentItemId) {
                         console.warn('No current request item found.');
                         return;
                     }
-                    this.sys.contextItemClick(currentRequestItem.itemId);
+                    this.sys.contextItemClick(currentItemId);
                 });
     
                 container.appendChild(row);
