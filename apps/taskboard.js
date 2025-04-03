@@ -21,7 +21,7 @@ export default class TaskboardApp extends NerdHudApp {
                 let old_order = this.orders[i];
                 let new_order = data.orders[i];
 
-                if ((!old_order.deliveredAt) && (new_order.deliveredAt)) {
+                if ((!old_order?.deliveredAt) && (new_order?.deliveredAt)) {
                     this.dispatchEvent('order_delivered', new_order);
                     this.dispatchEvent('report_order', {
                         levels: this.levels,
