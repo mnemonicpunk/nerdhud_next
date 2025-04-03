@@ -58,6 +58,10 @@ export default class ShoppingListApp extends NerdHudApp {
             this.showAddMenu(item, amount);
             this.show();
         });
+        this.exportAppFunction("add_direct", (item, amount = 1) => {
+            this.changeListItem(item, amount);
+            this.show();
+        });
 
         this.add_el = document.createElement('div');
         this.add_el.className = "nerd_hud_panel_right";
@@ -216,7 +220,8 @@ export default class ShoppingListApp extends NerdHudApp {
                     remove_btn.className = "hud_button";
                     remove_btn.style = "padding: 11px;";
                     remove_btn.innerHTML = "🗑️";
-                    remove_btn.addEventListener('click', () => {
+                    remove_btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
                         this.removeListItem(itemId);
                     })
 
