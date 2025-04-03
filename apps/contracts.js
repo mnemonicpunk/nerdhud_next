@@ -315,7 +315,7 @@ export default class ContractsApp extends NerdHudApp {
             // Compute cost/craft text.
             let expectedCost = "";
             if (price(item.itemId) === 0) {
-                expectedCost = "Craft " + (item.quantity - item_have) + "!";
+                expectedCost = (item.quantity - item_have > 0)?"Craft " + (item.quantity - item_have) + "!":"";
             } else {
                 // Calculate missing amount and clamp to 0.
                 let missing = item.quantity - item_have;
