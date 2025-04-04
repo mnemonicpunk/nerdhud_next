@@ -216,14 +216,6 @@ export default class ContractsApp extends NerdHudApp {
     
             this.window.appendChild(elements.main);
             order_slot = this._order_cache[slot] = elements;
-    
-            elements.details.addEventListener('mouseover', () => {
-                // For hover highlight, we assume the first item in the container (if available).
-                highlight_storage(elements.details.dataset.highlight_itm);
-            });
-            elements.details.addEventListener('mouseout', () => {
-                highlight_storage();
-            });
         }
     
         // Always update the cached request items so event listeners have current data.
@@ -283,12 +275,20 @@ export default class ContractsApp extends NerdHudApp {
     
                 // Add click handler for this row.
                 row.addEventListener('click', () => {
-                    const currentItemId = row.dataset.itemId;
-                    if (!currentItemId) {
+                    let idx = parseInt(row.dataset.index);
+                    let currentReqItems = this.orders[slot]?.requestItems;
+                    if (!currentReqItems || !currentReqItems[idx]) {
                         console.warn('No current request item found.');
                         return;
                     }
-                    this.sys.contextItemClick(currentItemId);
+                    this.sys.contextItemClick(currentReqItems[idx].itemId);
+                });
+                row.addEventListener('mouseover', () => {
+                    // For hover highlight, we assume the first item in the container (if available).
+                    highlight_storage(row.dataset.highlight_itm);
+                });
+                row.addEventListener('mouseout', () => {
+                    highlight_storage();
                 });
     
                 container.appendChild(row);
@@ -352,6 +352,7 @@ export default class ContractsApp extends NerdHudApp {
             }
             // Update the row's dataset for hover highlighting.
             row.dataset.highlight_itm = item.itemId;
+            row.dataset.index = index;
         });
     
         // Update the deliveredAt countdown if present.
