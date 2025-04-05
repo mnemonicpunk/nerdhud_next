@@ -392,8 +392,6 @@ export default class ItemInfoApp extends NerdHudApp {
         });
     }
     setSearchSuggestions(search_term) {
-        let matches = this.sys.findItemsByName(search_term);
-
         let items = null;
         if (this.selected_tab == "item") {
             items = this.sys.findItemsByName(search_term);
@@ -402,7 +400,7 @@ export default class ItemInfoApp extends NerdHudApp {
             let matches = {};
             for (let i in this.industry_name_mapping) {
                 let ind = this.industry_name_mapping[i];
-                if (ind.toLowerCase().includes(search_term)) {
+                if (ind.toLowerCase().includes(search_term.toLowerCase().trim())) {
                     matches[i] = ind;
                 }
 
