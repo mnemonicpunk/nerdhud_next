@@ -1,78 +1,379 @@
+/**********************************
+ * ContractListItemWidget
+ **********************************
+ * This widget represents one contract order.
+ * It uses an HTML template to build the structure:
+ *  - A main container with an overall title (“Contract X”),
+ *  - A details section that contains:
+ *       - A container for per-request item rows,
+ *       - A buttons container with “Buy all” and “Buy missing” buttons.
+ *  - A countdown area to display delivery info.
+ */
+ class ContractListItemWidget extends HUDWidget {
+    constructor(sys, entry) {
+        // The template builds the overall structure.
+        const template = `
+            <div class="contract-item" style="width: calc(100% - 16px); padding-bottom: 8px;">
+                <div class="order" style="width: 100%; box-sizing: border-box; padding: 6px;">
+                    <div class="details" style="width: 100%; box-sizing: border-box;">
+                        <div class="details-title"></div>
+                        <div class="details-items" style="width: 100%; box-sizing: border-box;"></div>
+                        <div class="details-buttons" style="display: flex; gap: 4px;"></div>
+                    </div>
+                </div>
+                <div class="countdown" style="text-align: center; color: #aaa; padding: 11px; padding-bottom: 11px;"></div>
+            </div>
+        `;
+        super(sys, { template });
+        // Store the entry data (expected to be { key, value }).
+        this.entry = entry;
+        this.order = entry.value;
+        // Will later hold the current set of request items.
+        this.requestItems = null;
+        this.cacheElements();
+        this.bindEvents();
+        this.render(entry);
+    }
+    
+    cacheElements() {
+        this.mainContainer = this.root; // overall container
+        this.detailsTitle = this.root.querySelector('.details-title');
+        this.detailsItems = this.root.querySelector('.details-items');
+        this.detailsButtons = this.root.querySelector('.details-buttons');
+        this.countdownElem = this.root.querySelector('.countdown');
+    }
+    
+    create() {
+        // Create the two buttons and add them to the buttons container.
+        this.btnBuyAll = document.createElement('div');
+        this.btnBuyAll.className = "hud_button";
+        this.btnBuyAll.innerHTML = "Buy all";
+        
+        this.btnBuyMissing = document.createElement('div');
+        this.btnBuyMissing.className = "hud_button";
+        this.btnBuyMissing.innerHTML = "Buy missing";
+        
+        this.detailsButtons.appendChild(this.btnBuyAll);
+        this.detailsButtons.appendChild(this.btnBuyMissing);
+    }
+    
+    bindEvents() {
+        // Import functions needed for highlighting and adding items.
+        this.highlightStorage = this.sys.importAppFunction('storage.highlight');
+        this.addItem = this.sys.importAppFunction('shoppinglist.add_direct');
+        
+        // Bind events on the buttons.
+        this.btnBuyAll.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Use the latest requestItems.
+            let reqItems = this.requestItems;
+            if (!reqItems) return;
+            reqItems.forEach(item => {
+                // Skip items that cannot be bought.
+                if (this.sys.importAppFunction('market.price')(item.itemId) === 0) return;
+                this.addItem(item.itemId, item.quantity);
+            });
+        });
+        this.btnBuyMissing.addEventListener('click', (e) => {
+            e.stopPropagation();
+            let reqItems = this.requestItems;
+            if (!reqItems) return;
+            reqItems.forEach(item => {
+                if (this.sys.importAppFunction('market.price')(item.itemId) === 0) return;
+                let haveVal = this.sys.importAppFunction('inventory.have')(item.itemId) +
+                              this.sys.importAppFunction('storage.have')(item.itemId);
+                let missing = item.quantity - haveVal;
+                if (missing > 0) {
+                    this.addItem(item.itemId, missing);
+                }
+            });
+        });
+        // When clicking on an individual item row (set later) we delegate to sys.contextItemClick.
+        // The row event handlers will be attached when rows are built.
+    }
+    
+    update(entry) {
+        // Update stored entry and order.
+        this.entry = entry;
+        this.order = entry.value;
+        // Ensure requestItems is an array; if empty, use a default.
+        const reqItems = (this.order.requestItems && this.order.requestItems.length > 0)
+                            ? this.order.requestItems
+                            : [{ itemId: '', quantity: 0 }];
+        this.requestItems = reqItems;
+        
+        // Update overall title: "Contract X" (if entry key is numeric, use key+1)
+        let title = "Contract ";
+        if (!isNaN(this.entry.key)) {
+            title += (Number(this.entry.key) + 1);
+        } else {
+            title += this.entry.key;
+        }
+        if (this.detailsTitle.innerHTML !== title) {
+            this.detailsTitle.innerHTML = title;
+        }
+        
+        // Set background based on player class.
+        this.detailsTitle.style.background = "";
+        if (this.order.playerClassId === "vip") {
+            this.detailsTitle.style.background = "#007";
+        }
+        if (this.order.playerClassId === "landowner") {
+            this.detailsTitle.style.background = "#666600";
+        }
+        
+        // Update the per-item rows in the details-items container.
+        // If the number of rows differs from requestItems.length, rebuild.
+        if (this.detailsItems.childElementCount !== reqItems.length) {
+            this.detailsItems.innerHTML = "";
+            reqItems.forEach((item, idx) => {
+                // Build row structure.
+                let row = document.createElement('div');
+                row.className = "item-row";
+                row.style.width = "100%";
+                row.style.boxSizing = "border-box";
+                row.style.display = "flex";
+                row.style.alignItems = "center";
+                row.style.justifyContent = "space-between";
+                row.style.padding = "4px 0";
+                
+                let img = document.createElement('img');
+                img.className = "hud_icon_small";
+                img.style.marginRight = "6px";
+                
+                let textContainer = document.createElement('div');
+                textContainer.style.width = "100%";
+                textContainer.style.display = "flex";
+                textContainer.style.flexGrow = "1";
+                textContainer.style.justifyContent = "space-between";
+                textContainer.style.alignItems = "center";
+                
+                let itemTitleDiv = document.createElement('div');
+                let itemCostDiv = document.createElement('div');
+                
+                textContainer.appendChild(itemTitleDiv);
+                textContainer.appendChild(itemCostDiv);
+                
+                row.appendChild(img);
+                row.appendChild(textContainer);
+                
+                // Attach click event for this row.
+                row.addEventListener('click', () => {
+                    // On click, invoke contextItemClick with this request item.
+                    if (!reqItems[idx]) {
+                        console.warn('No current request item found.');
+                        return;
+                    }
+                    this.sys.contextItemClick(reqItems[idx].itemId);
+                });
+                // Attach mouseover/mouseout for highlighting.
+                row.addEventListener('mouseover', () => {
+                    this.highlightStorage(row.dataset.highlight_itm);
+                });
+                row.addEventListener('mouseout', () => {
+                    this.highlightStorage();
+                });
+                // Save index in dataset.
+                row.dataset.index = idx;
+                this.detailsItems.appendChild(row);
+            });
+        }
+        // Update each row based on current requestItems.
+        Array.from(this.detailsItems.children).forEach((row, idx) => {
+            let item = reqItems[idx];
+            let img = row.children[0];
+            let textContainer = row.children[1];
+            let itemTitleDiv = textContainer.children[0];
+            let itemCostDiv = textContainer.children[1];
+            
+            // Update image.
+            let expectedImg = this.sys.getItemImage(item.itemId) || "#";
+            if (img.src !== expectedImg) {
+                img.src = expectedImg;
+            }
+            
+            // Compute inventory counts.
+            const itemInv = this.sys.importAppFunction('inventory.have')(item.itemId);
+            const itemStor = this.sys.importAppFunction('storage.have')(item.itemId);
+            const itemHave = itemInv + itemStor;
+            
+            // Build title text.
+            let expectedTitle = itemHave + "/" + item.quantity + "&nbsp;" + this.sys.getItemName(item.itemId);
+            if (itemTitleDiv.innerHTML !== expectedTitle) {
+                itemTitleDiv.innerHTML = expectedTitle;
+            }
+            
+            // Compute cost or craft text.
+            let price = this.sys.importAppFunction('market.price')(item.itemId);
+            let expectedCost = "";
+            if (price === 0) {
+                expectedCost = (item.quantity - itemHave > 0) ? "Craft " + (item.quantity - itemHave) + "!" : "";
+            } else {
+                let missing = Math.max(0, item.quantity - itemHave);
+                expectedCost = `<img class="hud_icon_small" src="${this.sys.getCurrencyData('cur_coins').sprite.image}">&nbsp;` +
+                               this.sys.formatCurrency(price * missing);
+            }
+            if (itemCostDiv.innerHTML !== expectedCost) {
+                itemCostDiv.innerHTML = expectedCost;
+            }
+            
+            // Adjust title styling based on inventory.
+            let titleColor = "";
+            if (itemHave >= item.quantity) {
+                titleColor = '#F0E68C';
+            }
+            if (itemInv >= item.quantity) {
+                titleColor = '#17B169';
+                itemTitleDiv.style.fontWeight = "900";
+            } else {
+                itemTitleDiv.style.fontWeight = "normal";
+            }
+            if (itemTitleDiv.style.color !== titleColor) {
+                itemTitleDiv.style.color = titleColor;
+            }
+            
+            // Update row dataset for highlighting.
+            row.dataset.highlight_itm = item.itemId;
+        });
+        
+        // Update countdown display.
+        if (this.order.deliveredAt) {
+            let finishTime = this.order.deliveredAt + this.order.deliveryTime;
+            let countdownText = "";
+            if (finishTime > Date.now()) {
+                countdownText = (this.requestItems[0].itemId === '') ? "Order slot maxed out!" : "Delivered in " + this.sys.formatRelativeTime(finishTime);
+            } else {
+                countdownText = "New order ready!";
+            }
+            if (this.countdownElem.innerHTML !== countdownText) {
+                this.countdownElem.innerHTML = countdownText;
+            }
+            this.countdownElem.style.display = "block";
+            // Hide order details if delivered.
+            this.root.querySelector('.order').style.display = "none";
+        } else {
+            this.root.querySelector('.order').style.display = "flex";
+            this.countdownElem.style.display = "none";
+        }
+    }
+}
+
+/**********************************
+ * ContractsWidget
+ **********************************
+ * This widget wraps the entire contracts view.
+ * It uses our global HUDInteractiveList with ContractListItemWidget as the item widget.
+ */
+class ContractsWidget extends HUDWidget {
+    constructor(sys, orders = [], resetTime = 0) {
+        const template = `
+            <div class="contracts-widget">
+                <div class="list-container"></div>
+                <div class="reset-display"></div>
+            </div>
+        `;
+        super(sys, { template });
+        this.listContainer = this.root.querySelector('.list-container');
+        this.resetDisplay = this.root.querySelector('.reset-display');
+        this.resetTime = resetTime;
+        // Create the interactive list using the globally available HUDInteractiveList.
+        this.interactiveList = new HUDInteractiveList(sys, {
+            data: orders,
+            itemWidgetClass: ContractListItemWidget
+        });
+        this.listContainer.appendChild(this.interactiveList.root);
+        this.update({ orders, resetTime });
+    }
+    
+    update({ orders, resetTime }) {
+        this.resetTime = resetTime;
+        this.interactiveList.update(orders);
+        this.resetDisplay.textContent = "Next reset: " + this.sys.formatRelativeTime(resetTime);
+    }
+    
+    destroy() {
+        this.interactiveList.destroy();
+        super.destroy();
+    }
+}
+
+/**********************************
+ * ContractsApp Implementation
+ **********************************/
+
 export default class ContractsApp extends NerdHudApp {
     constructor(sys) {
         super(sys);
         this.name = "contracts";
         this.orders = [];
-        this._order_cache = {};
+        // We no longer need _order_cache as the widget system handles caching.
         this.reset_time = 0;
         this.levels = null;
+        this.contractsWidget = null;
     }
+    
     event(type, data) {
         super.event(type, data);
-        if (type == "contracts") {
-            // if an order was delivered between this taskboard update and the previous one, send an event
-            for (let i=0; i<this.orders.length; i++) {
+        if (type === "contracts") {
+            // If any contract was delivered, dispatch events.
+            for (let i = 0; i < this.orders.length; i++) {
                 let old_order = this.orders[i];
                 let new_order = data.orders[i];
-
-                if ((!old_order.deliveredAt) && (new_order.deliveredAt)) {
+                if ((!old_order?.deliveredAt) && (new_order?.deliveredAt)) {
                     this.dispatchEvent('contract_delivered', new_order);
                     this.dispatchEvent('report_contract', {
                         levels: this.levels,
                         contracts: data
                     });
                 }
-
-               
             }
-
             this.orders = data.orders;
             this.reset_time = data.nextReset;
-
-            this.updateOrders();
+            if (this.contractsWidget) {
+                this.contractsWidget.update({ orders: this.orders, resetTime: this.reset_time });
+            }
             this.save();
         }
-        if (type == "update") {
-            this.updateOrders();
-
+        if (type === "update" || type === "inventory" || type === "set_storage") {
+            if (this.contractsWidget) {
+                this.contractsWidget.update({ orders: this.orders, resetTime: this.reset_time });
+            }
             const settings = this.getSettings();
-            if (this.settings.remove_refresh == true) {
+            if (settings.remove_refresh === true) {
                 document.querySelector('.commons_pushbutton__7Tpa3.SellOrdersResetButton_paidResetButton__T5c4x')?.remove();
-            
-                
             }
         }
-        if (type == "inventory") {
-            this.updateOrders();
-        }
-        if (type == "set_storage") {
-            this.updateOrders();
-        }
-        if (type == "levels") {
+        if (type === "levels") {
             this.levels = data;
         }
     }
+    
     onCreate() {
         super.onCreate();
-        this.window = this.sys.createWindow({ 
+        this.window = this.sys.createWindow({
             docked: "left",
             icon: "img/nhud_icon_contracts.png",
             name: "contracts",
             title: "Contracts"
         });
         this.window.dataset.placeholder = "Visit the harbour to register contracts here!";
-
         this.exportAppFunction("requested", (item) => {
             return this.getRequested(item);
         });
-
+        // Create and attach the ContractsWidget.
+        this.contractsWidget = new ContractsWidget(this.sys, this.orders, this.reset_time);
+        this.window.appendChild(this.contractsWidget.root);
+        
+        // Set up a MutationObserver to remove the refresh button if needed.
         const observer = new MutationObserver(() => {
             const button = document.querySelector('.commons_pushbutton__7Tpa3.SellOrdersResetButton_paidResetButton__T5c4x');
             if (button) {
                 button.remove();
             }
         });
+        // (Observer configuration would be added here as needed.)
     }
+    
     declareSettings() {
         return {
             title: 'Contracts',
@@ -87,307 +388,26 @@ export default class ContractsApp extends NerdHudApp {
             ]
         }
     }
+    
     onSave() {
         return {
             orders: this.orders,
             reset_time: this.reset_time
-        }
+        };
     }
+    
     onLoad(data) {
         this.orders = data.orders;
         this.reset_time = data.reset_time;
-        this.updateOrders();
-    }
-    updateOrders() {
-        for (let i=0; i<this.orders.length; i++) {
-            let order = this.orders[i];
-            this.updateOrderItem(i, order);
+        if (this.contractsWidget) {
+            this.contractsWidget.update({ orders: this.orders, resetTime: this.reset_time });
         }
     }
-    updateOrderItem(slot, order) {
-        let have_inventory = this.importAppFunction('inventory.have');
-        let have_storage = this.importAppFunction('storage.have');
-        let highlight_storage = this.importAppFunction('storage.highlight');
-        let price = this.importAppFunction('market.price');
-        let add = this.importAppFunction('shoppinglist.add_direct');
     
-        // Ensure we have an array of request items (or a default item)
-        let request_items = (order.requestItems && order.requestItems.length > 0)
-                            ? order.requestItems
-                            : [{ itemId: '', quantity: 0 }];
-    
-        // Use the first request item for order-level info (e.g. click and delivery status)
-        let first_request = request_items[0];
-        let in_inventory = have_inventory(first_request.itemId);
-        let in_storage = have_storage(first_request.itemId);
-        let have = in_inventory + in_storage;
-    
-        let order_slot = this._order_cache[slot];
-        if (!order_slot) {
-            let elements = {
-                main: document.createElement('div'),
-                order: document.createElement('div'),
-                details: document.createElement('div'),
-                // Overall order title: displays "Contract X"
-                details_title: document.createElement('div'),
-                // Container for rows corresponding to each request item
-                details_items: document.createElement('div'),
-                // Container for buttons
-                details_buttons: document.createElement('div'),
-                countdown: document.createElement('div')
-            };
-    
-            // Make each order fill available width and add spacing between orders.
-            elements.main.style.width = "calc(100% - 16px)";
-            elements.main.style.paddingBottom = "8px";
-    
-            // Ensure the order container also fills its parent.
-            elements.order.style.width = "100%";
-            elements.order.style.boxSizing = "border-box";
-    
-            elements.details.style.width = "100%";
-            elements.details.style.boxSizing = "border-box";
-    
-            // Build overall structure.
-            elements.order.appendChild(elements.details);
-            elements.details.appendChild(elements.details_title);
-            elements.details.appendChild(elements.details_items);
-            // Append the buttons container after the items.
-            elements.details.appendChild(elements.details_buttons);
-            elements.main.appendChild(elements.order);
-            elements.main.appendChild(elements.countdown);
-    
-            elements.main.className = "hud_interactive_list";
-            elements.order.style.padding = "6px";
-            elements.order.className = "hud_interactive_list_item";
-    
-            // Force details_items to fill available width.
-            elements.details_items.style.width = "100%";
-            elements.details_items.style.boxSizing = "border-box";
-    
-            // Setup countdown styling.
-            let countdown = elements.countdown;
-            countdown.style.textAlign = "center";
-            countdown.style.color = '#aaa';
-            countdown.style.padding = "11px";
-            countdown.style.paddingBottom = "11px";
-    
-            // Set up the buttons container styling.
-            elements.details_buttons.style.display = "flex";
-            elements.details_buttons.style.gap = "4px";  // space between buttons
-    
-            // Create "Buy all" button.
-            let btnBuyAll = document.createElement('div');
-            btnBuyAll.className = "hud_button";
-            btnBuyAll.innerHTML = "Buy all";
-            // Create "Buy missing" button.
-            let btnBuyMissing = document.createElement('div');
-            btnBuyMissing.className = "hud_button";
-            btnBuyMissing.innerHTML = "Buy missing";
-    
-            // Append buttons to container.
-            elements.details_buttons.appendChild(btnBuyAll);
-            elements.details_buttons.appendChild(btnBuyMissing);
-    
-            // Attach event listener for "Buy all"
-            btnBuyAll.addEventListener('click', (e) => {
-                e.stopPropagation();
-                // Always use the latest request items.
-                let reqItems = order_slot.request_items || request_items;
-                reqItems.forEach(item => {
-                    // Skip items that cannot be bought on the market.
-                    if (price(item.itemId) === 0) return;
-                    add(item.itemId, item.quantity);
-                });
-            });
-            // Attach event listener for "Buy missing"
-            btnBuyMissing.addEventListener('click', (e) => {
-                e.stopPropagation();
-                let reqItems = order_slot.request_items || request_items;
-                reqItems.forEach(item => {
-                    if (price(item.itemId) === 0) return;
-                    let haveVal = have_inventory(item.itemId) + have_storage(item.itemId);
-                    let missing = item.quantity - haveVal;
-                    if (missing > 0) {
-                        add(item.itemId, missing);
-                    }
-                });
-            });
-    
-            this.window.appendChild(elements.main);
-            order_slot = this._order_cache[slot] = elements;
-        }
-    
-        // Always update the cached request items so event listeners have current data.
-        order_slot.request_items = request_items;
-    
-        // Update overall title to "Contract X" (using slot index + 1)
-        let newTitle = "Contract " + (Number(slot) + 1);
-        if (order_slot.details_title.innerHTML !== newTitle) {
-            order_slot.details_title.innerHTML = newTitle;
-        }
-    
-        // Set background based on player class.
-        order_slot.details_title.style.background = "";
-        if (order.playerClassId === "vip") {
-            order_slot.details_title.style.background = "#007";
-        }
-        if (order.playerClassId === "landowner") {
-            order_slot.details_title.style.background = "#666600";
-        }
-    
-        // Update the per-item rows.
-        let container = order_slot.details_items;
-        if (container.childElementCount !== request_items.length) {
-            // If count doesn't match, rebuild the rows.
-            container.innerHTML = "";
-            request_items.forEach((item) => {
-                let row = document.createElement('div');
-                // Set each row to fill available width.
-                row.style.width = "100%";
-                row.style.boxSizing = "border-box";
-                row.style.display = "flex";
-                row.style.alignItems = "center";
-                row.style.justifyContent = "space-between";
-                row.style.padding = "4px 0";
-    
-                // Create image element.
-                let img = document.createElement('img');
-                img.className = "hud_icon_small";
-                img.style.marginRight = "6px";
-    
-                // Create a container for text.
-                let textContainer = document.createElement('div');
-                textContainer.style.width = "100%";
-                textContainer.style.display = "flex";
-                textContainer.style.flexGrow = "1";
-                textContainer.style.justifyContent = "space-between";
-                textContainer.style.alignItems = "center";
-    
-                let itemTitleDiv = document.createElement('div');
-                let itemCostDiv = document.createElement('div');
-    
-                textContainer.appendChild(itemTitleDiv);
-                textContainer.appendChild(itemCostDiv);
-    
-                row.appendChild(img);
-                row.appendChild(textContainer);
-    
-                // Add click handler for this row.
-                row.addEventListener('click', () => {
-                    let idx = parseInt(row.dataset.index);
-                    let currentReqItems = this.orders[slot]?.requestItems;
-                    if (!currentReqItems || !currentReqItems[idx]) {
-                        console.warn('No current request item found.');
-                        return;
-                    }
-                    this.sys.contextItemClick(currentReqItems[idx].itemId);
-                });
-                row.addEventListener('mouseover', () => {
-                    // For hover highlight, we assume the first item in the container (if available).
-                    highlight_storage(row.dataset.highlight_itm);
-                });
-                row.addEventListener('mouseout', () => {
-                    highlight_storage();
-                });
-    
-                container.appendChild(row);
-            });
-        }
-        // Now update each row based on request_items.
-        Array.from(container.children).forEach((row, index) => {
-            let item = request_items[index];
-            // Get the image and text container from row.
-            let img = row.children[0];
-            let textContainer = row.children[1];
-            let itemTitleDiv = textContainer.children[0];
-            let itemCostDiv = textContainer.children[1];
-    
-            // Get expected image source.
-            let expectedImgSrc = this.sys.getItemImage(item.itemId) || "#";
-            if (img.src !== expectedImgSrc) {
-                img.src = expectedImgSrc;
-            }
-    
-            // Compute inventory counts for this item.
-            let item_inventory = have_inventory(item.itemId);
-            let item_storage = have_storage(item.itemId);
-            let item_have = item_inventory + item_storage;
-    
-            // Build title text.
-            let expectedTitle = item_have + "/" + item.quantity + "&nbsp;" +
-                                this.sys.getItemName(item.itemId);
-            if (itemTitleDiv.innerHTML !== expectedTitle) {
-                itemTitleDiv.innerHTML = expectedTitle;
-            }
-    
-            // Compute cost/craft text.
-            let expectedCost = "";
-            if (price(item.itemId) === 0) {
-                expectedCost = (item.quantity - item_have > 0)?"Craft " + (item.quantity - item_have) + "!":"";
-            } else {
-                // Calculate missing amount and clamp to 0.
-                let missing = item.quantity - item_have;
-                if (missing < 0) missing = 0;
-                expectedCost = "<img class=\"hud_icon_small\" src=\"" +
-                               this.sys.getCurrencyData('cur_coins').sprite.image +
-                               "\">&nbsp;" + this.sys.formatCurrency(price(item.itemId) * missing);
-            }
-            // Adjust title styling based on inventory.
-            let titleColor = "";
-            if (item_have >= item.quantity) {
-                titleColor = '#F0E68C';
-            }
-            if (item_inventory >= item.quantity) {
-                titleColor = '#17B169';
-                itemTitleDiv.style.fontWeight = "900";
-            } else {
-                itemTitleDiv.style.fontWeight = "normal";
-            }
-            if (itemTitleDiv.style.color !== titleColor) {
-                itemTitleDiv.style.color = titleColor;
-            }
-            if (itemCostDiv.innerHTML !== expectedCost) {
-                itemCostDiv.innerHTML = expectedCost;
-            }
-            // Update the row's dataset for hover highlighting.
-            row.dataset.highlight_itm = item.itemId;
-            row.dataset.index = index;
-        });
-    
-        // Update the deliveredAt countdown if present.
-        let countdown_text = "";
-        if (order.deliveredAt) {
-            let finish_time = order.deliveredAt + order.deliveryTime;
-            if (finish_time > Date.now()) {
-                if (first_request.itemId === '') {
-                    countdown_text = "Order slot maxed out!";
-                } else {
-                    countdown_text = "Delivered in " + this.sys.formatRelativeTime(finish_time);
-                }
-            } else {
-                countdown_text = "New order ready!";
-            }
-            if (order_slot.countdown.innerHTML !== countdown_text) {
-                order_slot.countdown.innerHTML = countdown_text;
-            }
-            if (order_slot.countdown.style.display !== "block") {
-                order_slot.countdown.style.display = "block";
-                order_slot.order.style.display = "none";
-            }
-        } else {
-            if (order_slot.order.style.display !== "flex") {
-                order_slot.order.style.display = "flex";
-                order_slot.countdown.style.display = "none";
-            }
-        }
-    }
-       
     getRequested(item) {
         let amount = 0;
-        for (let i=0; i<this.orders.length; i++) {
-            let order = this.orders[i];
-            if(order?.requestItems[0]?.itemId == item) {
+        for (let order of this.orders) {
+            if (order?.requestItems[0]?.itemId === item) {
                 amount += order.requestItems[0].quantity;
             }
         }
