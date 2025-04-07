@@ -34,13 +34,6 @@ export default class ContractsApp extends NerdHudApp {
         }
         if (type == "update") {
             this.updateOrders();
-
-            const settings = this.getSettings();
-            if (this.settings.remove_refresh == true) {
-                document.querySelector('.commons_pushbutton__7Tpa3.SellOrdersResetButton_paidResetButton__T5c4x')?.remove();
-            
-                
-            }
         }
         if (type == "inventory") {
             this.updateOrders();
@@ -65,27 +58,6 @@ export default class ContractsApp extends NerdHudApp {
         this.exportAppFunction("requested", (item) => {
             return this.getRequested(item);
         });
-
-        const observer = new MutationObserver(() => {
-            const button = document.querySelector('.commons_pushbutton__7Tpa3.SellOrdersResetButton_paidResetButton__T5c4x');
-            if (button) {
-                button.remove();
-            }
-        });
-    }
-    declareSettings() {
-        return {
-            title: 'Contracts',
-            settings: [
-                {
-                    name: 'Remove Contracts Refresh Button',
-                    var: 'remove_refresh',
-                    type: 'bool',
-                    default: false,
-                    description: 'Removes the refresh button in Merchant Fleets to prevent accidental refreshes. (Requires reload to take effect.)'
-                }
-            ]
-        }
     }
     onSave() {
         return {
