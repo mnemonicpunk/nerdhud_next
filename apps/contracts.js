@@ -18,7 +18,10 @@
                     <div class="details" style="width: 100%; box-sizing: border-box;">
                         <div class="details-title"></div>
                         <div class="details-items" style="width: 100%; box-sizing: border-box;"></div>
-                        <div class="details-buttons" style="display: flex; gap: 4px;"></div>
+                        <div class="details-buttons" style="display: flex; gap: 4px;">
+                            <div class="hud_button buy_all_btn">Buy all</div>
+                            <div class="hud_button buy_missing_btn">Buy missing</div>
+                        </div>
                     </div>
                 </div>
                 <div class="countdown" style="text-align: center; color: #aaa; padding: 11px; padding-bottom: 11px;"></div>
@@ -41,22 +44,10 @@
         this.detailsItems = this.root.querySelector('.details-items');
         this.detailsButtons = this.root.querySelector('.details-buttons');
         this.countdownElem = this.root.querySelector('.countdown');
+        this.btnBuyAll = this.root.querySelector('.buy_all_btn');
+        this.btnBuyMissing = this.root.querySelector('.buy_missing_btn');
     }
-    
-    create() {
-        // Create the two buttons and add them to the buttons container.
-        this.btnBuyAll = document.createElement('div');
-        this.btnBuyAll.className = "hud_button";
-        this.btnBuyAll.innerHTML = "Buy all";
-        
-        this.btnBuyMissing = document.createElement('div');
-        this.btnBuyMissing.className = "hud_button";
-        this.btnBuyMissing.innerHTML = "Buy missing";
-        
-        this.detailsButtons.appendChild(this.btnBuyAll);
-        this.detailsButtons.appendChild(this.btnBuyMissing);
-    }
-    
+
     bindEvents() {
         // Import functions needed for highlighting and adding items.
         this.highlightStorage = this.sys.importAppFunction('storage.highlight');
@@ -268,8 +259,8 @@ class ContractsWidget extends HUDWidget {
     constructor(sys, orders = [], resetTime = 0) {
         const template = `
             <div class="contracts-widget">
-                <div class="list-container"></div>
                 <div class="reset-display"></div>
+                <div class="list-container"></div>
             </div>
         `;
         super(sys, { template });

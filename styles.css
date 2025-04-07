@@ -385,6 +385,31 @@
   margin-left: 5px;
 }
 
+.hud-collapsible-pane {
+  padding: 6px;
+  background-color: var(--nhud-interactive-pane-bg);
+  border-radius: 11px;
+  margin-top: 11px;
+  margin-bottom: 11px;
+}
+
+.hud-collapsible-pane:hover {
+  background-color: var(--nhud-interact-bg);
+}
+
+.pane-header {
+  font-weight: bold;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  text-align: center;
+  padding: 6px;
+  border-bottom: 3px solid var(--nhud-window-border);
+}
+
+.panet-content {
+  margin-left: 5px;
+}
+
 .hud_data_table {
   padding: 6px;
   background-color: var(--nhud-interactive-pane-bg);
