@@ -663,52 +663,53 @@ class NerdHUD {
     }
     adjustDocks() {
         const slidingGroup = document.querySelector('.Hud_slidingGroup__ZaO10');
-        const leftDock = this.dock_left
-        const rightDock = this.dock_right; 
-        const leftWindow = this.windows_left;
-        const rightWindow = this.windows_right;
+        const leftDock     = this.dock_left;
+        const rightDock    = this.dock_right; 
+        const leftWindow   = this.windows_left;
+        const rightWindow  = this.windows_right;
     
         if (!slidingGroup || !leftDock || !rightDock || !leftWindow || !rightWindow) {
             return;
         }
     
-        // Get sliding group dimensions
-        const groupRect = slidingGroup.getBoundingClientRect();
-        const screenWidth = window.innerWidth;
-
-        // Check if the screen is wide enough to let CSS handle everything
-        const isWideEnough = screenWidth >= (groupRect.width + leftDock.offsetWidth + rightDock.offsetWidth);
-
-        if (isWideEnough) {
-            // Allow CSS to handle positioning
+        // 1) Measure…
+        const groupRect   = slidingGroup.getBoundingClientRect();
+        const screenW     = window.innerWidth;
+        const screenH     = window.innerHeight;
+        const dockW       = leftDock.offsetWidth + rightDock.offsetWidth;
+    
+        // 2) Compute flags
+        const isWideEnough = screenW >= (groupRect.width + dockW);
+        const isMobile     = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+        const isBigGroup   = groupRect.width > (screenW * 0.5);
+    
+        // 3) If there’s room AND we’re NOT on mobile AND the group is not too big, let CSS do its thing
+        if (!isMobile && !isBigGroup && isWideEnough) {
             [leftDock, rightDock, leftWindow, rightWindow].forEach(el => {
                 el.style.position = '';
-                el.style.bottom = '';
+                el.style.bottom   = '';
             });
             this.is_narrow_screen = false;
             return;
         }
-
+    
+        // 4) Otherwise: “push the docks up” by exactly your old code
         this.is_narrow_screen = true;
-
-        // Calculate the bottom position for docks
-        const dockBottom = window.innerHeight - groupRect.top + 11; // Distance from the bottom of the viewport
-        const windowBottom = dockBottom + (leftDock.offsetHeight || 0) + 6; // Windows stack above docks with 6px spacing
-
-        // Position docks
-        leftDock.style.position = 'absolute';
-        leftDock.style.bottom = `${dockBottom}px`;
-
-        rightDock.style.position = 'absolute';
-        rightDock.style.bottom = `${dockBottom}px`;
-
-        // Position windows
-        leftWindow.style.position = 'absolute';
-        leftWindow.style.bottom = `${windowBottom}px`;
-
-        rightWindow.style.position = 'absolute';
-        rightWindow.style.bottom = `${windowBottom}px`;
-    }
+    
+        // distance from viewport bottom to top of sliding group, plus 11px gap
+        const dockBottom   = screenH - groupRect.top;
+        // stack windows above docks with 6px gap
+        const windowBottom = dockBottom;
+    
+        [leftDock, rightDock].forEach(d => {
+            d.style.position = 'absolute';
+            d.style.bottom   = `${dockBottom}px`;
+        });
+        [leftWindow, rightWindow].forEach(w => {
+            w.style.position = 'absolute';
+            w.style.bottom   = `${windowBottom}px`;
+        });
+    }    
     showDock(state, dock = "both") {
         if (!dock) { return; }
 

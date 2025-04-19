@@ -328,35 +328,39 @@
 
 #nerd_dock_left {
   position: absolute;
-  height: 32px;
-  left: 20px;
-  bottom: 20px;
+  width: 32px;
+  left: 10px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
 #nerd_dock_right {
   position: absolute;
-  height: 32px;
-  right: 20px;
-  bottom: 20px;
+  width: 32px;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
 }
 
 #nerd_windows_left {
   position: absolute;
-  left: 20px;
-  bottom: 68px;
+  left: 47px;
+  bottom: 10px;
   white-space: nowrap;
 }
 
 #nerd_windows_right {
   position: absolute;
-  right: 20px;
-  bottom: 68px;
+  right: 47px;
+  bottom: 10px;
   white-space: nowrap;
 }
 
 .nerd_dock_icon {
-  width: 48px;
-  height: 48px;
+  width: 32px;
+  height: 32px;
   pointer-events: all;
 }
 
