@@ -251,8 +251,10 @@ class NerdHUD {
             height: 0
         }
 
-        /*if (undefined !== libpixels) {
+        /*try {
             libpixels.debug_message = true;
+        } catch(e) {
+            console.log("Can't enable debug logging before installation of libpixels");
         }*/
 
         // create loading screen logo
@@ -319,7 +321,7 @@ class NerdHUD {
         ui_root.id = 'nerd-hud-ui';
         document.body.appendChild(ui_root);
 
-        document.querySelector('#game-container').addEventListener('mousemove', e => {
+        document.querySelector('#game-container')?.addEventListener('mousemove', e => {
             var rect = e.target.getBoundingClientRect();
             var x = e.clientX - rect.left; //x position within the element.
             var y = e.clientY - rect.top;  //y position within the element.
@@ -1384,6 +1386,26 @@ class NerdHUD {
         let screenY = (y - coords.y) * coords.zoom;
 
         return { x: screenX, y: screenY };
+    }
+    toWorldCoords(argX, argY) {
+        if (!this.camera) {
+            return { x: 0, y: 0 };
+        }
+        const { x: camX, y: camY, zoom } = this.camera;
+    
+        // allow either toWorldCoords(x, y) or toWorldCoords({x, y})
+        let screenX, screenY;
+        if (typeof argX === 'object') {
+            ({ x: screenX, y: screenY } = argX);
+        } else {
+            screenX = argX;
+            screenY = argY;
+        }
+    
+        return {
+            x: screenX / zoom + camX,
+            y: screenY / zoom + camY
+        };
     }
     boundsToScreenCoords(bounds) {
         if (!this.camera) {

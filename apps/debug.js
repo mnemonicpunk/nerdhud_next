@@ -25,9 +25,11 @@ export default class DebugApp extends NerdHudApp {
         }
     }
     /*draw(ctx, width, height) {
-        let rect = this.sys._inventory_dimensions;
-        ctx.strokeStyle = '#f00';
-        ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+          let x = this.sys.mouse_x;
+        let y = this.sys.mouse_y;
+        let world = this.sys.toWorldCoords(x, y);
+
+        this.drawTextCentered(ctx, `${world.x}/${world.y}`, x+60, y+60, '#fff', '#000');
     }*/
     /*onDrawPlayer(ctx, entity, bounds) {
         ctx.fillStyle = "#fff";

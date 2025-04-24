@@ -440,6 +440,7 @@ export default class ItemInfoApp extends NerdHudApp {
         for (let i in lib.achievements) {
             let recipe = lib.achievements[i];
             let result = recipe.craftable?.result?.items;
+            if (!recipe?.craftable?.energy) { continue; }
             if (!result) { continue; }
             for (let r = 0; r < result.length; r++) {
                 if (result[r].id == item) {
