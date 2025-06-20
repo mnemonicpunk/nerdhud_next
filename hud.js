@@ -1645,6 +1645,7 @@ class NerdHUD {
             "pixelsNFTFarm-(\\d{1,4})": match => "NFT Land #" + match[1],
             "nftHouse(\\d{1,4})": match => "NFT House #" + match[1],
             "terravilla": () => "Terravilla",
+            "TerravillaPier": () => "Beach",
             "carnival": () => "Carnival",
             "tutorialhouse": () => "Karen's house",
             "shareRent(\\d{1,6})": () => "Speck",

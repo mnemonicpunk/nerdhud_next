@@ -1,12 +1,13 @@
 {
     "libPixels": {
         "url": "lib/libPixels.js",
-        "version": "0.2.22"
+        "version": "0.2.26"
     },
     "repo": "builtin:",
     "hud": "hud.js",
     "style": "styles.css",
     "apps": [
+        "apps/shorelime.js",
         "apps/inventory.js",
         "apps/market.js",
         "apps/debug.js",
@@ -19,7 +20,6 @@
         "apps/timer.js",
         "apps/report.js",
         "apps/nerdmenu.js",
-        "apps/notification.js",
-        "apps/gw.js"
+        "apps/notification.js"
     ]
 }

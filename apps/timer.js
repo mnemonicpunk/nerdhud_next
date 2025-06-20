@@ -33,6 +33,14 @@ export default class TimerApp extends NerdHudApp {
             this.removeTimer(data.mid);
             this.save();
         }
+        if (type == "event_crop_planted") {
+            this.addTimer("crop", data.mid, this.sys.getCurrentMap(), data.generic.trackers.fruitItem, 1, (Date.now() + (60000 * data.generic.trackers.minutesNeeded)));
+            this.save();
+        }
+        if (type == "event_crop_picked") {
+            this.removeTimer(data.mid);
+            this.save();
+        }
         if (type == "industry_started") {
             let craft_result = this.sys.getCraftResult(data.generic?.trackers?.myCraftItem);
             this.addTimer("industry", data.mid, this.sys.getCurrentMap(), craft_result.id, craft_result.quantity, data.generic?.trackers?.myCraftFinish);
