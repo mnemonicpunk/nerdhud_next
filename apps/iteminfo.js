@@ -299,6 +299,8 @@ export default class ItemInfoApp extends NerdHudApp {
             }
             // END CRAFTING
 
+            
+
             let shopping_list_btn = document.createElement('div');
             shopping_list_btn.className = "hud_button";
             shopping_list_btn.innerHTML = "Add to shopping list";
@@ -318,6 +320,19 @@ export default class ItemInfoApp extends NerdHudApp {
             
             this.elements.info.appendChild(details);
             this.elements.info.appendChild(crafting);
+
+            // if it is a UGC show the "open in UGC viewer" button
+            if (item.startsWith("itm_ugc-")) {
+                let ugc_btn = document.createElement('div');
+                ugc_btn.className = "hud_button";
+                ugc_btn.innerHTML = "Open in UGC Viewer";
+                ugc_btn.addEventListener('click', () => {
+                    // open a new tab to https://pixels-ugcs.xyz/ugcs/insights.html?ugc=$item
+                    window.open("https://pixels-ugcs.xyz/ugcs/insights.html?ugc=" + item, '_blank');
+                });
+                this.elements.info.appendChild(ugc_btn);
+            }
+
             this.elements.info.appendChild(shopping_list_btn);
             this.elements.info.appendChild(bts);
         }
