@@ -428,6 +428,11 @@ export default class TimerApp extends NerdHudApp {
             let group_el = land_el.querySelector('.hud_window_group_entries').querySelector('[data-key="' + i + '"]');
 
             if (!group_el) {
+                // sanity checks to prevent malformed timers from being displayed
+                if ((!group[0].start_time) || (!group[0].finish_time) || (group[0].start_time > group[0].finish_time)) {
+                    continue;
+                }
+
                 group_el = document.createElement('div');
                 group_el.className = 'hud_window_group_entry';
                 group_el.dataset.key = i;
@@ -616,6 +621,12 @@ export default class TimerApp extends NerdHudApp {
             elapsed: false,
             options
         }
+
+        if (!timer.mid || !timer.start_time || !timer.finish_time || timer.start_time > timer.finish_time) {
+            console.warn("Invalid timer data for", type, mid, map, item, quantity, time);
+            return null;
+        }
+
         this.timers[mid] = timer;
     }
     getGroupOfTimer(mid) {
