@@ -247,6 +247,23 @@ export default class TimerApp extends NerdHudApp {
     highlightMids(mids) {
         this.highlights = mids;
     }
+
+    getTimeBasedColor(remainingTimeMs) {
+        const ONE_MINUTE_MS = 60 * 1000;
+        const FIVE_MINUTES_MS = 5 * ONE_MINUTE_MS;
+        const FIFTEEN_MINUTES_MS = 15 * ONE_MINUTE_MS; 
+
+        if (remainingTimeMs <= ONE_MINUTE_MS) {
+            return "#FF0000"; // Merah terang
+        } else if (remainingTimeMs <= FIVE_MINUTES_MS) {
+            return "#FFA500"; // Oranye terang
+        } else if (remainingTimeMs <= FIFTEEN_MINUTES_MS) {
+            return "#FFFF00"; // Kuning terang
+        } else {
+            return "#2eb025ff"; // Hijau terang
+        }
+    }
+
     onDrawEntity(ctx, entity, bounds, camera) {
         const settings = this.getSettings();
 
@@ -258,24 +275,99 @@ export default class TimerApp extends NerdHudApp {
             ctx.fillRect(bounds.x - bounds.width/2, bounds.y - bounds.height/2, bounds.width, bounds.height);
         }
 
-        if ((this.timers[entity.mid]) && (!this.timers[entity.mid].elapsed)) {
+        let timerTimestamp = null;
+        let timerColor = null; 
+
+        // KASUS 1: Timer aktif yang dilacak (crop, industry)
+        if (this.timers[entity.mid] && !this.timers[entity.mid].elapsed) {
             if (settings.display_active_timers) {
-                let t = this.timestampToServerTime(this.timers[entity.mid].finish_time);
-                this.drawEntityTimer(ctx, bounds, entity, t, "#444");
-            }
-        } else {
-            if (settings.display_use_timers && entity.generic?.statics.finishTime) {
-                let t = this.timestampToServerTime(entity.generic?.statics.finishTime);
-                this.drawEntityTimer(ctx, bounds, entity, t, "#f44");
-            } else if (entity.generic?.statics.thetimer) {
-                let t = this.timestampToServerTime(entity.generic?.statics.thetimer);
-                this.drawEntityTimer(ctx, bounds, entity, t, "#f44");
-            } else if (entity.generic?.statics.firedUntil) {
-                let t = this.timestampToServerTime(entity.generic?.statics.firedUntil);
-                this.drawEntityTimer(ctx, bounds, entity, t, "#880");
+                timerTimestamp = this.timers[entity.mid].finish_time;
+                timerColor = this.getTimeBasedColor(timerTimestamp - Date.now());
             }
         }
+        // KASUS 2: Timer cooldown dari data entitas (mine, dll)
+        else {
+            let currentTime = Date.now();
+            
+            if (settings.display_use_timers && entity.generic?.statics.finishTime) {
+                timerTimestamp = entity.generic.statics.finishTime;
+                timerColor = this.getTimeBasedColor(timerTimestamp - currentTime);
+            }
+            // Ini adalah bagian spesifik untuk timer mine (thetimer)
+            else if (entity.generic?.statics.thetimer) {
+                timerTimestamp = entity.generic.statics.thetimer;
+                timerColor = this.getTimeBasedColor(timerTimestamp - currentTime);
+            }
+            else if (entity.generic?.statics.firedUntil) {
+                timerTimestamp = entity.generic.statics.firedUntil;
+                timerColor = this.getTimeBasedColor(timerTimestamp - currentTime);
+            }
+        }
+        
+        if (timerTimestamp && timerColor) {
+            // Panggil fungsi drawEntityTimer yang menggambar lingkaran
+            this.drawEntityTimer(ctx, bounds, entity, timerTimestamp); 
+        }
     }
+
+drawEntityTimer(ctx, bounds, entity, timestamp) {
+    let time = this.sys.formatRelativeTime(timestamp);
+    if (time === "") { return; }
+
+    let remainingTimeMs = timestamp - Date.now();
+    let dynamicColor = this.getTimeBasedColor(remainingTimeMs); 
+
+    ctx.font = "bold 30px Arial";
+    let dim = ctx.measureText(time);
+    let textHeight = dim.actualBoundingBoxAscent + dim.actualBoundingBoxDescent || 14;
+
+    let x = bounds.x;
+    
+    // UBAH BARIS INI: Hapus `+ bounds.height / 2` agar posisi vertikal pas di tengah entitas.
+    let y = bounds.y;
+
+    // Pengecualian untuk 'crops' tidak lagi diperlukan jika defaultnya sudah di tengah,
+    // tapi bisa dipertahankan jika Anda ingin posisi 'crops' berbeda.
+    if (entity.entity && entity.entity.includes("crops")) {
+        y = bounds.y; // Contoh: ini sekarang sama dengan default
+    }
+    
+    ctx.textBaseline = 'middle'; 
+
+    // --- (Sisa kode tidak perlu diubah) ---
+
+    // Menggambar Lingkaran 🎨
+    let padding = 100;
+    let circleRadius = Math.max(dim.width / 2 + padding, textHeight / 2 + padding);
+    let circleX = x;
+    let circleY = y;
+
+    ctx.beginPath();
+    ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2, false);
+    ctx.fillStyle = dynamicColor;
+    ctx.globalAlpha = 0.6;
+    ctx.fill();
+
+    // Garis tepi lingkaran
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.globalAlpha = 1;
+
+    // Menggambar Teks Waktu dengan outline
+    ctx.fillStyle = "#000000";
+    ctx.fillText(time, x - dim.width / 2 - 1, y);
+    ctx.fillText(time, x - dim.width / 2 + 1, y);
+    ctx.fillText(time, x - dim.width / 2, y - 1);
+    ctx.fillText(time, x - dim.width / 2, y + 1);
+
+    ctx.fillStyle = "#FFFFFF"; // Warna teks utama
+    ctx.fillText(time, x - dim.width / 2, y);
+    
+    ctx.textBaseline = 'alphabetic'; // Reset
+}
+
     draw(ctx, width, height) {
         const settings = this.getSettings();
         let timer_text = "";
@@ -318,52 +410,15 @@ export default class TimerApp extends NerdHudApp {
             }
             timer_text += bed_timer_text;
         }
-      
+        
         if (timer_text != "") {
-            /*let dim = ctx.measureText(timer_text);
-            ctx.fillStyle = "#000";
-
-            ctx.globalAlpha = 0.4;
-            ctx.fillRect(width/2-dim.width/2 -5, 5, dim.width + 10, 20);
-            ctx.globalAlpha = 1;
-
-            ctx.fillText(timer_text, width/2-dim.width/2 - 1, 20);
-            ctx.fillText(timer_text, width/2-dim.width/2 + 1, 20);
-            ctx.fillText(timer_text, width/2-dim.width/2, 20 - 1);
-            ctx.fillText(timer_text, width/2-dim.width/2, 20 + 1);
-
-            ctx.fillStyle = "#fff";
-            ctx.fillText(timer_text, width/2-dim.width/2, 20);*/
             this.drawTextCentered(ctx, timer_text, width/2, 20, '#fff', '#000');
         }
     }
-    drawEntityTimer(ctx, bounds, entity, timestamp, color) {
-        let time = this.sys.formatRelativeTime(timestamp);
-        if (time == "") { return; }
-        
-        let dim = ctx.measureText(time);
 
-        let x = bounds.x;
-        let y = bounds.y+bounds.height/2;
-        if (entity.entity.includes("crops")) {
-            y = bounds.y;
-        }
+    // 🗑️ FUNGSI INI DIHAPUS KARENA SUDAH ADA VERSI BARU DI ATAS
+    // drawEntityTimer(ctx, bounds, entity, timestamp, color) { ... }
 
-        ctx.fillStyle = color;
-        ctx.globalAlpha = 0.5;
-
-        ctx.fillRect(x - dim.width/2 - 2, y - 11, dim.width + 4, 16);
-
-        ctx.globalAlpha = 1;
-
-        ctx.fillStyle = "#000";
-        ctx.fillText(time, x - dim.width/2 - 1, y);
-        ctx.fillText(time, x - dim.width/2 + 1, y);
-        ctx.fillText(time, x - dim.width/2, y - 1);
-        ctx.fillText(time, x - dim.width/2, y + 1);
-        ctx.fillStyle = "#fff";
-        ctx.fillText(time, x - dim.width/2, y);
-    }
     updateTimers() {
         for (let i in this.timers) {
             let t = this.timers[i];
@@ -484,7 +539,7 @@ export default class TimerApp extends NerdHudApp {
                                 ctx.drawImage(
                                     img, 
                                     0, 0, w, h, // Source (left side)
-                                    0, 0, 32, 32                // Destination (scaled to 32x32)
+                                    0, 0, 32, 32          // Destination (scaled to 32x32)
                                 );
 
                                 img.removeEventListener('load', load_func);
@@ -533,7 +588,7 @@ export default class TimerApp extends NerdHudApp {
                     } else {
                         name = this.sys.getEntityName(group[0].item);
                     }
-        
+    
                     let confirm_text = "Really delete timer for  " + name + " x" + group.length + "?";
 
                     if (confirm(confirm_text)) {
